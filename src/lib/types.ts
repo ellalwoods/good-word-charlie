@@ -21,6 +21,7 @@ export interface Word {
   definition: string;
   example: string;
   confusable?: { word: string; note: string };
+  groups?: string[];   // meaning groups; words sharing one are never used as each other's wrong options
   questions: Question[];
 }
 

@@ -21,11 +21,21 @@ export function filled(prompt: string, answer: string): string {
   return prompt.replace(GAP, answer).replace(/\{[^}]*\}/, answer);
 }
 
-const mentions = (text: string, word: string) => new RegExp(`\\b${word}\\b`, 'i').test(text);
+/** True if the text uses the word or a regular inflection of it (glut, gluts; mitigate, mitigated, mitigating; tally, tallies). */
+export function mentions(text: string, word: string): boolean {
+  const e = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const forms = [`${e}(s|es|d|ed|ing)?`];
+  if (word.endsWith('e')) forms.push(`${e.slice(0, -1)}(ing|ed|es)`);
+  if (word.endsWith('y')) forms.push(`${e.slice(0, -1)}(ies|ied)`);
+  return new RegExp(`\\b(${forms.join('|')})\\b`, 'i').test(text);
+}
+
+const shareGroup = (a?: Word, b?: Word) => !!a?.groups && !!b?.groups && a.groups.some(g => b.groups!.includes(g));
 
 /** Problems with one entry; an empty list means it can be used. */
 export function checkWord(w: Word, bank: Map<string, Word> = new Map()): string[] {
   const errs: string[] = [];
+  const byDefinition = new Map([...bank.values()].map(b => [b.definition, b]));
   const need = (ok: unknown, msg: string) => { if (!ok) errs.push(msg); };
 
   need(typeof w.word === 'string' && /^[a-z][a-z' -]*$/.test(w.word), 'word must be lowercase letters');
@@ -58,12 +68,17 @@ export function checkWord(w: Word, bank: Map<string, Word> = new Map()): string[
     if (q.type === 'pick-meaning') {
       need(q.prompt === w.word, `${at}: prompt must be the word`);
       need(q.answer === w.definition, `${at}: answer must be the card definition`);
+      for (const d of ds) {
+        const other = byDefinition.get(d);
+        need(!other || (other.pos === w.pos && !shareGroup(w, other)), `${at}: wrong option is the definition of "${other?.word}", too close in meaning or not a ${w.pos}`);
+      }
     } else {
       need(q.answer === w.word, `${at}: answer must be the word`);
       // Word options must be the same part of speech; we can check the ones in the bank.
       for (const d of ds) {
         const other = bank.get(d);
         need(!other || other.pos === w.pos, `${at}: distractor "${d}" is a ${other?.pos}`);
+        need(d === w.confusable?.word || !shareGroup(w, other), `${at}: distractor "${d}" is too close in meaning`);
       }
     }
     if (q.type === 'pick-word') need(!mentions(q.prompt, w.word), `${at}: prompt gives away the word`);
