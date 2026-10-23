@@ -216,6 +216,17 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 }
 
 .chip-quiet { background: var(--card); }
+.chip[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+
+.shuffle-btn { margin-bottom: 22px; background: var(--yellow); }
+.test-setup { margin-bottom: 22px; }
+.choice { border: 0; margin: 4px 0 10px; padding: 0; }
+.choice legend { padding: 0; margin-bottom: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips .chip { min-width: 52px; padding: 9px 12px 8px; font-size: 0.8125rem; }
+.small-print { margin: 4px 0 0; font-size: 0.9375rem; }
+.test-setup .card-actions { align-items: center; }
+.test-setup .card-actions .btn { width: auto; flex: 1 1 auto; }
 
 /* ---------- Index cards ---------- */
 

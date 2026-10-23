@@ -14,6 +14,8 @@ const LABEL: Record<QuestionType, string> = {
   gap: 'Fill the gap',
 };
 
+const KIND = { daily: 'Practice', redo: 'Redo', shuffle: 'Shuffle test' } as const;
+
 interface Props {
   start: Session;
   state: State;
@@ -33,17 +35,23 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
 
   useEffect(() => { if (picked) next.current?.focus({ preventScroll: true }); }, [picked]);
 
+  const daily = session.kind === 'daily';
+
   if (finished) {
     const missed = session.missed.map(w => byWord.get(w)).filter((w): w is Word => !!w);
     return (
       <section className="practice">
-        <span className="tag">Session complete</span>
-        <p className="score"><b>{session.firstRight}</b> of {session.total} word{session.total === 1 ? '' : 's'} with every question right first time.</p>
-        {missed.length > 0 && <h2 className="tag section-label">Back tomorrow</h2>}
+        <span className="tag">{KIND[session.kind]} complete</span>
+        {daily
+          ? <p className="score"><b>{session.firstRight}</b> of {session.total} word{session.total === 1 ? '' : 's'} with every question right first time.</p>
+          : <p className="score"><b>{session.questionsRight}</b> of {session.questionsAsked} question{session.questionsAsked === 1 ? '' : 's'} right first time.</p>}
+        {missed.length > 0 && <h2 className="tag section-label">{daily ? 'Back tomorrow' : 'Worth another look'}</h2>}
         <div className="cards">
           {missed.map(w => <WordCard key={w.word} word={w} number={number(w.word)} note />)}
         </div>
-        <button type="button" className="btn btn-quiet" onClick={onDone}>Back to today</button>
+        <button type="button" className="btn btn-quiet" onClick={onDone}>
+          {session.kind === 'shuffle' ? 'Back to the lexicon' : 'Back to today'}
+        </button>
       </section>
     );
   }
@@ -65,7 +73,7 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
 
   const advance = () => {
     if (last) {
-      onState(finish(state, date));
+      if (daily) onState(finish(state, date));
       setFinished(true);
     } else {
       setSession({ ...session, i: session.i + 1 });
@@ -79,7 +87,7 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
       <div className="meter" aria-hidden="true"><span style={{ width: `${(session.i / session.items.length) * 100}%` }} /></div>
       <div className="q-head">
         <span className={`qtag qtag-${q.type}`}>{LABEL[q.type]}</span>
-        <span className="tag">{item.retry ? 'Once more · ' : ''}{session.i + 1} of {session.items.length}</span>
+        <span className="tag">{daily ? '' : `${KIND[session.kind]} · `}{item.retry ? 'Once more · ' : ''}{session.i + 1} of {session.items.length}</span>
       </div>
 
       <div className="prompt-card">

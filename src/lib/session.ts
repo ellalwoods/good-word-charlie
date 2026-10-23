@@ -16,6 +16,8 @@ export function shuffle<T>(items: T[], rand: Rand = Math.random): T[] {
 /** Questions per word in a session: today's new words get the full set, reviews a quick check. */
 export const NEW_QUESTIONS = 5;
 export const REVIEW_QUESTIONS = 2;
+/** The most different questions one word can get in a session (its pool, less the pair that clash). */
+export const MAX_PER_WORD = 6;
 
 // Easier types first, so a word's first questions start gently.
 const RANK: Record<QuestionType, number> = {
@@ -63,11 +65,16 @@ export interface Progress {
   failed: boolean;     // any first-attempt question wrong
 }
 
+export type SessionKind = 'daily' | 'redo' | 'shuffle';
+
 export interface Session {
+  kind: SessionKind;    // only 'daily' changes levels and review dates
   items: Item[];
   i: number;
   total: number;        // words in the session
   firstRight: number;   // words with every question right first time
+  questionsRight: number;   // first-attempt questions answered correctly
+  questionsAsked: number;   // first-attempt questions in the session
   missed: string[];
   words: Record<string, Progress>;
 }
@@ -84,27 +91,66 @@ export function sessionSize(state: State, bank: Word[], date: string): { words: 
 }
 
 /**
- * Today's new words get five questions each and reviews two, dealt round by round
+ * Builds a session from words and how many questions each gets, dealt round by round
  * so the same word's questions are spread out rather than back to back.
  */
-export function startSession(state: State, bank: Word[], date: string, rand: Rand = Math.random): Session {
+function deal(kind: SessionKind, state: State, bank: Word[], plan: [string, number][], rand: Rand): Session {
   const byWord = new Map(bank.map(w => [w.word, w]));
-  const due = dueWords(state, bank, date);
-  const todays = new Set(state.days[date] ?? []);
-  const news = (state.days[date] ?? []).filter(w => due.includes(w));
-  const order = [...news, ...shuffle(due.filter(w => !todays.has(w)), rand)];
-
-  const lists = order.map(w => {
+  const lists = plan.map(([w, count]) => {
     const word = byWord.get(w)!;
-    const qs = questionsFor(word, state.cards[w].asked, todays.has(w) ? NEW_QUESTIONS : REVIEW_QUESTIONS);
-    return qs.map(q => item(word, q, false, rand));
+    return questionsFor(word, state.cards[w]?.asked ?? 0, count).map(q => item(word, q, false, rand));
   });
   const items: Item[] = [];
   for (let round = 0; lists.some(l => l.length > round); round++) {
     for (const l of shuffle(lists.filter(l => l.length > round), rand)) items.push(l[round]);
   }
-  const words = Object.fromEntries(lists.map((l, k) => [order[k], { left: l.length, failed: false }]));
-  return { items, i: 0, total: order.length, firstRight: 0, missed: [], words };
+  const words = Object.fromEntries(lists.map((l, k) => [plan[k][0], { left: l.length, failed: false }]));
+  return { kind, items, i: 0, total: plan.length, firstRight: 0, questionsRight: 0, questionsAsked: items.length, missed: [], words };
+}
+
+/** Today's practice: new words get five questions each and reviews two. Changes levels. */
+export function startSession(state: State, bank: Word[], date: string, rand: Rand = Math.random): Session {
+  const due = dueWords(state, bank, date);
+  const todays = new Set(state.days[date] ?? []);
+  const news = (state.days[date] ?? []).filter(w => due.includes(w));
+  const order = [...news, ...shuffle(due.filter(w => !todays.has(w)), rand)];
+  return deal('daily', state, bank, order.map(w => [w, todays.has(w) ? NEW_QUESTIONS : REVIEW_QUESTIONS]), rand);
+}
+
+/** Remembers which words were in today's practice, so it can be redone. */
+export function recordPractised(state: State, session: Session, date: string): State {
+  const before = state.practised?.[date] ?? [];
+  const words = [...before, ...Object.keys(session.words).filter(w => !before.includes(w))];
+  return { ...state, practised: { [date]: words } };
+}
+
+/** The words that "Redo today" would go over. */
+export function practisedToday(state: State, bank: Word[], date: string): string[] {
+  const inBank = new Set(bank.map(w => w.word));
+  return (state.practised?.[date] ?? state.days[date] ?? []).filter(w => inBank.has(w) && state.cards[w]);
+}
+
+/** Today's practice again, with fresh questions. Practice only: levels don't change. */
+export function redoSession(state: State, bank: Word[], date: string, rand: Rand = Math.random): Session {
+  const todays = new Set(state.days[date] ?? []);
+  const words = practisedToday(state, bank, date);
+  return deal('redo', state, bank, words.map(w => [w, todays.has(w) ? NEW_QUESTIONS : REVIEW_QUESTIONS]), rand);
+}
+
+/** Words that can go in a shuffle test: every word met so far. */
+export function testableWords(state: State, bank: Word[]): string[] {
+  return bank.filter(w => state.cards[w.word]).map(w => w.word);
+}
+
+/**
+ * A random test: `wordCount` words picked from those met so far, with `questionCount`
+ * questions shared out between them as evenly as possible. Practice only.
+ */
+export function shuffleTest(state: State, bank: Word[], wordCount: number, questionCount: number, rand: Rand = Math.random): Session {
+  const words = shuffle(testableWords(state, bank), rand).slice(0, Math.max(1, wordCount));
+  const total = Math.min(questionCount, words.length * MAX_PER_WORD);
+  const plan = words.map((w, k): [string, number] => [w, Math.floor(total / words.length) + (k < total % words.length ? 1 : 0)]);
+  return deal('shuffle', state, bank, plan.filter(([, n]) => n > 0), rand);
 }
 
 export function answer(
@@ -122,10 +168,12 @@ export function answer(
 
   if (!it.retry) {
     const p = { ...next.words[it.word], left: next.words[it.word].left - 1 };
+    const graded = session.kind === 'daily';
+    if (correct) next.questionsRight++;
     if (!correct) {
-      // First miss on this word: back to level 0, due tomorrow. Later misses don't count again.
+      // First miss on this word: back to level 0, due tomorrow (in today's practice only).
       if (!p.failed) {
-        card = grade(card, false, date);
+        if (graded) card = grade(card, false, date);
         next.missed = [...next.missed, it.word];
       }
       p.failed = true;
@@ -135,8 +183,8 @@ export function answer(
       const fresh = questionsFor(word, card.asked, 1, seen)[0] ?? it.question;
       next.items.push(item(word, fresh, true, rand));
     } else if (p.left === 0 && !p.failed) {
-      // Every first-attempt question right: up a level.
-      card = grade(card, true, date);
+      // Every first-attempt question right: up a level (in today's practice only).
+      if (graded) card = grade(card, true, date);
       next.firstRight++;
     }
     next.words[it.word] = p;

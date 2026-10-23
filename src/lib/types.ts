@@ -44,5 +44,6 @@ export interface State {
   done: Record<string, true>;        // dates a session was finished, for the streak
   known: Record<string, true>;       // "Already know it"
   rejected: Record<string, true>;    // "Not for me"
+  practised?: Record<string, string[]>;  // date -> words in that day's practice, for "Redo today"
   updated: number;
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import words from '../data/words.json';
 import { canDismiss, dismiss, dueWords, ensureToday, streak, unseen } from './daily';
-import { answer, finish, pool, questionsFor, sessionSize, startSession } from './session';
+import { answer, finish, MAX_PER_WORD, pool, practisedToday, questionsFor, recordPractised, redoSession, sessionSize, shuffleTest, startSession } from './session';
 import { grade, newCard } from './srs';
 import { fresh } from './storage';
 import type { Word } from './types';
@@ -138,5 +138,40 @@ describe('practice session', () => {
     expect(dueWords(s, bank, D)).not.toContain('farcical');
     expect(canDismiss(s, 'farcical')).toBe(false);
     expect(finish(s, D).done[D]).toBe(true);
+  });
+
+  it("redo goes over today's words again without changing levels", () => {
+    let s = ensureToday(fresh(), bank, D);
+    const daily = startSession(s, bank, D, fixed);
+    s = recordPractised(s, daily, D);
+    expect(practisedToday(s, bank, D)).toEqual(['farcical', 'paucity', 'modicum']);
+    const before = s.cards.farcical;
+    let sess = redoSession(s, bank, D, fixed);
+    expect(sess.kind).toBe('redo');
+    expect(sess.items).toHaveLength(15);
+    // Every question right, then one wrong: levels and due dates stay put.
+    for (const [j, it] of sess.items.entries()) {
+      const r = answer(s, { ...sess, i: j }, bank, it.word === 'paucity' ? it.question.distractors[0] : it.question.answer, D, fixed);
+      s = r.state; sess = r.session;
+    }
+    expect(s.cards.farcical).toMatchObject({ level: before.level, due: before.due, right: 0, wrong: 0 });
+    expect(s.cards.paucity).toMatchObject({ level: 0, due: D, wrong: 0 });
+    expect(sess.questionsRight).toBe(10);
+    expect(sess.questionsAsked).toBe(15);
+    expect(sess.missed).toEqual(['paucity']);
+  });
+
+  it('a shuffle test picks the chosen number of words and shares out the questions', () => {
+    let s = ensureToday(fresh(), bank, D);
+    for (const d of ['2026-10-20', '2026-10-21', '2026-10-22']) s = ensureToday(s, bank, d);
+    expect(Object.keys(s.cards)).toHaveLength(12);
+    const sess = shuffleTest(s, bank, 5, 12, fixed);
+    expect(sess.kind).toBe('shuffle');
+    expect(sess.total).toBe(5);
+    expect(sess.items).toHaveLength(12);
+    const counts = Object.values(sess.words).map(p => p.left).sort();
+    expect(counts).toEqual([2, 2, 2, 3, 3]);
+    // Never more questions than a word can give.
+    expect(shuffleTest(s, bank, 2, 50, fixed).items).toHaveLength(2 * MAX_PER_WORD);
   });
 });

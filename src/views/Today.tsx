@@ -1,5 +1,5 @@
 import { canDismiss, dueWords, PER_DAY, streak } from '../lib/daily';
-import { sessionSize } from '../lib/session';
+import { practisedToday, sessionSize } from '../lib/session';
 import type { State, Word } from '../lib/types';
 import { WordCard } from './WordCard';
 
@@ -10,15 +10,17 @@ interface Props {
   date: string;
   onDismiss: (word: string, reason: 'known' | 'rejected') => void;
   onPractise: () => void;
+  onRedo: () => void;
 }
 
-export function Today({ state, bank, number, date, onDismiss, onPractise }: Props) {
+export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo }: Props) {
   const byWord = new Map(bank.map(w => [w.word, w]));
   const news = (state.days[date] ?? []).map(w => byWord.get(w)).filter((w): w is Word => !!w);
   const due = dueWords(state, bank, date).length;
   const learned = Object.keys(state.cards).filter(w => byWord.has(w)).length;
   const days = streak(state, date);
   const size = sessionSize(state, bank, date);
+  const canRedo = !!state.done[date] && practisedToday(state, bank, date).length > 0;
 
   return (
     <>
@@ -37,6 +39,12 @@ export function Today({ state, bank, number, date, onDismiss, onPractise }: Prop
             </button>
           )
           : <p className="slip">All done for today. Three new words tomorrow.</p>}
+        {canRedo && (
+          <button type="button" className="btn btn-quiet" onClick={onRedo}>
+            Redo today’s practice
+            <span className="btn-sub">Practice only · won’t change your levels</span>
+          </button>
+        )}
       </div>
 
       <h2 className="tag section-label">Today’s words</h2>

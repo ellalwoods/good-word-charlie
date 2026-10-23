@@ -20,6 +20,14 @@ It's hosted on GitHub Pages. On every push to `main`, `.github/workflows/deploy.
 
 **On a phone:** open the address, then **Share → Add to Home Screen** (iPhone) or **⋮ → Install app** (Android). The site then opens full screen with its own icon and works offline.
 
+## Practising
+
+- **Today:** today's new words get 5 questions each and due reviews get 2. Only this practice moves words up or down a level.
+- **Redo today's practice** (on Today, once the day's practice is done) goes over the same words with fresh questions.
+- **Shuffle test** (on Lexicon) picks random words you've met; you choose how many words (5, 10, 20 or all) and questions (10 to 50).
+
+Redo and shuffle tests are practice only: they never change levels, review dates or the streak.
+
 ## Loading more words
 
 The words live in `src/data/words.json`. When people run out, the site shows them an empty-card-box card telling them to ask Ella. To add more:
@@ -51,7 +59,7 @@ src/
   lib/storage.ts       load/save progress: the one place to swap in Supabase later
   lib/daily.ts         three a day, "Already know it", "Not for me", streak
   lib/srs.ts           levels 0–6, intervals 0/1/3/7/14/30/60 days
-  lib/session.ts       5 questions per new word and 2 per review, pool rotation, end-of-session retries
+  lib/session.ts       today's practice (5 questions per new word, 2 per review), redo, shuffle test
   lib/validate.ts      the checks above
   views/               Today, Practice, Lexicon, index card
 public/                manifest, icons, offline service worker
