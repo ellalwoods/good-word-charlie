@@ -16,9 +16,7 @@ npm test         # logic tests, plus checks on every word in the bank
 
 **https://ellalwoods.github.io/good-word-charlie/**
 
-It's hosted on GitHub Pages and deployed by `.github/workflows/deploy.yml` on every push to `main`. If any word fails its checks, the deploy stops, so a bad batch never goes live.
-
-One-time setup: **Settings → Pages → Source: GitHub Actions**.
+It's hosted on GitHub Pages. On every push to `main`, `.github/workflows/deploy.yml` tests and builds the site and publishes it to the `gh-pages` branch, which Pages serves. If any word fails its checks, the deploy stops, so a bad batch never goes live.
 
 **On a phone:** open the address, then **Share → Add to Home Screen** (iPhone) or **⋮ → Install app** (Android). The site then opens full screen with its own icon and works offline.
 
