@@ -70,9 +70,10 @@ function OutOfWords() {
     <article className="card empty">
       <div className="band"><span>Card box</span><span>Empty</span></div>
       <div className="ruled">
-        <h3 className="hw">That’s the lot.</h3>
-        <p className="sense">You’ve met every word in the box. Tell Ella it’s time to load more.</p>
-        <p className="example">Reviews will keep coming in the meantime.</p>
+        <h3 className="hw">Well, this is farcical.</h3>
+        <p className="sense">You’ve used up every word in the box. Tell Ella it’s time to load more.</p>
+        <p className="example">A word app with no new words? Utterly farcical.</p>
+        <p className="sense">Your reviews will keep coming in the meantime.</p>
       </div>
     </article>
   );
