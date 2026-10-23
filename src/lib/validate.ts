@@ -21,12 +21,13 @@ export function filled(prompt: string, answer: string): string {
   return prompt.replace(GAP, answer).replace(/\{[^}]*\}/, answer);
 }
 
-/** True if the text uses the word or a regular inflection of it (glut, gluts; mitigate, mitigated, mitigating; tally, tallies). */
+/** True if the text uses the word or a regular inflection of it (glut, gluts; mitigate, mitigated; tally, tallies; extol, extolled). */
 export function mentions(text: string, word: string): boolean {
   const e = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const forms = [`${e}(s|es|d|ed|ing)?`];
   if (word.endsWith('e')) forms.push(`${e.slice(0, -1)}(ing|ed|es)`);
   if (word.endsWith('y')) forms.push(`${e.slice(0, -1)}(ies|ied)`);
+  if (/[^aeiou][aeiou][bdglmnprt]$/.test(word)) forms.push(`${e}${word.slice(-1)}(ed|ing)`); // extolled, demurred
   return new RegExp(`\\b(${forms.join('|')})\\b`, 'i').test(text);
 }
 

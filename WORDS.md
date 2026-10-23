@@ -16,6 +16,7 @@ Avoid:
 
 - `word`, `pos` (noun / adjective / verb), `pron` (a respelling such as SPEE-shus), `definition`, and `example` (the sentence shown on the card)
 - optional `confusable`: `{ word, note }`, where the note is one line on the difference
+- `groups`: one or more meaning groups, such as `["careless", "irregular"]`. Words that share a group are never used as each other's wrong options, so near-synonyms can't sneak in as a 'wrong' answer that is really right. Reuse the existing group names where they fit.
 - five `questions`, each `{ type, prompt, answer, distractors: [3] }`:
   - `pick-meaning`: the prompt is the word, the answer is the card definition, and the distractors are other definitions
   - `pick-word`: the prompt is a definition (not containing the word), and the answer is the word
@@ -23,5 +24,6 @@ Avoid:
   - `confusable`: a sentence with one `___`, and the confusable word among the distractors
   - `gap`: a sentence with one `___`
 - Every test sentence must be different from the card example.
-- Distractors must be the same part of speech and must not also fit the sentence. Avoid near-synonyms (paucity/modicum, nascent/inchoate, otiose/nugatory).
+- Distractors must be the same part of speech and must not also fit the sentence, including as an opposite ("copious evidence" fits a sentence about scant evidence). Choose wrong options that clash with the sentence, not just ones that mean something different.
+- Avoid "a ___" or "an ___" unless every option takes the same article; the checks flag it.
 - Use Australian spelling.
