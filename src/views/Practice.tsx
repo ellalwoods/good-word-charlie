@@ -7,6 +7,8 @@ import { ConfusableNote, Headword, WordCard } from './WordCard';
 const LABEL: Record<QuestionType, string> = {
   'pick-meaning': 'What does it mean?',
   'pick-word': 'Which word fits?',
+  synonym: 'Closest in meaning?',
+  usage: 'Which sentence uses it right?',
   rewrite: 'Rewrite: swap the highlight',
   confusable: 'Confusables: which belongs?',
   gap: 'Fill the gap',
@@ -36,7 +38,7 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
     return (
       <section className="practice">
         <span className="tag">Session complete</span>
-        <p className="score"><b>{session.firstRight}</b> of {session.total} right first time.</p>
+        <p className="score"><b>{session.firstRight}</b> of {session.total} word{session.total === 1 ? '' : 's'} with every question right first time.</p>
         {missed.length > 0 && <h2 className="tag section-label">Back tomorrow</h2>}
         <div className="cards">
           {missed.map(w => <WordCard key={w.word} word={w} number={number(w.word)} note />)}
@@ -49,7 +51,7 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
   const item = session.items[session.i];
   const word = byWord.get(item.word)!;
   const q = item.question;
-  const isWords = q.type !== 'pick-meaning';
+  const isWords = q.type !== 'pick-meaning' && q.type !== 'usage';
   const last = session.i + 1 >= session.items.length;
   const correct = picked === q.answer;
 
@@ -111,7 +113,7 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
 }
 
 function Prompt({ q, word }: { q: Question; word: Word }) {
-  if (q.type === 'pick-meaning') return <Headword word={word} />;
+  if (q.type === 'pick-meaning' || q.type === 'synonym' || q.type === 'usage') return <Headword word={word} />;
   if (q.type === 'pick-word') return <p className="prompt">{q.prompt}</p>;
   if (q.type === 'rewrite') {
     const [, before, phrase, after] = q.prompt.match(/^(.*)\{([^}]*)\}(.*)$/s)!;

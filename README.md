@@ -31,7 +31,8 @@ The words live in `src/data/words.json`. When people run out, the site shows the
 
 ### What the checks enforce (`src/lib/validate.ts`)
 
-- Every field is present, and there are about five questions per word, each with an answer and three distractors.
+- Every field is present, and each word has seven questions, each with an answer and three distractors.
+- The tests never reuse the card definition. Each word's test definition is worded differently, and its synonym isn't taken from the card.
 - The answer isn't also one of the distractors, and no option repeats.
 - No test sentence matches the card's example sentence, or comes close to it.
 - No sentence gives the answer away: the word itself doesn't appear, and there's no "a ___" / "an ___" that only fits one option.
@@ -50,7 +51,7 @@ src/
   lib/storage.ts       load/save progress: the one place to swap in Supabase later
   lib/daily.ts         three a day, "Already know it", "Not for me", streak
   lib/srs.ts           levels 0–6, intervals 0/1/3/7/14/30/60 days
-  lib/session.ts       one question per due word, pool rotation, end-of-session retry
+  lib/session.ts       5 questions per new word and 2 per review, pool rotation, end-of-session retries
   lib/validate.ts      the checks above
   views/               Today, Practice, Lexicon, index card
 public/                manifest, icons, offline service worker

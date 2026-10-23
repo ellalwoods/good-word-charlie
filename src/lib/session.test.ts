@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import words from '../data/words.json';
 import { canDismiss, dismiss, dueWords, ensureToday, streak, unseen } from './daily';
-import { answer, finish, pool, questionFor, startSession } from './session';
+import { answer, finish, pool, questionsFor, sessionSize, startSession } from './session';
 import { grade, newCard } from './srs';
 import { fresh } from './storage';
 import type { Word } from './types';
@@ -58,51 +58,85 @@ describe('daily words', () => {
 });
 
 describe('practice session', () => {
-  it('asks one question per due word, today\'s new words first', () => {
+  const wordsOf = (sess: { items: { word: string }[] }) => sess.items.map(i => i.word);
+
+  it("asks today's new words five questions each, spread out rather than back to back", () => {
     const s = ensureToday(fresh(), bank, D);
     const sess = startSession(s, bank, D, fixed);
-    expect(sess.items.map(i => i.word)).toEqual(['farcical', 'paucity', 'modicum']);
+    expect(sess.items).toHaveLength(15);
+    for (const w of ['farcical', 'paucity', 'modicum']) {
+      const qs = sess.items.filter(i => i.word === w).map(i => i.question);
+      expect(qs).toHaveLength(5);
+      expect(new Set(qs).size).toBe(5);
+    }
+    const order = wordsOf(sess);
+    expect(order.every((w, k) => k === 0 || w !== order[k - 1])).toBe(true);
     for (const it of sess.items) {
       expect(it.options).toHaveLength(4);
       expect(it.options).toContain(it.question.answer);
     }
+    expect(sessionSize(s, bank, D)).toEqual({ words: 3, questions: 15 });
   });
 
-  it('rotates through the pool, easiest types first', () => {
+  it('asks review words two questions each', () => {
+    let s = ensureToday(fresh(), bank, '2026-10-22');
+    s = { ...s, days: {} };
+    const sess = startSession(s, bank, D, fixed);
+    expect(sess.items).toHaveLength(6);
+    expect(sessionSize(s, bank, D)).toEqual({ words: 3, questions: 6 });
+  });
+
+  it('rotates through the pool and never pairs the two definition questions', () => {
     const w = bank.find(x => x.confusable)!;
-    expect(pool(w).map(q => q.type)).toEqual(['pick-meaning', 'pick-word', 'gap', 'rewrite', 'confusable']);
-    expect(new Set([0, 1, 2, 3, 4].map(n => questionFor(w, n).prompt)).size).toBe(5);
-    expect(questionFor(w, 5)).toBe(questionFor(w, 0));
+    expect(pool(w).map(q => q.type)).toEqual(['pick-meaning', 'synonym', 'pick-word', 'gap', 'rewrite', 'usage', 'confusable']);
+    for (let n = 0; n < 7; n++) {
+      const types = questionsFor(w, n, 5).map(q => q.type);
+      expect(types).toHaveLength(5);
+      expect(types.includes('pick-meaning') && types.includes('pick-word')).toBe(false);
+    }
+    expect(questionsFor(w, 0, 2)[0]).not.toBe(questionsFor(w, 2, 2)[0]);
   });
 
-  it('a wrong answer resets the word and asks it once more at the end, without changing the level', () => {
+  it('a wrong answer resets the word and asks it again at the end with a fresh question', () => {
     let s = ensureToday(fresh(), bank, D);
     s = { ...s, cards: { ...s.cards, farcical: { ...s.cards.farcical, level: 3 } } };
     let sess = startSession(s, bank, D, fixed);
-    const first = sess.items[0];
+    const k = sess.items.findIndex(i => i.word === 'farcical');
+    sess = { ...sess, i: k };
+    const first = sess.items[k];
     let r = answer(s, sess, bank, first.question.distractors[0], D, fixed);
     expect(r.correct).toBe(false);
     expect(r.state.cards.farcical).toMatchObject({ level: 0, due: '2026-10-24', asked: 1 });
-    expect(r.session.items).toHaveLength(4);
-    const retry = r.session.items[3];
+    expect(r.session.items).toHaveLength(16);
+    const retry = r.session.items[15];
     expect(retry).toMatchObject({ word: 'farcical', retry: true });
-    expect(retry.question).not.toBe(first.question);
+    expect(sess.items.filter(i => i.word === 'farcical').map(i => i.question)).not.toContain(retry.question);
 
-    s = r.state; sess = { ...r.session, i: 3 };
-    r = answer(s, sess, bank, retry.question.answer, D, fixed);
-    expect(r.correct).toBe(true);
-    expect(r.state.cards.farcical).toMatchObject({ level: 0, due: '2026-10-24', asked: 2 });
+    // Getting the rest of its questions right doesn't lift it back up.
+    s = r.state;
+    for (const [j, it] of r.session.items.entries()) {
+      if (it.word !== 'farcical' || j === k) continue;
+      r = answer(s, { ...r.session, i: j }, bank, it.question.answer, D, fixed);
+      s = r.state;
+    }
+    expect(s.cards.farcical).toMatchObject({ level: 0, due: '2026-10-24' });
     expect(r.session.firstRight).toBe(0);
-    expect(r.session.items).toHaveLength(4);
+    expect(r.session.missed).toEqual(['farcical']);
   });
 
-  it('a right first answer levels up and leaves the word out of today\'s due list', () => {
-    const s = ensureToday(fresh(), bank, D);
-    const sess = startSession(s, bank, D, fixed);
-    const r = answer(s, sess, bank, sess.items[0].question.answer, D, fixed);
-    expect(r.state.cards.farcical).toMatchObject({ level: 1, due: '2026-10-24', right: 1 });
-    expect(dueWords(r.state, bank, D)).not.toContain('farcical');
-    expect(canDismiss(r.state, 'farcical')).toBe(false);
-    expect(finish(r.state, D).done[D]).toBe(true);
+  it('a word moves up only once every question is right', () => {
+    let s = ensureToday(fresh(), bank, D);
+    let sess = startSession(s, bank, D, fixed);
+    const mine = sess.items.map((it, j) => [it, j] as const).filter(([it]) => it.word === 'farcical');
+    for (const [n, [it, j]] of mine.entries()) {
+      const r = answer(s, { ...sess, i: j }, bank, it.question.answer, D, fixed);
+      s = r.state; sess = r.session;
+      expect(s.cards.farcical.level).toBe(n === mine.length - 1 ? 1 : 0);
+    }
+    expect(s.cards.farcical).toMatchObject({ level: 1, due: '2026-10-24', right: 1, asked: 5 });
+    expect(sess.firstRight).toBe(1);
+    expect(dueWords(s, bank, D)).not.toContain('farcical');
+    expect(canDismiss(s, 'farcical')).toBe(false);
+    expect(finish(s, D).done[D]).toBe(true);
   });
 });

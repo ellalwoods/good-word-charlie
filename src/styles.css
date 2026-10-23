@@ -196,6 +196,13 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 
 .btn-quiet { background: var(--card); margin-top: 24px; }
 
+.btn-sub {
+  display: block;
+  margin-top: 4px;
+  font: 700 0.6875rem/1 var(--mono);
+  letter-spacing: 0.1em;
+}
+
 .chip {
   appearance: none;
   border: var(--line);

@@ -1,4 +1,5 @@
 import { canDismiss, dueWords, PER_DAY, streak } from '../lib/daily';
+import { sessionSize } from '../lib/session';
 import type { State, Word } from '../lib/types';
 import { WordCard } from './WordCard';
 
@@ -17,6 +18,7 @@ export function Today({ state, bank, number, date, onDismiss, onPractise }: Prop
   const due = dueWords(state, bank, date).length;
   const learned = Object.keys(state.cards).filter(w => byWord.has(w)).length;
   const days = streak(state, date);
+  const size = sessionSize(state, bank, date);
 
   return (
     <>
@@ -28,7 +30,12 @@ export function Today({ state, bank, number, date, onDismiss, onPractise }: Prop
 
       <div className="practise">
         {due > 0
-          ? <button type="button" className="btn" onClick={onPractise}>Practise {due} word{due === 1 ? '' : 's'}</button>
+          ? (
+            <button type="button" className="btn" onClick={onPractise}>
+              Practise {due} word{due === 1 ? '' : 's'}
+              <span className="btn-sub">{size.questions} questions</span>
+            </button>
+          )
           : <p className="slip">All done for today. Three new words tomorrow.</p>}
       </div>
 

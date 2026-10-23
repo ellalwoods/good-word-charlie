@@ -1,11 +1,13 @@
 export type Pos = 'noun' | 'adjective' | 'verb';
 
-// pick-meaning: the prompt is the headword, options are definitions.
-// pick-word:    the prompt is a definition, options are words.
+// pick-meaning: the prompt is the headword, options are test definitions (never the card's wording).
+// pick-word:    the prompt is the word's test definition, options are words.
+// synonym:      the prompt is the headword, options are plain synonyms.
+// usage:        the prompt is the headword, options are four sentences; only one uses it correctly.
 // rewrite:      a sentence with one {phrase} to replace with the word.
 // confusable:   a sentence with one ___ gap; the word's confusable is among the distractors.
 // gap:          a sentence with one ___ gap.
-export type QuestionType = 'pick-meaning' | 'pick-word' | 'rewrite' | 'confusable' | 'gap';
+export type QuestionType = 'pick-meaning' | 'pick-word' | 'synonym' | 'usage' | 'rewrite' | 'confusable' | 'gap';
 
 export interface Question {
   type: QuestionType;
@@ -18,7 +20,9 @@ export interface Word {
   word: string;
   pos: Pos;
   pron: string;
-  definition: string;
+  definition: string;       // shown on the card
+  testDefinition: string;   // a differently worded definition, used only in questions
+  synonym: string;          // a plain everyday synonym, used only in questions
   example: string;
   confusable?: { word: string; note: string };
   groups?: string[];   // meaning groups; words sharing one are never used as each other's wrong options
