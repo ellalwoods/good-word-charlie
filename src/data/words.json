@@ -1,0 +1,1706 @@
+[
+  {
+    "word": "farcical",
+    "pos": "adjective",
+    "pron": "FAR-sih-kul",
+    "definition": "So absurd or badly handled as to be ridiculous.",
+    "example": "The meeting became farcical when nobody could find the agenda or the chair.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "farcical",
+        "answer": "So absurd or badly handled as to be ridiculous.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "In terminal decline; close to ending and lacking vitality.",
+          "Complaining in a whining, irritable way."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Ridiculous because of how chaotically or absurdly something is being handled.",
+        "answer": "farcical",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The ticketing system was {so chaotic it was ridiculous}, with three queues for the same door.",
+        "answer": "farcical",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The election count turned ___ when two boxes of votes were found in a cupboard.",
+        "answer": "farcical",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "oleaginous"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Asking forty people to sign off on a two-line email is ___.",
+        "answer": "farcical",
+        "distractors": [
+          "nascent",
+          "pyrrhic",
+          "querulous"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "paucity",
+    "pos": "noun",
+    "pron": "PAW-suh-tee",
+    "definition": "The presence of something in only small or insufficient amounts.",
+    "example": "The paucity of reliable data made the forecast little more than a guess.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "paucity",
+        "answer": "The presence of something in only small or insufficient amounts.",
+        "distractors": [
+          "A solution claimed to fix every problem or difficulty.",
+          "A gap or missing part, especially in a text or argument.",
+          "An action or plan intended to deceive someone."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "A scarcity of something, especially something that is needed.",
+        "answer": "paucity",
+        "distractors": [
+          "glut",
+          "ruse",
+          "sinecure"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "Reviewers pointed to the {striking shortage} of women on the shortlist.",
+        "answer": "paucity",
+        "distractors": [
+          "glut",
+          "panacea",
+          "sinecure"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Despite the ___ of evidence, the committee pressed ahead with the ban.",
+        "answer": "paucity",
+        "distractors": [
+          "panacea",
+          "ruse",
+          "sinecure"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Applications have dropped, and the ___ of experienced teachers is now the school's biggest problem.",
+        "answer": "paucity",
+        "distractors": [
+          "remit",
+          "ruse",
+          "veneer"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "modicum",
+    "pos": "noun",
+    "pron": "MOD-ih-kum",
+    "definition": "A small amount, especially of something good such as sense or decency.",
+    "example": "Anyone with a modicum of common sense would have checked the forecast.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "modicum",
+        "answer": "A small amount, especially of something good such as sense or decency.",
+        "distractors": [
+          "An excessive supply of something, more than can be used or sold.",
+          "An action or plan intended to deceive someone.",
+          "A paid position that requires little or no work."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "A small but real amount of something worthwhile.",
+        "answer": "modicum",
+        "distractors": [
+          "glut",
+          "ruse",
+          "crux"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The new manager has brought a {small amount} of order to the office.",
+        "answer": "modicum",
+        "distractors": [
+          "glut",
+          "crux",
+          "ruse"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "If the council showed even a ___ of urgency, the footpath would have been fixed months ago.",
+        "answer": "modicum",
+        "distractors": [
+          "panacea",
+          "lacuna",
+          "sinecure"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "She asked for nothing more than a ___ of respect from the people she had trained.",
+        "answer": "modicum",
+        "distractors": [
+          "ruse",
+          "crux",
+          "gambit"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "glut",
+    "pos": "noun",
+    "pron": "GLUT",
+    "definition": "An excessive supply of something, more than can be used or sold.",
+    "example": "A glut of new apartments has pushed rents down across the inner suburbs.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "glut",
+        "answer": "An excessive supply of something, more than can be used or sold.",
+        "distractors": [
+          "A small amount, especially of something good such as sense or decency.",
+          "A gap or missing part, especially in a text or argument.",
+          "A solution claimed to fix every problem or difficulty."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Far more of something than the market or situation can absorb.",
+        "answer": "glut",
+        "distractors": [
+          "paucity",
+          "lacuna",
+          "panacea"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "After a wet spring, growers are dealing with a {huge oversupply} of stone fruit.",
+        "answer": "glut",
+        "distractors": [
+          "paucity",
+          "ruse",
+          "sinecure"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "There is now such a ___ of streaming services that most people can't keep track of them.",
+        "answer": "glut",
+        "distractors": [
+          "paucity",
+          "lacuna",
+          "remit"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Prices for used cars fell sharply once the ___ of ex-rental vehicles hit the market.",
+        "answer": "glut",
+        "distractors": [
+          "crux",
+          "lacuna",
+          "remit"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "risible",
+    "pos": "adjective",
+    "pron": "RIZ-uh-bul",
+    "definition": "So foolish or inadequate as to be laughable.",
+    "example": "The company's offer of a $20 voucher for a cancelled holiday was risible.",
+    "confusable": {
+      "word": "derisive",
+      "note": "Risible means laughable. Derisive means mocking: a derisive laugh is aimed at something risible."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "risible",
+        "answer": "So foolish or inadequate as to be laughable.",
+        "distractors": [
+          "Bland and inoffensive, deliberately avoiding anything that might upset.",
+          "In terminal decline; close to ending and lacking vitality.",
+          "Nervously excited or tense, as if in a fever."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Laughably absurd or inadequate.",
+        "answer": "risible",
+        "distractors": [
+          "nascent",
+          "febrile",
+          "querulous"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "Critics called the minister's excuse {so weak it was laughable}.",
+        "answer": "risible",
+        "distractors": [
+          "nascent",
+          "febrile",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "The idea that the bridge would be finished by Christmas was ___ to anyone who had seen the site.",
+        "answer": "risible",
+        "distractors": [
+          "derisive",
+          "nascent",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Ninety minutes of training before running the whole warehouse? The suggestion is ___.",
+        "answer": "risible",
+        "distractors": [
+          "nascent",
+          "moribund",
+          "pyrrhic"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "specious",
+    "pos": "adjective",
+    "pron": "SPEE-shus",
+    "definition": "Seeming reasonable or true at first, but actually wrong.",
+    "example": "The claim that the policy pays for itself is specious; it ignores the cost of enforcement.",
+    "confusable": {
+      "word": "spurious",
+      "note": "Specious means plausible but wrong. Spurious means false or fake."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "specious",
+        "answer": "Seeming reasonable or true at first, but actually wrong.",
+        "distractors": [
+          "Nervously excited or tense, as if in a fever.",
+          "Just coming into existence and beginning to develop.",
+          "Complaining in a whining, irritable way."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Sounding convincing on the surface but flawed underneath.",
+        "answer": "specious",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "moribund"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "His argument was {convincing at first glance but wrong}, and the panel saw through it quickly.",
+        "answer": "specious",
+        "distractors": [
+          "febrile",
+          "querulous",
+          "nascent"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "The reasoning is ___: it sounds persuasive until you check the numbers.",
+        "answer": "specious",
+        "distractors": [
+          "spurious",
+          "moribund",
+          "querulous"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "It sounds tidy, but the logic is ___ once you look at who actually pays.",
+        "answer": "specious",
+        "distractors": [
+          "nascent",
+          "febrile",
+          "querulous"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "spurious",
+    "pos": "adjective",
+    "pron": "SPYOOR-ee-us",
+    "definition": "False or fake; not genuine or not what it claims to be.",
+    "example": "The insurer rejected the claim after finding it was backed by a spurious receipt.",
+    "confusable": {
+      "word": "specious",
+      "note": "Spurious means false or fake. Specious means plausible but wrong."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "spurious",
+        "answer": "False or fake; not genuine or not what it claims to be.",
+        "distractors": [
+          "Nervously excited or tense, as if in a fever.",
+          "Bland and inoffensive, deliberately avoiding anything that might upset.",
+          "Just coming into existence and beginning to develop."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Fake, or not what it pretends to be.",
+        "answer": "spurious",
+        "distractors": [
+          "nascent",
+          "febrile",
+          "turgid"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The scam relied on {official-looking but fake} letters from a made-up bank.",
+        "answer": "spurious",
+        "distractors": [
+          "nascent",
+          "febrile",
+          "moribund"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "He took three weeks off on the strength of a ___ medical certificate he had bought online.",
+        "answer": "spurious",
+        "distractors": [
+          "specious",
+          "nascent",
+          "querulous"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The link between the two is ___: both just happen to rise in summer.",
+        "answer": "spurious",
+        "distractors": [
+          "querulous",
+          "febrile",
+          "moribund"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "jejune",
+    "pos": "adjective",
+    "pron": "juh-JOON",
+    "definition": "Naive and simplistic; also dull and lacking substance.",
+    "example": "His early essays were jejune, full of big claims and very little evidence.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "jejune",
+        "answer": "Naive and simplistic; also dull and lacking substance.",
+        "distractors": [
+          "Nervously excited or tense, as if in a fever.",
+          "In terminal decline; close to ending and lacking vitality.",
+          "Insisting on immediate obedience, in a brusque way that allows no discussion."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Naive and shallow, in a way that suggests inexperience.",
+        "answer": "jejune",
+        "distractors": [
+          "febrile",
+          "moribund",
+          "peremptory"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The panel found the proposal {naive and simplistic}, though it praised the team's energy.",
+        "answer": "jejune",
+        "distractors": [
+          "febrile",
+          "moribund",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Her views on the housing market seemed ___ to anyone who had actually tried to buy a home.",
+        "answer": "jejune",
+        "distractors": [
+          "moribund",
+          "pyrrhic",
+          "febrile"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Compared with her later work, the first novel feels ___ and thin.",
+        "answer": "jejune",
+        "distractors": [
+          "peremptory",
+          "febrile",
+          "pyrrhic"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "otiose",
+    "pos": "adjective",
+    "pron": "OH-tee-ohss",
+    "definition": "Serving no useful purpose; redundant.",
+    "example": "Once the new rule came in, the old approval form became otiose.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "otiose",
+        "answer": "Serving no useful purpose; redundant.",
+        "distractors": [
+          "Complaining in a whining, irritable way.",
+          "Nervously excited or tense, as if in a fever.",
+          "Of a victory: won at such a great cost that it is hardly worth winning."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Redundant; adding nothing of use.",
+        "answer": "otiose",
+        "distractors": [
+          "febrile",
+          "querulous",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "Half the meetings on the calendar are {there for no real purpose}.",
+        "answer": "otiose",
+        "distractors": [
+          "febrile",
+          "nascent",
+          "querulous"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "With the receipts already scanned, keeping the paper copies is ___.",
+        "answer": "otiose",
+        "distractors": [
+          "febrile",
+          "querulous",
+          "peremptory"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Cut the second paragraph; it repeats the first and is entirely ___.",
+        "answer": "otiose",
+        "distractors": [
+          "febrile",
+          "nascent",
+          "pyrrhic"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "perfunctory",
+    "pos": "adjective",
+    "pron": "per-FUNK-tuh-ree",
+    "definition": "Done only as a formality, with minimal effort or care.",
+    "example": "The doctor gave the X-ray a perfunctory glance and sent him home.",
+    "confusable": {
+      "word": "peremptory",
+      "note": "Perfunctory means done with minimal effort. Peremptory means brusquely demanding obedience."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "perfunctory",
+        "answer": "Done only as a formality, with minimal effort or care.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "Nervously excited or tense, as if in a fever.",
+          "Complaining in a whining, irritable way."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Carried out as a routine duty, without real care or interest.",
+        "answer": "perfunctory",
+        "distractors": [
+          "nascent",
+          "febrile",
+          "querulous"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The inspection was {quick and box-ticking}, and nobody looked under the floor.",
+        "answer": "perfunctory",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "febrile"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "After a ___ apology, he went straight back to talking about himself.",
+        "answer": "perfunctory",
+        "distractors": [
+          "peremptory",
+          "nascent",
+          "febrile"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The handover was ___: ten minutes, no notes, and a password on a sticky note.",
+        "answer": "perfunctory",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "pyrrhic"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "desultory",
+    "pos": "adjective",
+    "pron": "DEZ-ul-tree",
+    "definition": "Lacking plan, purpose or enthusiasm; half-hearted and aimless.",
+    "example": "We made desultory conversation while waiting for the train.",
+    "confusable": {
+      "word": "dilatory",
+      "note": "Desultory means aimless or half-hearted. Dilatory means slow, or meant to cause delay."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "desultory",
+        "answer": "Lacking plan, purpose or enthusiasm; half-hearted and aimless.",
+        "distractors": [
+          "Complaining in a whining, irritable way.",
+          "Insisting on immediate obedience, in a brusque way that allows no discussion.",
+          "Just coming into existence and beginning to develop."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Jumping from one thing to another without purpose or enthusiasm.",
+        "answer": "desultory",
+        "distractors": [
+          "peremptory",
+          "nascent",
+          "querulous"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The search for the missing keys was {half-hearted and aimless} until Mum got involved.",
+        "answer": "desultory",
+        "distractors": [
+          "peremptory",
+          "nascent",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "There was some ___ clapping, then the audience drifted towards the bar.",
+        "answer": "desultory",
+        "distractors": [
+          "dilatory",
+          "peremptory",
+          "nascent"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "After a few ___ attempts at the crossword, he gave up and went to bed.",
+        "answer": "desultory",
+        "distractors": [
+          "peremptory",
+          "nascent",
+          "pyrrhic"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "tawdry",
+    "pos": "adjective",
+    "pron": "TAW-dree",
+    "definition": "Showy but cheap and of poor quality; also sordid.",
+    "example": "The main street is lined with tawdry souvenir shops.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "tawdry",
+        "answer": "Showy but cheap and of poor quality; also sordid.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "Silly and pointless, often in a smug or self-satisfied way.",
+          "Insisting on immediate obedience, in a brusque way that allows no discussion."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Cheap and flashy, or seedy and sordid.",
+        "answer": "tawdry",
+        "distractors": [
+          "nascent",
+          "peremptory",
+          "querulous"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The whole {cheap and sordid} affair ended up in the newspapers.",
+        "answer": "tawdry",
+        "distractors": [
+          "nascent",
+          "peremptory",
+          "otiose"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The hotel had promised luxury but delivered ___ curtains and plastic chandeliers.",
+        "answer": "tawdry",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "peremptory"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Nobody wanted the ___ details of the divorce read out at the dinner table.",
+        "answer": "tawdry",
+        "distractors": [
+          "nascent",
+          "peremptory",
+          "pyrrhic"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "nascent",
+    "pos": "adjective",
+    "pron": "NAY-sunt",
+    "definition": "Just coming into existence and beginning to develop.",
+    "example": "The town's nascent arts scene is starting to draw visitors from the city.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "nascent",
+        "answer": "Just coming into existence and beginning to develop.",
+        "distractors": [
+          "In terminal decline; close to ending and lacking vitality.",
+          "Complaining in a whining, irritable way.",
+          "Showy but cheap and of poor quality; also sordid."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Newly formed and only beginning to grow.",
+        "answer": "nascent",
+        "distractors": [
+          "moribund",
+          "querulous",
+          "tawdry"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "Her interest in politics was still {only just beginning}, but it would shape her career.",
+        "answer": "nascent",
+        "distractors": [
+          "moribund",
+          "tawdry",
+          "querulous"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Investors are pouring money into the ___ battery industry, hoping to get in early.",
+        "answer": "nascent",
+        "distractors": [
+          "moribund",
+          "tawdry",
+          "querulous"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The ___ friendship between the two neighbours survived its first big argument over the fence.",
+        "answer": "nascent",
+        "distractors": [
+          "querulous",
+          "tawdry",
+          "peremptory"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "querulous",
+    "pos": "adjective",
+    "pron": "KWERR-yuh-lus",
+    "definition": "Complaining in a whining, irritable way.",
+    "example": "By the fourth hour of the drive, the children had become querulous.",
+    "confusable": {
+      "word": "quarrelsome",
+      "note": "Querulous means whiny and complaining. Quarrelsome means inclined to pick fights."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "querulous",
+        "answer": "Complaining in a whining, irritable way.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "Done only as a formality, with minimal effort or care.",
+          "Of a victory: won at such a great cost that it is hardly worth winning."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Habitually whining and complaining.",
+        "answer": "querulous",
+        "distractors": [
+          "nascent",
+          "perfunctory",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "He left a long, {whining and complaining} review about the size of the parking spaces.",
+        "answer": "querulous",
+        "distractors": [
+          "nascent",
+          "pyrrhic",
+          "moribund"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "\"Is it nearly ready? Why is it taking so long?\" came the ___ voice from the back seat.",
+        "answer": "querulous",
+        "distractors": [
+          "quarrelsome",
+          "nascent",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Age had made him ___, forever grumbling about the noise, the cold and the price of bread.",
+        "answer": "querulous",
+        "distractors": [
+          "nascent",
+          "pyrrhic",
+          "perfunctory"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "febrile",
+    "pos": "adjective",
+    "pron": "FEE-bryle",
+    "definition": "Nervously excited or tense, as if in a fever.",
+    "example": "The mood in the trading room was febrile as the results came in.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "febrile",
+        "answer": "Nervously excited or tense, as if in a fever.",
+        "distractors": [
+          "Bland and inoffensive, deliberately avoiding anything that might upset.",
+          "Serving no useful purpose; redundant.",
+          "In terminal decline; close to ending and lacking vitality."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Tense and overexcited, in a way that feels unstable.",
+        "answer": "febrile",
+        "distractors": [
+          "anodyne",
+          "otiose",
+          "moribund"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "Rumours spread quickly in the {tense, overexcited} days before the election.",
+        "answer": "febrile",
+        "distractors": [
+          "anodyne",
+          "otiose",
+          "moribund"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Social media was ___ for hours after the referee's decision, with fans demanding a replay.",
+        "answer": "febrile",
+        "distractors": [
+          "anodyne",
+          "otiose",
+          "nugatory"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The share market has been ___ all week, swinging wildly on every rumour.",
+        "answer": "febrile",
+        "distractors": [
+          "anodyne",
+          "otiose",
+          "tawdry"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "oleaginous",
+    "pos": "adjective",
+    "pron": "oh-lee-AJ-ih-nus",
+    "definition": "Of a person: smarmy and insincerely flattering, in an oily way.",
+    "example": "The oleaginous salesman complimented every outfit I tried on.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "oleaginous",
+        "answer": "Of a person: smarmy and insincerely flattering, in an oily way.",
+        "distractors": [
+          "Nervously excited or tense, as if in a fever.",
+          "Just coming into existence and beginning to develop.",
+          "Done only as a formality, with minimal effort or care."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Oily and ingratiating; flattering in a way that feels false.",
+        "answer": "oleaginous",
+        "distractors": [
+          "febrile",
+          "nascent",
+          "jejune"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The host's {smarmy, over-flattering} manner made the guests uneasy.",
+        "answer": "oleaginous",
+        "distractors": [
+          "nascent",
+          "otiose",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "He became positively ___ whenever the boss walked past, all smiles and compliments.",
+        "answer": "oleaginous",
+        "distractors": [
+          "nascent",
+          "moribund",
+          "otiose"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "I can't stand his ___ emails, each one opening with three lines of praise.",
+        "answer": "oleaginous",
+        "distractors": [
+          "nascent",
+          "pyrrhic",
+          "moribund"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "facile",
+    "pos": "adjective",
+    "pron": "FAS-ile",
+    "definition": "Too simple; ignoring the real complexity of an issue.",
+    "example": "Blaming the whole crisis on lazy young people is a facile explanation.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "facile",
+        "answer": "Too simple; ignoring the real complexity of an issue.",
+        "distractors": [
+          "In terminal decline; close to ending and lacking vitality.",
+          "Complaining in a whining, irritable way.",
+          "Nervously excited or tense, as if in a fever."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Easy and superficial, glossing over what makes a problem hard.",
+        "answer": "facile",
+        "distractors": [
+          "moribund",
+          "querulous",
+          "febrile"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "It's {far too simplistic} to say the team lost because of one bad referee.",
+        "answer": "facile",
+        "distractors": [
+          "moribund",
+          "querulous",
+          "peremptory"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The report avoids ___ answers and admits the problem has no single cause.",
+        "answer": "facile",
+        "distractors": [
+          "moribund",
+          "querulous",
+          "febrile"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Calling it \"just a communication issue\" is ___ when three people have resigned.",
+        "answer": "facile",
+        "distractors": [
+          "moribund",
+          "nascent",
+          "querulous"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "tendentious",
+    "pos": "adjective",
+    "pron": "ten-DEN-shus",
+    "definition": "Slanted to promote a particular point of view, especially a controversial one.",
+    "example": "The documentary was so tendentious that it never put the other side's case.",
+    "confusable": {
+      "word": "contentious",
+      "note": "Tendentious means slanted towards one view. Contentious means likely to cause argument."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "tendentious",
+        "answer": "Slanted to promote a particular point of view, especially a controversial one.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "Nervously excited or tense, as if in a fever.",
+          "Of a victory: won at such a great cost that it is hardly worth winning."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Deliberately one-sided; pushing a particular agenda.",
+        "answer": "tendentious",
+        "distractors": [
+          "nascent",
+          "febrile",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The article's {slanted, one-sided} summary of the study left out every finding that didn't suit it.",
+        "answer": "tendentious",
+        "distractors": [
+          "nascent",
+          "pyrrhic",
+          "moribund"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "The briefing was ___: every statistic was chosen to support the minister's plan.",
+        "answer": "tendentious",
+        "distractors": [
+          "contentious",
+          "nascent",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Her account of the dispute is ___, since she quotes only the emails that make her look good.",
+        "answer": "tendentious",
+        "distractors": [
+          "nascent",
+          "pyrrhic",
+          "febrile"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "nugatory",
+    "pos": "adjective",
+    "pron": "NYOO-guh-tree",
+    "definition": "Of no real value or importance; having no practical effect.",
+    "example": "The pay rise was nugatory once the new parking fees came in.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "nugatory",
+        "answer": "Of no real value or importance; having no practical effect.",
+        "distractors": [
+          "Nervously excited or tense, as if in a fever.",
+          "Complaining in a whining, irritable way.",
+          "Showy but cheap and of poor quality; also sordid."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "So small in effect that it amounts to nothing.",
+        "answer": "nugatory",
+        "distractors": [
+          "febrile",
+          "querulous",
+          "tawdry"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The warranty is {effectively worthless} if you have to post the phone overseas for repairs.",
+        "answer": "nugatory",
+        "distractors": [
+          "febrile",
+          "querulous",
+          "nascent"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Without anyone to enforce it, the new rule is ___.",
+        "answer": "nugatory",
+        "distractors": [
+          "febrile",
+          "querulous",
+          "tawdry"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The savings from the merger turned out to be ___, a few thousand dollars against millions in costs.",
+        "answer": "nugatory",
+        "distractors": [
+          "febrile",
+          "querulous",
+          "peremptory"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "meretricious",
+    "pos": "adjective",
+    "pron": "meh-ruh-TRISH-us",
+    "definition": "Attractive on the surface but having no real value or integrity.",
+    "example": "The ad campaign was slick, meretricious and quickly forgotten.",
+    "confusable": {
+      "word": "meritorious",
+      "note": "Meretricious means flashy but worthless. Meritorious means deserving praise, almost the opposite."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "meretricious",
+        "answer": "Attractive on the surface but having no real value or integrity.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "In terminal decline; close to ending and lacking vitality.",
+          "Complaining in a whining, irritable way."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Superficially appealing but hollow or worthless underneath.",
+        "answer": "meretricious",
+        "distractors": [
+          "nascent",
+          "moribund",
+          "querulous"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The film is {glossy but empty}, all special effects and no story.",
+        "answer": "meretricious",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "peremptory"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "Behind the ___ branding was a product that broke within a week.",
+        "answer": "meretricious",
+        "distractors": [
+          "meritorious",
+          "nascent",
+          "querulous"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The tower's ___ glass facade hides cramped flats and cheap fittings.",
+        "answer": "meretricious",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "peremptory"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "turgid",
+    "pos": "adjective",
+    "pron": "TUR-jid",
+    "definition": "Pompous, overblown and tedious, especially in style.",
+    "example": "The report's turgid prose made a simple point take forty pages.",
+    "confusable": {
+      "word": "turbid",
+      "note": "Turgid means swollen or pompous. Turbid means muddy or cloudy."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "turgid",
+        "answer": "Pompous, overblown and tedious, especially in style.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "Of a victory: won at such a great cost that it is hardly worth winning.",
+          "Complaining in a whining, irritable way."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Heavy, overwritten and hard going.",
+        "answer": "turgid",
+        "distractors": [
+          "nascent",
+          "pyrrhic",
+          "querulous"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The speech was {long-winded and pompous}, and half the room was asleep by the end.",
+        "answer": "turgid",
+        "distractors": [
+          "nascent",
+          "pyrrhic",
+          "ersatz"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "The manual is so ___ that nobody gets past the introduction.",
+        "answer": "turgid",
+        "distractors": [
+          "turbid",
+          "nascent",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "I love the story, but the ___ dialogue makes every character sound like a lawyer.",
+        "answer": "turgid",
+        "distractors": [
+          "nascent",
+          "pyrrhic",
+          "moribund"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "fatuous",
+    "pos": "adjective",
+    "pron": "FAT-yoo-us",
+    "definition": "Silly and pointless, often in a smug or self-satisfied way.",
+    "example": "The interviewer's fatuous questions about her shoes made the panel cringe.",
+    "confusable": {
+      "word": "facetious",
+      "note": "Fatuous means silly and pointless. Facetious means flippant, joking about something serious."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "fatuous",
+        "answer": "Silly and pointless, often in a smug or self-satisfied way.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "Done only as a formality, with minimal effort or care.",
+          "Insisting on immediate obedience, in a brusque way that allows no discussion."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Foolish and empty, often smugly so.",
+        "answer": "fatuous",
+        "distractors": [
+          "nascent",
+          "perfunctory",
+          "peremptory"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "Spare me the {smug, empty} slogans about \"living your best life\".",
+        "answer": "fatuous",
+        "distractors": [
+          "nascent",
+          "peremptory",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "It was a ___ question, asked in all seriousness, about whether the moon landing happened on a weekend.",
+        "answer": "fatuous",
+        "distractors": [
+          "facetious",
+          "nascent",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The ad's ___ claim that the cereal \"makes mornings magic\" fooled nobody.",
+        "answer": "fatuous",
+        "distractors": [
+          "nascent",
+          "pyrrhic",
+          "moribund"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "anodyne",
+    "pos": "adjective",
+    "pron": "AN-uh-dyne",
+    "definition": "Bland and inoffensive, deliberately avoiding anything that might upset.",
+    "example": "The CEO's statement was anodyne and said nothing about the job cuts.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "anodyne",
+        "answer": "Bland and inoffensive, deliberately avoiding anything that might upset.",
+        "distractors": [
+          "Nervously excited or tense, as if in a fever.",
+          "Of a victory: won at such a great cost that it is hardly worth winning.",
+          "Complaining in a whining, irritable way."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Safe and bland to the point of saying nothing.",
+        "answer": "anodyne",
+        "distractors": [
+          "febrile",
+          "pyrrhic",
+          "querulous"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The band's new album is {pleasant but completely forgettable}, as if written for supermarket speakers.",
+        "answer": "anodyne",
+        "distractors": [
+          "febrile",
+          "pyrrhic",
+          "querulous"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The council's ___ press release thanked everyone and explained nothing.",
+        "answer": "anodyne",
+        "distractors": [
+          "febrile",
+          "pyrrhic",
+          "querulous"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Wedding speeches tend to be ___, but his was surprisingly sharp.",
+        "answer": "anodyne",
+        "distractors": [
+          "febrile",
+          "pyrrhic",
+          "moribund"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "inchoate",
+    "pos": "adjective",
+    "pron": "in-KOH-ut",
+    "definition": "Just begun and not yet fully formed or developed.",
+    "example": "She had an inchoate idea for a business but no plan yet.",
+    "confusable": {
+      "word": "incoherent",
+      "note": "Inchoate means not yet fully formed. It is often misused to mean incoherent or chaotic."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "inchoate",
+        "answer": "Just begun and not yet fully formed or developed.",
+        "distractors": [
+          "In terminal decline; close to ending and lacking vitality.",
+          "Showy but cheap and of poor quality; also sordid.",
+          "Complaining in a whining, irritable way."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Only partly formed; still taking shape.",
+        "answer": "inchoate",
+        "distractors": [
+          "moribund",
+          "tawdry",
+          "querulous"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "Plans for the new park are still {rough and only half worked out}, so there's time to have a say.",
+        "answer": "inchoate",
+        "distractors": [
+          "moribund",
+          "tawdry",
+          "pyrrhic"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "Their plans for the restaurant were still ___: a name, a location they liked, and nothing else.",
+        "answer": "inchoate",
+        "distractors": [
+          "incoherent",
+          "moribund",
+          "tawdry"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The protest movement was ___, with lots of anger but no leaders or demands.",
+        "answer": "inchoate",
+        "distractors": [
+          "tawdry",
+          "pyrrhic",
+          "peremptory"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "moribund",
+    "pos": "adjective",
+    "pron": "MOR-ih-bund",
+    "definition": "In terminal decline; close to ending and lacking vitality.",
+    "example": "The local cinema had been moribund for years before it finally closed.",
+    "confusable": {
+      "word": "morbid",
+      "note": "Moribund means dying or in decline. Morbid means preoccupied with death or gloom."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "moribund",
+        "answer": "In terminal decline; close to ending and lacking vitality.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "Showy but cheap and of poor quality; also sordid.",
+          "Complaining in a whining, irritable way."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Dying out; stagnant and in its final decline.",
+        "answer": "moribund",
+        "distractors": [
+          "nascent",
+          "tawdry",
+          "querulous"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The once-busy port is now {all but dead}, with just one ship a month.",
+        "answer": "moribund",
+        "distractors": [
+          "nascent",
+          "tawdry",
+          "querulous"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "The tennis club was ___ until a group of retirees took it over and doubled the membership.",
+        "answer": "moribund",
+        "distractors": [
+          "morbid",
+          "tawdry",
+          "querulous"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Talks between the two companies are ___ and few expect a deal.",
+        "answer": "moribund",
+        "distractors": [
+          "tawdry",
+          "querulous",
+          "oleaginous"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "peremptory",
+    "pos": "adjective",
+    "pron": "puh-REMP-tuh-ree",
+    "definition": "Insisting on immediate obedience, in a brusque way that allows no discussion.",
+    "example": "She sent a peremptory email demanding the report by noon.",
+    "confusable": {
+      "word": "perfunctory",
+      "note": "Peremptory means brusquely demanding. Perfunctory means done with minimal effort."
+    },
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "peremptory",
+        "answer": "Insisting on immediate obedience, in a brusque way that allows no discussion.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "Showy but cheap and of poor quality; also sordid.",
+          "Nervously excited or tense, as if in a fever."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Curt and commanding, leaving no room for argument.",
+        "answer": "peremptory",
+        "distractors": [
+          "nascent",
+          "tawdry",
+          "febrile"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The landlord left a {curt, take-it-or-leave-it} note telling us to move the bins.",
+        "answer": "peremptory",
+        "distractors": [
+          "nascent",
+          "tawdry",
+          "febrile"
+        ]
+      },
+      {
+        "type": "confusable",
+        "prompt": "\"Sit down,\" said the manager, in a ___ tone that ended the discussion.",
+        "answer": "peremptory",
+        "distractors": [
+          "perfunctory",
+          "nascent",
+          "tawdry"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The coach's ___ dismissal of the players' concerns made the dressing room tense.",
+        "answer": "peremptory",
+        "distractors": [
+          "nascent",
+          "tawdry",
+          "otiose"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "ersatz",
+    "pos": "adjective",
+    "pron": "AIR-zats",
+    "definition": "Used as an inferior substitute for the real thing; imitation.",
+    "example": "The café served an ersatz carbonara made with cream and bacon bits.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "ersatz",
+        "answer": "Used as an inferior substitute for the real thing; imitation.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "Complaining in a whining, irritable way.",
+          "Insisting on immediate obedience, in a brusque way that allows no discussion."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "A poor imitation standing in for the genuine article.",
+        "answer": "ersatz",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "peremptory"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The suburb's {fake, imitation} village green is really just a roundabout with a bench.",
+        "answer": "ersatz",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "peremptory"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "After a week of ___ coffee from the office machine, a proper flat white felt like a luxury.",
+        "answer": "ersatz",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "peremptory"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The theme park offers an ___ version of Venice, complete with plastic gondolas.",
+        "answer": "ersatz",
+        "distractors": [
+          "otiose",
+          "inchoate",
+          "oleaginous"
+        ]
+      }
+    ]
+  },
+  {
+    "word": "pyrrhic",
+    "pos": "adjective",
+    "pron": "PIRR-ik",
+    "definition": "Of a victory: won at such a great cost that it is hardly worth winning.",
+    "example": "Winning the court case was a pyrrhic victory: the legal fees bankrupted the company.",
+    "questions": [
+      {
+        "type": "pick-meaning",
+        "prompt": "pyrrhic",
+        "answer": "Of a victory: won at such a great cost that it is hardly worth winning.",
+        "distractors": [
+          "Just coming into existence and beginning to develop.",
+          "Bland and inoffensive, deliberately avoiding anything that might upset.",
+          "Complaining in a whining, irritable way."
+        ]
+      },
+      {
+        "type": "pick-word",
+        "prompt": "Describing a win that costs so much it is close to a defeat.",
+        "answer": "pyrrhic",
+        "distractors": [
+          "nascent",
+          "anodyne",
+          "querulous"
+        ]
+      },
+      {
+        "type": "rewrite",
+        "prompt": "The team won the final, but losing their captain to injury made it a {costly, hollow} victory.",
+        "answer": "pyrrhic",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "febrile"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "Getting the old tree removed was a ___ win; the neighbours haven't spoken to us since.",
+        "answer": "pyrrhic",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "febrile"
+        ]
+      },
+      {
+        "type": "gap",
+        "prompt": "The union's ___ victory secured a pay rise but cost three hundred jobs.",
+        "answer": "pyrrhic",
+        "distractors": [
+          "nascent",
+          "querulous",
+          "turgid"
+        ]
+      }
+    ]
+  }
+]
