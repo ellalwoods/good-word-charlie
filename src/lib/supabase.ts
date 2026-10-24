@@ -56,6 +56,11 @@ function supabaseRemote(sb: SupabaseClient): Remote {
       if (error) throw error;
       return Array.isArray(data) ? data : null;
     },
+    async archive(password, id, archived) {
+      const { data, error } = await sb.rpc('charlie_archive', { p_password: password, p_id: id, p_archived: archived });
+      if (error) throw error;
+      return data === true;
+    },
     async claim(name) {
       const { data, error } = await sb.rpc('charlie_claim', { p_name: name });
       if (error) throw error;

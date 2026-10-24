@@ -21,6 +21,8 @@ export interface Remote {
   claim(name: string): Promise<string | null>;
   /** Everyone's records, for the owner's stats page. Null if the password is wrong. */
   stats(password: string): Promise<Row[] | null>;
+  /** Archives (or brings back) a record on the owner's stats page. False if the password is wrong. */
+  archive(password: string, id: string, archived: boolean): Promise<boolean>;
 }
 
 /** Keeps progress on this device, and in step with a sync link if there is one. */

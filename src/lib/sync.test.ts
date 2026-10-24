@@ -66,6 +66,7 @@ function server() {
     listen(_key, fn) { listeners.add(fn); return () => listeners.delete(fn); },
     announce() { listeners.forEach(fn => fn()); },
     async stats() { return null; },
+    async archive() { return false; },
     async claim(name) {
       return [...rows].find(([, r]) => r.data.name?.value === name)?.[0] ?? null;
     },

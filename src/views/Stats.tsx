@@ -114,18 +114,30 @@ function Pin({ onCode, wrong, busy }: { onCode: (code: string) => void; wrong: n
 }
 
 /** Ella's stats: how everyone's using the site. Behind a four-digit code checked by Supabase, asked every time. */
-export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: (password: string) => Promise<Row[] | null> }) {
+export function Stats({ bank, date, load, archive }: {
+  bank: Word[]; date: string;
+  load: (password: string) => Promise<Row[] | null>;
+  archive: (password: string, id: string, archived: boolean) => Promise<boolean>;
+}) {
+  // Held only while the page is open, for archiving; never saved.
+  const [code, setCode] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
   const [stats, setStats] = useState<S | null>(null);
   const [state, setState] = useState<'locked' | 'loading' | 'failed' | 'open'>('locked');
   const [wrong, setWrong] = useState(0);
   const [chart, setChart] = useState<string | null>(null);
+
+  const setArchived = async (id: string, archived: boolean) => {
+    setStats(s => s && { ...s, people: s.people.map(p => (p.id === id ? { ...p, archived } : p)), guests: s.guests + (archived ? -1 : 1) });
+    try { await archive(code, id, archived); } catch { /* shown again next time it loads */ }
+  };
 
   const open = async (code: string) => {
     setState('loading');
     try {
       const rows = await load(code);
       if (!rows) { setWrong(n => n + 1); setState('locked'); return; }
-      setStats(computeStats(rows, bank, date)); setState('open');
+      setCode(code); setStats(computeStats(rows, bank, date)); setState('open');
     } catch { setState('failed'); }
   };
 
@@ -151,7 +163,7 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
   return (
     <section className="sync stats-page">
       <section className="stats" aria-label="Overview">
-        <div className="stat"><b>{stats.people.length - stats.guests}</b><span className="tag">People{stats.guests ? ` + ${stats.guests} guest${stats.guests === 1 ? '' : 's'}` : ''}</span></div>
+        <div className="stat"><b>{stats.people.filter(p => !p.guest).length}</b><span className="tag">People{stats.guests ? ` + ${stats.guests} guest${stats.guests === 1 ? '' : 's'}` : ''}</span></div>
         <div className="stat stat-yellow"><b>{stats.activeWeek}</b><span className="tag">Active this week</span></div>
         <div className="stat stat-pink"><b>{stats.people.reduce((n, p) => n + p.used, 0)}</b><span className="tag">Words used</span></div>
       </section>
@@ -164,8 +176,8 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
 
       <h2 className="tag section-label">People</h2>
       <div className="cards">
-        {stats.people.map(p => (
-          <article key={p.name} className={`card person ${p.guest ? 'c-guest' : `c-${colorOf(p.color)}`}`}>
+        {stats.people.filter(p => !p.archived).map(p => (
+          <article key={p.id} className={`card person ${p.guest ? 'c-guest' : `c-${colorOf(p.color)}`}`}>
             <div className="band"><span>{p.name}</span><span>Seen {ago(p.lastSeen)}</span></div>
             <div className="ruled">
               {p.started && (
@@ -174,6 +186,7 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
                   {p.guest && <> · no name yet</>}
                 </p>
               )}
+              {p.guest && <button type="button" className="link whoops archive-link" onClick={() => setArchived(p.id, true)}>Archive this guest</button>}
               <div className="profile-head"><Avatar friend={p.guest ? { name: '?', color: null } : p} /><span className="tag">{p.streak}-day streak · practised {p.practised} of {p.dealt} days</span></div>
               <dl className="facts">
                 <div><dt>Learned</dt><dd>{p.learned}</dd></div>
@@ -198,6 +211,26 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
           </article>
         ))}
       </div>
+
+      {stats.people.some(p => p.archived) && (
+        <div>
+          <button type="button" className="chip chip-quiet" aria-expanded={showArchived} onClick={() => setShowArchived(!showArchived)}>
+            {showArchived ? 'Hide archived guests' : `Archived guests · ${stats.people.filter(p => p.archived).length}`}
+          </button>
+          {showArchived && (
+            <ul className="archive archived-guests">
+              {stats.people.filter(p => p.archived).map(p => (
+                <li key={p.id}>
+                  <div>
+                    <p className="archive-line"><b>{p.name}</b> <span className="tag">first visit {p.started ? started(p.started, p.startedTime) : '–'} · seen {ago(p.lastSeen)}</span></p>
+                    <button type="button" className="link whoops" onClick={() => setArchived(p.id, false)}>Bring back</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       <h2 className="tag section-label">Pages, everyone</h2>
       <article className="card">

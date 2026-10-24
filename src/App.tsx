@@ -245,7 +245,7 @@ export default function App() {
               onNote={(w, d, text) => update(setNote(latest(), w, d, text))}
               onCheer={(n, w, d, yes) => update(markCheer(latest(), n, w, d, yes))} />
           ) : tab === 'stats' && remote ? (
-            <Stats bank={bank} date={date} load={p => remote!.stats(p)} />
+            <Stats bank={bank} date={date} load={p => remote!.stats(p)} archive={(p, id, a) => remote!.archive(p, id, a)} />
           ) : tab === 'sync' ? (
             <SyncView snap={snap} onLink={() => sync.link()} onJoin={join}
               onUnlink={() => { try { localStorage.setItem(LOCAL_ONLY, '1'); } catch { /* storage blocked */ } sync.unlink(); }} />

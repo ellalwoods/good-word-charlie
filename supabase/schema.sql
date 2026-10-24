@@ -130,6 +130,22 @@ create table if not exists public.charlie_owner (
 );
 alter table public.charlie_owner enable row level security;
 
+-- Records Ella has archived on her stats page (by the start of their key).
+create table if not exists public.charlie_archived (id text primary key);
+alter table public.charlie_archived enable row level security;
+
+create or replace function public.charlie_owner_ok(p_password text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (select 1 from public.charlie_owner o
+                  where o.password_hash = extensions.crypt(p_password, o.password_hash));
+$$;
+revoke all on function public.charlie_owner_ok(text) from public;
+
 create or replace function public.charlie_stats(p_password text)
 returns jsonb
 language plpgsql
@@ -138,14 +154,40 @@ security definer
 set search_path = ''
 as $$
 begin
-  if not exists (select 1 from public.charlie_owner o
-                  where o.password_hash = extensions.crypt(p_password, o.password_hash)) then
+  if not public.charlie_owner_ok(p_password) then
     return null;
   end if;
-  return (select coalesce(jsonb_agg(jsonb_build_object('updated_at', p.updated_at, 'data', p.data)), '[]'::jsonb)
+  return (select coalesce(jsonb_agg(jsonb_build_object(
+            'id', left(p.secret, 12),
+            'updated_at', p.updated_at,
+            'archived', exists (select 1 from public.charlie_archived a where a.id = left(p.secret, 12)),
+            'data', p.data)), '[]'::jsonb)
             from public.charlie_progress p);
 end;
 $$;
+
+-- Archive (or bring back) a record on Ella's stats page.
+create or replace function public.charlie_archive(p_password text, p_id text, p_archived boolean)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if not public.charlie_owner_ok(p_password) then
+    return false;
+  end if;
+  if p_archived then
+    insert into public.charlie_archived (id) values (p_id) on conflict do nothing;
+  else
+    delete from public.charlie_archived where id = p_id;
+  end if;
+  return true;
+end;
+$$;
+
+revoke all on function public.charlie_archive(text, text, boolean) from public;
+grant execute on function public.charlie_archive(text, text, boolean) to anon, authenticated;
 
 revoke all on function public.charlie_stats(text) from public;
 grant execute on function public.charlie_stats(text) to anon, authenticated;

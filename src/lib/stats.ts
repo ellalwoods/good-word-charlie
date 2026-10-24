@@ -6,9 +6,11 @@ import { byUse, minutesByDay, pageUse, type PageUse } from './time';
 import type { State, Word } from './types';
 
 /** One record as the owner's stats function returns it. */
-export interface Row { updated_at: string; data: unknown }
+export interface Row { id?: string; updated_at: string; archived?: boolean; data: unknown }
 
 export interface Person {
+  id: string;                // the start of their key, for archiving
+  archived: boolean;
   name: string;
   guest: boolean;            // no name yet: "Guest 1", "Guest 2", by when they started
   started: string | null;    // when the record was first used (ISO), or the first day it was dealt words
@@ -56,7 +58,8 @@ const bump = (m: Map<string, number>, k: string, by = 1) => m.set(k, (m.get(k) ?
 
 export function computeStats(rows: Row[], bank: Word[], date: string): Stats {
   // A guest record whose device has since become someone else is left out.
-  const records = rows.map(r => ({ at: r.updated_at, s: normalise(r.data) as State })).filter(r => !r.s.moved);
+  const records = rows.map((r, i) => ({ id: r.id ?? String(i), archived: !!r.archived, at: r.updated_at, s: normalise(r.data) as State }))
+    .filter(r => !r.s.moved);
   const named = records.filter(r => r.s.name?.value);
   const startOf = (s: State): { started: string | null; startedTime: boolean } => {
     if (s.started) return { started: new Date(s.started).toISOString(), startedTime: true };
@@ -103,6 +106,8 @@ export function computeStats(rows: Row[], bank: Word[], date: string): Stats {
       pages: pageUse(s),
       ...startOf(s),
       guest: !s.name?.value,
+      id: r.id,
+      archived: r.archived,
       name: f.name,
       color: f.color,
       lastSeen: at,
@@ -124,7 +129,7 @@ export function computeStats(rows: Row[], bank: Word[], date: string): Stats {
   const weekAgo = Date.now() - 7 * 864e5;
   return {
     people,
-    guests: records.length - named.length,
+    guests: records.filter(r => !r.s.name?.value && !r.archived).length,
     activeWeek: people.filter(p => !p.guest && Date.parse(p.lastSeen) > weekAgo).length,
     hardest: top(wrong, 8, w => `${right.get(w) ?? 0} right`),
     known: top(known),
