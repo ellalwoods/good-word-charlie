@@ -3,6 +3,7 @@ import { answer, finish, type Session } from '../lib/session';
 import { play } from '../lib/sounds';
 import type { Question, QuestionType, State, Word } from '../lib/types';
 import { GAP } from '../lib/validate';
+import { SoundToggle } from './SoundToggle';
 import { ConfusableNote, Headword, WordCard } from './WordCard';
 
 const LABEL: Record<QuestionType, string> = {
@@ -95,15 +96,7 @@ export function Practice({ start, state, bank, number, date, onState, onDone, so
         <span className={`qtag qtag-${q.type}`}>{LABEL[q.type]}</span>
         <span className="q-right">
           <span className="tag">{daily ? '' : `${KIND[session.kind]} · `}{item.retry ? 'Once more · ' : ''}{session.i + 1} of {session.items.length}</span>
-          <button type="button" className="sound-btn" aria-pressed={soundOn} onClick={onSound}
-            aria-label={soundOn ? 'Sound on. Turn it off' : 'Sound off. Turn it on'} title={soundOn ? 'Sound on' : 'Sound off'}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" />
-              {soundOn
-                ? <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                : <path d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
-            </svg>
-          </button>
+          <SoundToggle on={soundOn} onToggle={onSound} compact />
         </span>
       </div>
 

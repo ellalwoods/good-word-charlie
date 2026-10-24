@@ -17,6 +17,7 @@ import { Practice } from './views/Practice';
 import { Sync as SyncView, syncLabel } from './views/Sync';
 import { Today } from './views/Today';
 import { InstallHelp, installed, useInstall } from './views/Install';
+import { SoundToggle } from './views/SoundToggle';
 import { Stats } from './views/Stats';
 import { TextElla } from './views/TextElla';
 import { Welcome } from './views/Welcome';
@@ -265,7 +266,7 @@ export default function App() {
           <footer className="foot">
             {!installed() && <button type="button" className="chip" onClick={install.start}>Add to home screen</button>}
             <button type="button" className="chip" onClick={() => go('sync')}>Sync devices · {syncLabel(snap)}</button>
-            <button type="button" className="chip chip-quiet" aria-pressed={soundOn} onClick={toggleSound}>Sound · {soundOn ? 'On' : 'Off'}</button>
+            <SoundToggle on={soundOn} onToggle={toggleSound} />
             <TextElla label="Error? Tell Ella" body="Hi Ella, something’s not working on Good Word, Charlie: " />
             {remote && name.trim().toLowerCase() === 'ella' && (
               <button type="button" className="chip chip-quiet" onClick={() => go('stats')}>Ella’s stats</button>

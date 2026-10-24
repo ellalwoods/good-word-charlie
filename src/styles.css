@@ -807,6 +807,27 @@ ol.welcome-list { padding-left: 1.3em; }
 .archived-guests .whoops { font: 400 0.75rem/1.4 var(--mono); opacity: 0.7; }
 
 .q-right { display: inline-flex; align-items: center; gap: 10px; }
-.sound-btn { appearance: none; display: grid; place-items: center; width: 30px; height: 30px; padding: 4px; border: 2px solid var(--ink); background: var(--card); color: var(--ink); cursor: pointer; }
-.sound-btn[aria-pressed='false'] { opacity: 0.6; }
-.sound-btn svg { width: 100%; height: 100%; }
+
+/* Sound switch: ON is pink with the knob on the right; OFF is plain with the knob on the left. */
+.toggle { appearance: none; display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; padding: 2px; cursor: pointer; color: var(--ink); }
+.toggle-label { font: 700 0.6875rem/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.toggle-track {
+  position: relative; display: flex; align-items: center;
+  width: 64px; height: 30px; border: var(--line); border-radius: 999px;
+  background: var(--card); box-shadow: 2px 2px 0 var(--ink);
+  transition: background 0.15s;
+}
+.toggle-knob {
+  position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border: 2px solid var(--ink); border-radius: 50%;
+  background: var(--paper); transition: left 0.15s;
+}
+.toggle-text { width: 100%; padding: 0 9px 0 28px; text-align: center; font: 700 0.625rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.toggle[aria-checked='true'] .toggle-track { background: var(--pink); }
+.toggle[aria-checked='true'] .toggle-knob { left: 37px; background: var(--card); }
+.toggle[aria-checked='true'] .toggle-text { padding: 0 28px 0 9px; }
+.toggle-compact .toggle-track { width: 56px; height: 26px; }
+.toggle-compact .toggle-knob { width: 16px; height: 16px; }
+.toggle-compact[aria-checked='true'] .toggle-knob { left: 33px; }
+.toggle-compact .toggle-text { padding-left: 22px; }
+.toggle-compact[aria-checked='true'] .toggle-text { padding: 0 22px 0 7px; }
+@media (prefers-reduced-motion: reduce) { .toggle-track, .toggle-knob { transition: none; } }
