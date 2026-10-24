@@ -738,3 +738,6 @@ ol.welcome-list { padding-left: 1.3em; }
 .profile-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .profile-words { margin: 0; }
 .profile-close { margin-top: 8px; }
+.who-card .btn { margin: 4px 0 6px; }
+.who-card .sync-warn { margin-top: 4px; }
+.who-note { margin: 0 0 4px; }

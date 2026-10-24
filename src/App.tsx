@@ -16,6 +16,7 @@ import { Sync as SyncView, syncLabel } from './views/Sync';
 import { Today } from './views/Today';
 import { InstallHelp, installed, useInstall } from './views/Install';
 import { Welcome } from './views/Welcome';
+import { WhoAreYou } from './views/WhoAreYou';
 
 const bank = usable(words as Word[]);
 const numbers = new Map(bank.map((w, i) => [w.word, i + 1]));
@@ -50,6 +51,7 @@ window.addEventListener('online', sync.wake);
 
 // Friends' news already looked at, so the header only counts new things.
 const SEEN = 'good-word-charlie-seen-v2';
+const ASKED = 'good-word-charlie-asked';
 function readSeen(): string[] {
   try { const s = JSON.parse(localStorage.getItem(SEEN) || '[]'); return Array.isArray(s) ? s : []; } catch { return []; }
 }
@@ -117,6 +119,14 @@ export default function App() {
   const used = usedOn(state.used, date);
   const toggleUsed = (w: string) => update(markUsed(state, w, date, !used.includes(w)));
 
+  // Become someone who has already joined: you, on a new device.
+  const claim = async (n: string) => {
+    const key = await remote!.claim(n);
+    if (!key) throw new Error('not found');
+    await join(key);
+    if (sync.get().status === 'invalid') throw new Error('not found');
+  };
+
   const joinFriends = async (n: string, color: string) => {
     if (!sync.get().key) await sync.link();
     update(setProfile(sync.get().state, n, color));
@@ -132,7 +142,11 @@ export default function App() {
   // The welcome card sits over everything until it's dismissed.
   const welcoming = settled && !state.welcomed;
   const install = useInstall();
-  const blocked = welcoming || install.open;
+  // Then, on a device that doesn't know you: are you one of these people? Asked once per device.
+  const [asked, setAsked] = useState(() => { try { return !!localStorage.getItem(ASKED); } catch { return false; } });
+  const doneAsking = () => { setAsked(true); try { localStorage.setItem(ASKED, '1'); } catch { /* storage blocked */ } };
+  const asking = settled && !welcoming && !asked && !name && snap.status !== 'off' && (friends !== null || friendsFailed);
+  const blocked = welcoming || install.open || asking;
 
   const heading = useMemo(() => longDate(new Date(`${date}T12:00`)), [date]);
 
@@ -178,12 +192,7 @@ export default function App() {
           ) : tab === 'friends' ? (
             <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}
               onProfile={joinFriends}
-              onClaim={async n => {
-                const key = await remote!.claim(n);
-                if (!key) throw new Error('not found');
-                await join(key);
-                if (sync.get().status === 'invalid') throw new Error('not found');
-              }} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
+              onClaim={claim} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
               fresh={fresh}
               onUsed={(w, d, yes) => update(markUsed(state, w, d, yes))}
               onNote={(w, d, text) => update(setNote(state, w, d, text))}
@@ -203,6 +212,10 @@ export default function App() {
         )}
       </main>
       {install.open && <InstallHelp onClose={install.close} />}
+      {asking && (
+        <WhoAreYou people={(friends ?? []).filter(f => !f.mine)} onClaim={async n => { await claim(n); doneAsking(); }}
+          onAdd={async (n, c) => { await joinFriends(n, c); doneAsking(); }} onGuest={doneAsking} />
+      )}
       {welcoming && <Welcome onDone={() => update({ ...state, welcomed: true })} />}
     </>
   );

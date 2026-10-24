@@ -36,7 +36,7 @@ function ago(at: number): string {
 const list = (items: string[]) =>
   items.map((w, i) => <span key={w}>{i > 0 && (i === items.length - 1 ? ' and ' : ', ')}{w}</span>);
 
-function Avatar({ friend, big }: { friend: { name: string; color: string | null }; big?: boolean }) {
+export function Avatar({ friend, big }: { friend: { name: string; color: string | null }; big?: boolean }) {
   return <span className={`avatar c-${colorOf(friend.color)}${big ? ' avatar-big' : ''}`} aria-hidden="true">{friend.name.slice(0, 1).toUpperCase()}</span>;
 }
 
