@@ -14,9 +14,10 @@ interface Props {
   onRedo: () => void;
   used: string[];
   onUsed: (word: string) => void;
+  onWelcomed: () => void;
 }
 
-export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo, used, onUsed }: Props) {
+export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo, used, onUsed, onWelcomed }: Props) {
   const byWord = new Map(bank.map(w => [w.word, w]));
   const news = (state.days[date] ?? []).map(w => byWord.get(w)).filter((w): w is Word => !!w);
   const due = dueWords(state, bank, date).length;
@@ -27,6 +28,7 @@ export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo
 
   return (
     <>
+      {!state.welcomed && <Welcome onDone={onWelcomed} />}
       <section className="stats" aria-label="Progress">
         <div className="stat"><b>{learned}</b><span className="tag">Words learned</span></div>
         <div className="stat stat-yellow"><b>{days}</b><span className="tag">Day streak</span></div>
@@ -76,6 +78,30 @@ function OutOfWords() {
         <p className="sense">You’ve used up every word in the box. Tell Ella it’s time to load more.</p>
         <p className="example">A word app with no new words? Utterly farcical.</p>
         <p className="sense">Your reviews will keep coming in the meantime.</p>
+      </div>
+    </article>
+  );
+}
+
+/** Shown once, the first time someone opens the site. */
+function Welcome({ onDone }: { onDone: () => void }) {
+  return (
+    <article className="card welcome">
+      <div className="band"><span>Read me first</span><span>No. 000</span></div>
+      <div className="ruled">
+        <h3 className="hw">Good word, Charlie.</h3>
+        <p className="sense">Charlie says things like <i>farcical</i>. Casually. Over breakfast.</p>
+        <p className="sense">Ella says things like “that’s so… you know… silly.”</p>
+        <p className="sense">So Ella made this, to close the gap. You’re welcome to come along.</p>
+        <h4 className="tag welcome-how">How it works</h4>
+        <ul className="welcome-list">
+          <li><b>Three new words a day.</b> Already know one, or don’t like it? Swap it out.</li>
+          <li><b>Practise them</b> with quick multiple choice. Get a word right and it comes back less often; slip up and it’s back tomorrow.</li>
+          <li><b>Use them for real.</b> Tell your friends when you do, and they can celebrate.</li>
+        </ul>
+        <div className="card-actions">
+          <button type="button" className="btn" onClick={onDone}>Let’s begin</button>
+        </div>
       </div>
     </article>
   );

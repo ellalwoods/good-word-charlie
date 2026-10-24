@@ -624,3 +624,12 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
   cursor: pointer;
 }
 .word-box[aria-pressed='true'] { background: var(--pink); }
+
+/* ---------- Welcome ---------- */
+
+.welcome { --band: var(--ink); --band-ink: var(--yellow); margin-bottom: 24px; }
+.welcome .sense { margin: 0 0 8px; }
+.welcome-how { margin: 18px 0 6px; }
+.welcome-list { margin: 0; padding-left: 1.1em; }
+.welcome-list li { margin-bottom: 6px; }
+.welcome .card-actions .btn { width: 100%; }

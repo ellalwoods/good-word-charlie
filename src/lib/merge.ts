@@ -38,6 +38,7 @@ export function merge(a: State, b: State): State {
   if (Object.keys(cheers).length) out.cheers = cheers;
   const name = latestOf(a.name, b.name);
   if (name) out.name = name;
+  if (a.welcomed || b.welcomed) out.welcomed = true;
   if (latest) out.practised = { [latest]: unionList(a.practised?.[latest] ?? [], b.practised?.[latest] ?? []) };
   return out;
 }

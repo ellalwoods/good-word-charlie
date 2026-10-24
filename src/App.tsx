@@ -147,7 +147,8 @@ export default function App() {
                 begin(s, 'today');
               }}
               onRedo={() => begin(redoSession(state, bank, date), 'today')}
-              used={used} onUsed={toggleUsed} />
+              used={used} onUsed={toggleUsed}
+              onWelcomed={() => update({ ...state, welcomed: true })} />
           ) : tab === 'friends' ? (
             <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}
               onProfile={joinFriends} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
