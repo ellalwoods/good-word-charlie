@@ -82,6 +82,8 @@ export default function App() {
   const name = nameOf(state);
 
   const update = (next: State) => sync.update({ ...next, updated: Date.now() });
+  // The newest progress, including changes made earlier in the same tap (e.g. a word and its story).
+  const latest = () => sync.get().state;
 
   // Roll over to a new day when the app comes back from the background after midnight.
   useEffect(() => {
@@ -203,9 +205,9 @@ export default function App() {
               onProfile={joinFriends}
               onClaim={claim} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
               fresh={fresh}
-              onUsed={(w, d, yes) => update(markUsed(state, w, d, yes))}
-              onNote={(w, d, text) => update(setNote(state, w, d, text))}
-              onCheer={(n, w, d, yes) => update(markCheer(state, n, w, d, yes))} />
+              onUsed={(w, d, yes) => update(markUsed(latest(), w, d, yes))}
+              onNote={(w, d, text) => update(setNote(latest(), w, d, text))}
+              onCheer={(n, w, d, yes) => update(markCheer(latest(), n, w, d, yes))} />
           ) : tab === 'sync' ? (
             <SyncView snap={snap} onLink={() => sync.link()} onJoin={join} onUnlink={() => sync.unlink()} />
           ) : (
