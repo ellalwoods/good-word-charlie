@@ -39,7 +39,7 @@ The **Friends** button in the top corner opens the Friends page. **I used a word
 
 ## Practising
 
-- **Today:** today's new words get 5 questions each and due reviews get 2. Only this practice moves words up or down a level.
+- **Today:** one practice a day, never more than 21 questions. Today's three new words get 3 questions each, then the most overdue reviews get 2 each until the 21 are used; any other reviews wait for tomorrow. Only this practice moves words up or down a level.
 - **Redo today's practice** (on Today, once the day's practice is done) goes over the same words with fresh questions.
 - **Shuffle test** (on Lexicon) picks random words you've met; you choose how many words (5, 10, 20 or all) and questions (10 to 50).
 
@@ -79,7 +79,7 @@ src/
   lib/supabase.ts      the Supabase connection
   lib/daily.ts         three a day, "Already know it", "Not for me", streak
   lib/srs.ts           levels 0–6, intervals 0/1/3/7/14/30/60 days
-  lib/session.ts       today's practice (5 questions per new word, 2 per review), redo, shuffle test
+  lib/session.ts       today's practice (3 questions per new word, 2 per review, 21 at most), redo, shuffle test
   lib/validate.ts      the checks above
   views/               Today, Practice, Lexicon, Sync, index card
 public/                manifest, icons, offline service worker

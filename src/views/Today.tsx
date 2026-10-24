@@ -37,14 +37,15 @@ export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo
       </section>
 
       <div className="practise">
-        {due > 0
+        {/* One practice a day, 21 questions at most; reviews that don't fit come round tomorrow. */}
+        {!state.done[date] && size.words > 0
           ? (
             <button type="button" className="btn" onClick={onPractise}>
-              Practise {due} word{due === 1 ? '' : 's'}
+              Practise {size.words} word{size.words === 1 ? '' : 's'}
               <span className="btn-sub">{size.questions} questions</span>
             </button>
           )
-          : <p className="slip">All done for today. Three new words tomorrow.</p>}
+          : <p className="slip">All done for today. Three new words tomorrow{due > 0 ? `, and ${due} review${due === 1 ? '' : 's'} waiting` : ''}.</p>}
         {canRedo && (
           <button type="button" className="btn btn-quiet" onClick={onRedo}>
             Redo today’s practice

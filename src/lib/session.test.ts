@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import words from '../data/words.json';
 import { canDismiss, dismiss, dueWords, ensureToday, streak, unseen } from './daily';
-import { answer, finish, MAX_PER_WORD, pool, practisedToday, questionsFor, recordPractised, redoSession, sessionSize, shuffleTest, startSession } from './session';
+import { answer, DAILY_MAX, finish, MAX_PER_WORD, pool, practisedToday, questionsFor, recordPractised, redoSession, sessionSize, shuffleTest, startSession } from './session';
 import { grade, newCard } from './srs';
 import { fresh } from './storage';
 import type { Word } from './types';
@@ -60,14 +60,14 @@ describe('daily words', () => {
 describe('practice session', () => {
   const wordsOf = (sess: { items: { word: string }[] }) => sess.items.map(i => i.word);
 
-  it("asks today's new words five questions each, spread out rather than back to back", () => {
+  it("asks today's new words three questions each, spread out rather than back to back", () => {
     const s = ensureToday(fresh(), bank, D);
     const sess = startSession(s, bank, D, fixed);
-    expect(sess.items).toHaveLength(15);
+    expect(sess.items).toHaveLength(9);
     for (const w of ['farcical', 'paucity', 'modicum']) {
       const qs = sess.items.filter(i => i.word === w).map(i => i.question);
-      expect(qs).toHaveLength(5);
-      expect(new Set(qs).size).toBe(5);
+      expect(qs).toHaveLength(3);
+      expect(new Set(qs).size).toBe(3);
     }
     const order = wordsOf(sess);
     expect(order.every((w, k) => k === 0 || w !== order[k - 1])).toBe(true);
@@ -75,7 +75,7 @@ describe('practice session', () => {
       expect(it.options).toHaveLength(4);
       expect(it.options).toContain(it.question.answer);
     }
-    expect(sessionSize(s, bank, D)).toEqual({ words: 3, questions: 15 });
+    expect(sessionSize(s, bank, D)).toEqual({ words: 3, questions: 9 });
   });
 
   it('asks review words two questions each', () => {
@@ -107,8 +107,8 @@ describe('practice session', () => {
     let r = answer(s, sess, bank, first.question.distractors[0], D, fixed);
     expect(r.correct).toBe(false);
     expect(r.state.cards.farcical).toMatchObject({ level: 0, due: '2026-10-24', asked: 1 });
-    expect(r.session.items).toHaveLength(16);
-    const retry = r.session.items[15];
+    expect(r.session.items).toHaveLength(10);
+    const retry = r.session.items[9];
     expect(retry).toMatchObject({ word: 'farcical', retry: true });
     expect(sess.items.filter(i => i.word === 'farcical').map(i => i.question)).not.toContain(retry.question);
 
@@ -133,7 +133,7 @@ describe('practice session', () => {
       s = r.state; sess = r.session;
       expect(s.cards.farcical.level).toBe(n === mine.length - 1 ? 1 : 0);
     }
-    expect(s.cards.farcical).toMatchObject({ level: 1, due: '2026-10-24', right: 1, asked: 5 });
+    expect(s.cards.farcical).toMatchObject({ level: 1, due: '2026-10-24', right: 1, asked: 3 });
     expect(sess.firstRight).toBe(1);
     expect(dueWords(s, bank, D)).not.toContain('farcical');
     expect(canDismiss(s, 'farcical')).toBe(false);
@@ -148,7 +148,7 @@ describe('practice session', () => {
     const before = s.cards.farcical;
     let sess = redoSession(s, bank, D, fixed);
     expect(sess.kind).toBe('redo');
-    expect(sess.items).toHaveLength(15);
+    expect(sess.items).toHaveLength(9);
     // Every question right, then one wrong: levels and due dates stay put.
     for (const [j, it] of sess.items.entries()) {
       const r = answer(s, { ...sess, i: j }, bank, it.word === 'paucity' ? it.question.distractors[0] : it.question.answer, D, fixed);
@@ -156,8 +156,8 @@ describe('practice session', () => {
     }
     expect(s.cards.farcical).toMatchObject({ level: before.level, due: before.due, right: 0, wrong: 0 });
     expect(s.cards.paucity).toMatchObject({ level: 0, due: D, wrong: 0 });
-    expect(sess.questionsRight).toBe(10);
-    expect(sess.questionsAsked).toBe(15);
+    expect(sess.questionsRight).toBe(6);
+    expect(sess.questionsAsked).toBe(9);
     expect(sess.missed).toEqual(['paucity']);
   });
 
@@ -173,5 +173,26 @@ describe('practice session', () => {
     expect(counts).toEqual([2, 2, 2, 3, 3]);
     // Never more questions than a word can give.
     expect(shuffleTest(s, bank, 2, 50, fixed).items).toHaveLength(2 * MAX_PER_WORD);
+  });
+
+  it('never asks more than 21 questions a day; the most overdue reviews go first', () => {
+    // Twenty days of words, none practised: plenty of reviews due, plus today's three.
+    let s = fresh();
+    for (let i = 20; i >= 1; i--) s = ensureToday(s, bank, `2026-10-${String(23 - i).padStart(2, '0')}`);
+    s = ensureToday(s, bank, D);
+    const sess = startSession(s, bank, D, fixed);
+    expect(sess.items).toHaveLength(DAILY_MAX);
+    expect(sessionSize(s, bank, D)).toEqual({ words: 9, questions: 21 });
+    // Today's three new words, then six of the oldest reviews (dealt on the 3rd and 4th).
+    const reviews = Object.keys(sess.words).filter(w => !s.days[D].includes(w));
+    expect(reviews.every(w => ['2026-10-03', '2026-10-04'].includes(s.cards[w].due))).toBe(true);
+
+    // Getting everything wrong doesn't add retries past 21.
+    let st = s, se = sess;
+    for (let j = 0; j < se.items.length; j++) {
+      const r = answer(st, { ...se, i: j }, bank, se.items[j].question.distractors[0], D, fixed);
+      st = r.state; se = r.session;
+    }
+    expect(se.items).toHaveLength(DAILY_MAX);
   });
 });

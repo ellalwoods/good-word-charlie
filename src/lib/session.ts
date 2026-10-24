@@ -13,9 +13,11 @@ export function shuffle<T>(items: T[], rand: Rand = Math.random): T[] {
   return a;
 }
 
-/** Questions per word in a session: today's new words get the full set, reviews a quick check. */
-export const NEW_QUESTIONS = 5;
+/** Questions per word in a session: today's new words get three, reviews a quick check of two. */
+export const NEW_QUESTIONS = 3;
 export const REVIEW_QUESTIONS = 2;
+/** Today's practice never asks more than this, retries included. Reviews that don't fit wait for tomorrow. */
+export const DAILY_MAX = 21;
 /** The most different questions one word can get in a session (its pool, less the pair that clash). */
 export const MAX_PER_WORD = 6;
 
@@ -83,11 +85,29 @@ function item(word: Word, question: Question, retry: boolean, rand: Rand): Item 
   return { word: word.word, question, options: shuffle([question.answer, ...question.distractors], rand), retry };
 }
 
-/** How many questions a session would ask today. */
-export function sessionSize(state: State, bank: Word[], date: string): { words: number; questions: number } {
+/**
+ * Today's practice: the day's new words first, then the most overdue reviews that
+ * still fit in DAILY_MAX questions. The rest stay due and come round tomorrow.
+ */
+export function dailyPlan(state: State, bank: Word[], date: string): [string, number][] {
   const due = dueWords(state, bank, date);
-  const news = new Set(state.days[date] ?? []);
-  return { words: due.length, questions: due.reduce((n, w) => n + (news.has(w) ? NEW_QUESTIONS : REVIEW_QUESTIONS), 0) };
+  const todays = new Set(state.days[date] ?? []);
+  const plan: [string, number][] = (state.days[date] ?? []).filter(w => due.includes(w)).map(w => [w, NEW_QUESTIONS]);
+  let left = DAILY_MAX - plan.length * NEW_QUESTIONS;
+  const reviews = due.filter(w => !todays.has(w))
+    .sort((a, b) => state.cards[a].due.localeCompare(state.cards[b].due) || state.cards[a].level - state.cards[b].level || a.localeCompare(b));
+  for (const w of reviews) {
+    if (left < REVIEW_QUESTIONS) break;
+    plan.push([w, REVIEW_QUESTIONS]);
+    left -= REVIEW_QUESTIONS;
+  }
+  return plan;
+}
+
+/** How many words and questions today's practice would ask. */
+export function sessionSize(state: State, bank: Word[], date: string): { words: number; questions: number } {
+  const plan = dailyPlan(state, bank, date);
+  return { words: plan.length, questions: plan.reduce((n, [, q]) => n + q, 0) };
 }
 
 /**
@@ -108,13 +128,12 @@ function deal(kind: SessionKind, state: State, bank: Word[], plan: [string, numb
   return { kind, items, i: 0, total: plan.length, firstRight: 0, questionsRight: 0, questionsAsked: items.length, missed: [], words };
 }
 
-/** Today's practice: new words get five questions each and reviews two. Changes levels. */
+/** Today's practice: new words get three questions each and reviews two, 21 at most. Changes levels. */
 export function startSession(state: State, bank: Word[], date: string, rand: Rand = Math.random): Session {
-  const due = dueWords(state, bank, date);
-  const todays = new Set(state.days[date] ?? []);
-  const news = (state.days[date] ?? []).filter(w => due.includes(w));
-  const order = [...news, ...shuffle(due.filter(w => !todays.has(w)), rand)];
-  return deal('daily', state, bank, order.map(w => [w, todays.has(w) ? NEW_QUESTIONS : REVIEW_QUESTIONS]), rand);
+  const plan = dailyPlan(state, bank, date);
+  const isNew = new Set(state.days[date] ?? []);
+  const order = [...plan.filter(([w]) => isNew.has(w)), ...shuffle(plan.filter(([w]) => !isNew.has(w)), rand)];
+  return deal('daily', state, bank, order, rand);
 }
 
 /** Remembers which words were in today's practice, so it can be redone. */
@@ -177,11 +196,14 @@ export function answer(
         next.missed = [...next.missed, it.word];
       }
       p.failed = true;
-      // Ask again at the end, with a question not already seen today if there is one.
-      const word = bank.find(w => w.word === it.word)!;
-      const seen = next.items.filter(x => x.word === it.word).map(x => x.question);
-      const fresh = questionsFor(word, card.asked, 1, seen)[0] ?? it.question;
-      next.items.push(item(word, fresh, true, rand));
+      // Ask again at the end, with a question not already seen today if there is one
+      // (in today's practice, only while it stays within the day's questions).
+      if (!graded || next.items.length < DAILY_MAX) {
+        const word = bank.find(w => w.word === it.word)!;
+        const seen = next.items.filter(x => x.word === it.word).map(x => x.question);
+        const fresh = questionsFor(word, card.asked, 1, seen)[0] ?? it.question;
+        next.items.push(item(word, fresh, true, rand));
+      }
     } else if (p.left === 0 && !p.failed) {
       // Every first-attempt question right: up a level (in today's practice only).
       if (graded) card = grade(card, true, date);
