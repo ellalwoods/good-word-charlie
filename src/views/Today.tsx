@@ -87,20 +87,17 @@ function OutOfWords() {
 function Welcome({ onDone }: { onDone: () => void }) {
   return (
     <article className="card welcome">
-      <div className="band"><span>Read me first</span><span>No. 000</span></div>
+      <div className="band"><span>WTF is this?</span><span>No. 000</span></div>
       <div className="ruled">
-        <h3 className="hw">Good word, Charlie.</h3>
-        <p className="sense">Charlie says things like <i>farcical</i>. Casually. Over breakfast.</p>
-        <p className="sense">Ella says things like “that’s so… you know… silly.”</p>
-        <p className="sense">So Ella made this, to close the gap. You’re welcome to come along.</p>
+        <p className="sense">Charlie uses the word <i>farcical</i>. Ella wishes she used the word <i>farcical</i>. Ella made this app to improve her vocabulary.</p>
         <h4 className="tag welcome-how">How it works</h4>
         <ul className="welcome-list">
-          <li><b>Three new words a day.</b> Already know one, or don’t like it? Swap it out.</li>
-          <li><b>Practise them</b> with quick multiple choice. Get a word right and it comes back less often; slip up and it’s back tomorrow.</li>
-          <li><b>Use them for real.</b> Tell your friends when you do, and they can celebrate.</li>
+          <li><b>Three new words a day.</b></li>
+          <li><b>Practise them with spaced repetition.</b> Get a word right and it comes back less often; slip up and it’s back tomorrow.</li>
+          <li><b>Use them for real.</b> And tell us, so we can celebrate.</li>
         </ul>
         <div className="card-actions">
-          <button type="button" className="btn" onClick={onDone}>Let’s begin</button>
+          <button type="button" className="btn" onClick={onDone}>Begin</button>
         </div>
       </div>
     </article>
