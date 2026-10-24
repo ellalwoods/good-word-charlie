@@ -85,9 +85,8 @@ export default function App() {
 
   // Friends are fetched when the site opens or comes back into view, and when the Friends page opens.
   const loadFriends = () => {
-    const key = sync.get().key;
-    if (!remote || !key) return;
-    remote.friends(key, '')
+    if (!remote) return;
+    remote.friends(sync.get().key ?? '', '')
       .then(f => { setFriends(combine(f)); setFriendsFailed(false); })
       .catch(() => setFriendsFailed(true));
   };
@@ -167,7 +166,8 @@ export default function App() {
               used={used} onUsed={toggleUsed} />
           ) : tab === 'friends' ? (
             <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}
-              onProfile={joinFriends} onLink={join} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
+              onProfile={joinFriends}
+              onClaim={async n => { const key = await remote!.claim(n); if (!key) throw new Error('not found'); await join(key); }} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
               fresh={fresh}
               onUsed={(w, d, yes) => update(markUsed(state, w, d, yes))}
               onNote={(w, d, text) => update(setNote(state, w, d, text))}

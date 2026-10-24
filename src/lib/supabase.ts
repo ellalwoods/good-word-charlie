@@ -51,6 +51,11 @@ function supabaseRemote(sb: SupabaseClient): Remote {
     announce(key) {
       channels.get(key)?.send({ type: 'broadcast', event: 'saved', payload: {} });
     },
+    async claim(name) {
+      const { data, error } = await sb.rpc('charlie_claim', { p_name: name });
+      if (error) throw error;
+      return typeof data === 'string' ? data : null;
+    },
     async friends(key, since) {
       const { data, error } = await sb.rpc('charlie_friends', { p_key: key, p_since: since });
       if (error) throw error;

@@ -14,8 +14,10 @@ export interface Remote {
   listen(key: string, onSaved: () => void): () => void;
   /** Tells other devices we saved. */
   announce(key: string): void;
-  /** Everyone with a name, with the words they've used since `since` (a date). */
+  /** Everyone with a name, with the words they've used since `since` (a date). `key` may be empty. */
   friends(key: string, since: string): Promise<Friend[]>;
+  /** The sync key of the person with this name, so a new device can be them. */
+  claim(name: string): Promise<string | null>;
 }
 
 /** Keeps progress on this device, and in step with a sync link if there is one. */

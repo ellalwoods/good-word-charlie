@@ -65,6 +65,9 @@ function server() {
     },
     listen(_key, fn) { listeners.add(fn); return () => listeners.delete(fn); },
     announce() { listeners.forEach(fn => fn()); },
+    async claim(name) {
+      return [...rows].find(([, r]) => r.data.name?.value === name)?.[0] ?? null;
+    },
     async friends(key) {
       return [...rows].filter(([, r]) => r.data.name?.value).map(([k, r]) => ({ name: r.data.name!.value, color: r.data.name!.color ?? null, used: r.data.used ?? {}, cheers: r.data.cheers ?? {}, notes: r.data.notes ?? {}, mine: k === key }));
     },

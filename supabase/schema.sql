@@ -99,4 +99,22 @@ $$;
 revoke all on function public.charlie_friends(text, text) from public;
 grant execute on function public.charlie_friends(text, text) to anon, authenticated;
 
+-- "Who are you?": a new device picks a name and becomes that person.
+-- Only names are needed, which is fine for a site shared among friends.
+create or replace function public.charlie_claim(p_name text)
+returns text
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select p.secret from public.charlie_progress p
+   where lower(p.data->'name'->>'value') = lower(trim(p_name))
+   order by p.updated_at desc
+   limit 1;
+$$;
+
+revoke all on function public.charlie_claim(text) from public;
+grant execute on function public.charlie_claim(text) to anon, authenticated;
+
 select 'Good Word, Charlie friends are ready' as done;
