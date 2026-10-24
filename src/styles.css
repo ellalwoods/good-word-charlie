@@ -806,7 +806,6 @@ ol.welcome-list { padding-left: 1.3em; }
 .archived-guests { margin-top: 10px; }
 .archived-guests .whoops { font: 400 0.75rem/1.4 var(--mono); opacity: 0.7; }
 
-.q-right { display: inline-flex; align-items: center; gap: 10px; }
 
 /* Sound switch: ON is pink with the knob on the right; OFF is plain with the knob on the left. */
 .toggle { appearance: none; display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; padding: 2px; cursor: pointer; color: var(--ink); }
@@ -825,9 +824,4 @@ ol.welcome-list { padding-left: 1.3em; }
 .toggle[aria-checked='true'] .toggle-track { background: var(--pink); }
 .toggle[aria-checked='true'] .toggle-knob { left: 37px; background: var(--card); }
 .toggle[aria-checked='true'] .toggle-text { padding: 0 28px 0 9px; }
-.toggle-compact .toggle-track { width: 56px; height: 26px; }
-.toggle-compact .toggle-knob { width: 16px; height: 16px; }
-.toggle-compact[aria-checked='true'] .toggle-knob { left: 33px; }
-.toggle-compact .toggle-text { padding-left: 22px; }
-.toggle-compact[aria-checked='true'] .toggle-text { padding: 0 22px 0 7px; }
 @media (prefers-reduced-motion: reduce) { .toggle-track, .toggle-knob { transition: none; } }

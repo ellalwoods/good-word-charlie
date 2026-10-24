@@ -232,7 +232,6 @@ export default function App() {
         {!settled ? null
           : session ? (
             <Practice start={session} state={state} bank={bank} number={number} date={date}
-              soundOn={soundOn} onSound={toggleSound}
               onState={update} onDone={() => go(from)} />
           ) : tab === 'today' ? (
             <Today state={state} bank={bank} number={number} date={date}

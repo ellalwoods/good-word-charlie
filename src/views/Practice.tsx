@@ -3,7 +3,6 @@ import { answer, finish, type Session } from '../lib/session';
 import { play } from '../lib/sounds';
 import type { Question, QuestionType, State, Word } from '../lib/types';
 import { GAP } from '../lib/validate';
-import { SoundToggle } from './SoundToggle';
 import { ConfusableNote, Headword, WordCard } from './WordCard';
 
 const LABEL: Record<QuestionType, string> = {
@@ -26,11 +25,9 @@ interface Props {
   date: string;
   onState: (s: State) => void;
   onDone: () => void;
-  soundOn: boolean;
-  onSound: () => void;
 }
 
-export function Practice({ start, state, bank, number, date, onState, onDone, soundOn, onSound }: Props) {
+export function Practice({ start, state, bank, number, date, onState, onDone }: Props) {
   const [session, setSession] = useState(start);
   const [picked, setPicked] = useState<string | null>(null);
   const [finished, setFinished] = useState(start.items.length === 0);
@@ -94,10 +91,7 @@ export function Practice({ start, state, bank, number, date, onState, onDone, so
       <div className="meter" aria-hidden="true"><span style={{ width: `${(session.i / session.items.length) * 100}%` }} /></div>
       <div className="q-head">
         <span className={`qtag qtag-${q.type}`}>{LABEL[q.type]}</span>
-        <span className="q-right">
-          <span className="tag">{daily ? '' : `${KIND[session.kind]} · `}{item.retry ? 'Once more · ' : ''}{session.i + 1} of {session.items.length}</span>
-          <SoundToggle on={soundOn} onToggle={onSound} compact />
-        </span>
+        <span className="tag">{daily ? '' : `${KIND[session.kind]} · `}{item.retry ? 'Once more · ' : ''}{session.i + 1} of {session.items.length}</span>
       </div>
 
       <div className="prompt-card">
