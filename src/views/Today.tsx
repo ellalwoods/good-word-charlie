@@ -54,11 +54,10 @@ export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo
         {news.map(w => (
           <WordCard key={w.word} word={w} number={number(w.word)}>
             <div className="card-actions">
-              {canDismiss(state, w.word) && <>
+              {canDismiss(state, w.word) ? <>
                 <button type="button" className="chip" onClick={() => onDismiss(w.word, 'known')}>Already know it</button>
                 <button type="button" className="chip chip-quiet" onClick={() => onDismiss(w.word, 'rejected')}>Not for me</button>
-              </>}
-              <UsedChip used={used.includes(w.word)} onToggle={() => onUsed(w.word)} />
+              </> : <UsedChip used={used.includes(w.word)} onToggle={() => onUsed(w.word)} />}
             </div>
           </WordCard>
         ))}

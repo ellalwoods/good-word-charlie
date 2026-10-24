@@ -46,6 +46,7 @@ export interface State {
   rejected: Record<string, true>;    // "Not for me"
   practised?: Record<string, string[]>;  // date -> words in that day's practice, for "Redo today"
   used?: Record<string, Record<string, number>>;  // date -> word -> when "I used it" was tapped (negative once untapped)
-  name?: { value: string; at: number };  // the name friends see; empty once you leave
+  name?: { value: string; color?: string; at: number };  // the name and colour friends see; empty once you leave
+  cheers?: Record<string, Record<string, number>>;  // date -> "name:word" celebrated -> when (negative once undone)
   updated: number;
 }

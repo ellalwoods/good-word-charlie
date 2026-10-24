@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import words from '../data/words.json';
 import { dismiss, ensureToday } from './daily';
-import { markUsed, setName, usedOn } from './friends';
+import { celebrators, markCheer, markUsed, news, setProfile, usedOn } from './friends';
 import { merge, same } from './merge';
 import { answer, startSession } from './session';
 import { fresh } from './storage';
@@ -66,7 +66,7 @@ function server() {
     listen(_key, fn) { listeners.add(fn); return () => listeners.delete(fn); },
     announce() { listeners.forEach(fn => fn()); },
     async friends(key) {
-      return [...rows].filter(([, r]) => r.data.name?.value).map(([k, r]) => ({ name: r.data.name!.value, used: r.data.used ?? {}, mine: k === key }));
+      return [...rows].filter(([, r]) => r.data.name?.value).map(([k, r]) => ({ name: r.data.name!.value, color: r.data.name!.color ?? null, used: r.data.used ?? {}, cheers: r.data.cheers ?? {}, mine: k === key }));
     },
   };
   return r;
@@ -99,17 +99,17 @@ describe('friends', () => {
   });
 
   it('keeps the latest name', async () => {
-    const a = setName(start, 'Charlie');
+    const a = setProfile(start, 'Charlie', 'pink');
     await new Promise(r => setTimeout(r, 5));
-    const b = setName(start, 'Ella');
+    const b = setProfile(start, 'Ella', 'blue');
     expect(merge(a, b).name?.value).toBe('Ella');
     expect(merge(b, a).name?.value).toBe('Ella');
   });
 
   it("shows friends' names and what they used, and nothing else", async () => {
     const srv = server();
-    const ella = new Sync(srv, memory(setName(markUsed(start, 'paucity', D, true), 'Ella')));
-    const charlie = new Sync(srv, memory(setName(start, 'Charlie')));
+    const ella = new Sync(srv, memory(setProfile(markUsed(start, 'paucity', D, true), 'Ella', 'blue')));
+    const charlie = new Sync(srv, memory(setProfile(start, 'Charlie', 'pink')));
     await ella.link();
     const key = await charlie.link();
     const friends = await srv.friends(key, D);
@@ -117,6 +117,15 @@ describe('friends', () => {
     expect(e.mine).toBe(false);
     expect(usedOn(e.used, D)).toEqual(['paucity']);
     expect(friends.find(f => f.name === 'Charlie')!.mine).toBe(true);
+    expect(e.color).toBe('blue');
+    expect(news(friends, D)).toEqual(['use:Ella:paucity']);
+
+    // Charlie celebrates; Ella hears about it.
+    charlie.update(markCheer(charlie.get().state, 'Ella', 'paucity', D, true));
+    await settle();
+    const after = await srv.friends(ella.get().key!, D);
+    expect(celebrators(after, 'Ella', 'paucity', D).map(f => f.name)).toEqual(['Charlie']);
+    expect(news(after, D)).toEqual(['cheer:Charlie:Ella:paucity']);
   });
 });
 

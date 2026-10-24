@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import words from './data/words.json';
 import { dismiss, ensureToday } from './lib/daily';
-import { friendUses, markUsed, nameOf, setName, usedOn, type Friend } from './lib/friends';
+import { markCheer, markUsed, nameOf, news, setProfile, usedOn, type Friend } from './lib/friends';
 import { addDays, longDate, today } from './lib/dates';
 import { recordPractised, redoSession, shuffleTest, startSession, type Session } from './lib/session';
 import { device, fresh } from './lib/storage';
@@ -92,7 +92,7 @@ export default function App() {
     return () => document.removeEventListener('visibilitychange', check);
   }, []);
 
-  const uses = friends ? friendUses(friends, date) : [];
+  const uses = friends ? news(friends, date) : [];
   const unseen = uses.filter(id => !seen.includes(id)).length;
   useEffect(() => {
     if (tab === 'friends' && unseen) { setSeen(uses); writeSeen(date, uses); }
@@ -101,9 +101,9 @@ export default function App() {
   const used = usedOn(state.used, date);
   const toggleUsed = (w: string) => update(markUsed(state, w, date, !used.includes(w)));
 
-  const joinFriends = async (n: string) => {
+  const joinFriends = async (n: string, color: string) => {
     if (!sync.get().key) await sync.link();
-    update(setName(sync.get().state, n));
+    update(setProfile(sync.get().state, n, color));
     setTimeout(loadFriends, 1500);   // once the name has saved
   };
 
@@ -149,8 +149,9 @@ export default function App() {
               onRedo={() => begin(redoSession(state, bank, date), 'today')}
               used={used} onUsed={toggleUsed} />
           ) : tab === 'friends' ? (
-            <Friends snap={snap} date={date} name={name} friends={friends} failed={friendsFailed}
-              onName={joinFriends} onLeave={() => { update(setName(state, '')); setFriends(null); }} />
+            <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}
+              onProfile={joinFriends} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
+              onUsed={toggleUsed} onCheer={(n, w, yes) => update(markCheer(state, n, w, date, yes))} />
           ) : tab === 'sync' ? (
             <SyncView snap={snap} onLink={() => sync.link()} onJoin={join} onUnlink={() => sync.unlink()} />
           ) : (

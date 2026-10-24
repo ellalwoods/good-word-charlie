@@ -62,18 +62,24 @@ grant execute on function public.charlie_load(text) to anon, authenticated;
 grant execute on function public.charlie_save(text, jsonb, integer) to anon, authenticated;
 
 
--- Friends: everyone who has picked a name, and the words they've marked
--- "I used it" since p_since. Nothing else about anyone's progress is shared.
-create or replace function public.charlie_friends(p_key text, p_since text)
-returns table (name text, used jsonb, mine boolean)
+-- Friends: everyone who has picked a name, their colour, the words they've marked
+-- "I used it" and the words they've celebrated since p_since. Nothing else about
+-- anyone's progress is shared.
+drop function if exists public.charlie_friends(text, text);
+create function public.charlie_friends(p_key text, p_since text)
+returns table (name text, color text, used jsonb, cheers jsonb, mine boolean)
 language sql
 stable
 security definer
 set search_path = ''
 as $$
   select p.data->'name'->>'value',
+         p.data->'name'->>'color',
          coalesce((select jsonb_object_agg(e.key, e.value)
                      from jsonb_each(case when jsonb_typeof(p.data->'used') = 'object' then p.data->'used' else '{}'::jsonb end) e
+                    where e.key >= p_since), '{}'::jsonb),
+         coalesce((select jsonb_object_agg(e.key, e.value)
+                     from jsonb_each(case when jsonb_typeof(p.data->'cheers') = 'object' then p.data->'cheers' else '{}'::jsonb end) e
                     where e.key >= p_since), '{}'::jsonb),
          p.secret = p_key
     from public.charlie_progress p

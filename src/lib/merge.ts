@@ -32,8 +32,10 @@ export function merge(a: State, b: State): State {
   };
   // Only the latest day's practice is kept, as on a single device.
   const latest = keys(a.practised ?? {}, b.practised ?? {}).sort().pop();
-  const used = mergeUsed(a.used ?? {}, b.used ?? {});
+  const used = mergeStamps(a.used ?? {}, b.used ?? {});
   if (Object.keys(used).length) out.used = used;
+  const cheers = mergeStamps(a.cheers ?? {}, b.cheers ?? {});
+  if (Object.keys(cheers).length) out.cheers = cheers;
   const name = latestOf(a.name, b.name);
   if (name) out.name = name;
   if (latest) out.practised = { [latest]: unionList(a.practised?.[latest] ?? [], b.practised?.[latest] ?? []) };
@@ -61,9 +63,11 @@ function pickCard(a: Card, b: Card): Card {
   return { ...win, asked: Math.max(a.asked, b.asked) };
 }
 
+type Stamps = Record<string, Record<string, number>>;
+
 // Each tap carries its time, so un-tapping on one device isn't undone by the other.
-function mergeUsed(a: NonNullable<State['used']>, b: NonNullable<State['used']>): NonNullable<State['used']> {
-  const out: NonNullable<State['used']> = {};
+function mergeStamps(a: Stamps, b: Stamps): Stamps {
+  const out: Stamps = {};
   for (const d of keys(a, b)) {
     const x = a[d] ?? {}, y = b[d] ?? {};
     out[d] = {};
@@ -78,7 +82,7 @@ function mergeUsed(a: NonNullable<State['used']>, b: NonNullable<State['used']>)
 function latestOf(a: State['name'], b: State['name']): State['name'] {
   if (!a || !b) return a ?? b;
   if (a.at !== b.at) return a.at > b.at ? a : b;
-  return a.value >= b.value ? a : b;
+  return JSON.stringify(a) >= JSON.stringify(b) ? a : b;
 }
 
 function unionList(a: string[], b: string[]): string[] {
