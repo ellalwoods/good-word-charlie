@@ -136,13 +136,15 @@ export function Friends({ snap, state, bank, date, friends, failed, onProfile, o
                 <h3 className="hw">Good word, {f.name}!</h3>
                 <p className="sense">{f.mine ? 'You' : f.name} used <i>{w}</i> today.</p>
                 {cheered.length > 0 && <p className="cheered">{list(cheered)} celebrated <i>{w}</i>.</p>}
-                {!f.mine && (
-                  <div className="card-actions">
-                    <button type="button" className="chip chip-cheer" aria-pressed={mine} onClick={() => onCheer(f.name, w, !mine)}>
-                      {mine ? 'Celebrated 🎉' : 'Celebrate'}
-                    </button>
-                  </div>
-                )}
+                <div className="card-actions">
+                  {f.mine
+                    ? <button type="button" className="chip chip-quiet" onClick={() => onUsed(w)}>Remove · didn’t use it</button>
+                    : (
+                      <button type="button" className="chip chip-cheer" aria-pressed={mine} onClick={() => onCheer(f.name, w, !mine)}>
+                        {mine ? 'Celebrated 🎉' : 'Celebrate'}
+                      </button>
+                    )}
+                </div>
               </div>
             </article>
           );
