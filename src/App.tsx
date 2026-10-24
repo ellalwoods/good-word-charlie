@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import words from './data/words.json';
 import { dismiss, ensureToday } from './lib/daily';
-import { markCheer, markUsed, nameOf, news, setNote, setProfile, usedOn, type Friend } from './lib/friends';
+import { combine, markCheer, markUsed, nameOf, news, setNote, setProfile, usedOn, type Friend } from './lib/friends';
 import { longDate, today } from './lib/dates';
 import { recordPractised, redoSession, shuffleTest, startSession, type Session } from './lib/session';
 import { device, fresh } from './lib/storage';
@@ -83,9 +83,9 @@ export default function App() {
   // Friends are fetched when the site opens or comes back into view, and when the Friends page opens.
   const loadFriends = () => {
     const key = sync.get().key;
-    if (!remote || !key || !nameOf(sync.get().state)) return;
+    if (!remote || !key) return;
     remote.friends(key, '')
-      .then(f => { setFriends(f); setFriendsFailed(false); })
+      .then(f => { setFriends(combine(f)); setFriendsFailed(false); })
       .catch(() => setFriendsFailed(true));
   };
   useEffect(loadFriends, [snap.key, name, date, tab]);

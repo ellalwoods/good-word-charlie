@@ -38,11 +38,12 @@ function Avatar({ friend, big }: { friend: { name: string; color: string | null 
 }
 
 /** Name and colour: the first time, and whenever you change them. */
-function Setup({ name, color, onSave, onCancel }: { name: string; color: string; onSave: Props['onProfile']; onCancel?: () => void }) {
+function Setup({ name, color, taken = [], onSave, onCancel }: { name: string; color: string; taken?: string[]; onSave: Props['onProfile']; onCancel?: () => void }) {
   const [draft, setDraft] = useState(name);
   const [pick, setPick] = useState(color);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const clash = taken.some(t => t.trim().toLowerCase() === draft.trim().toLowerCase() && t.trim().toLowerCase() !== name.trim().toLowerCase());
   const save = async () => {
     setBusy(true); setError('');
     try { await onSave(draft, pick); } catch { setError('Couldn’t reach the server. Try again in a moment.'); }
@@ -66,6 +67,12 @@ function Setup({ name, color, onSave, onCancel }: { name: string; color: string;
               ))}
             </div>
           </fieldset>
+          {clash && (
+            <p className="small-print sync-warn">
+              Someone called {draft.trim()} is already here. If that’s you on another device, use your sync link
+              instead (Sync devices, at the bottom of Today), or you’ll appear twice.
+            </p>
+          )}
           <div className="card-actions">
             <button type="button" className="chip" disabled={!draft.trim() || busy} onClick={save}>{onCancel ? 'Save' : 'Join'}</button>
             {onCancel && <button type="button" className="chip chip-quiet" onClick={onCancel}>Cancel</button>}
@@ -218,8 +225,9 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
   const color = colorOf(state.name?.color);
 
   if (snap.status === 'off') return <p className="slip">Friends isn’t switched on for this site yet. Tell Ella.</p>;
-  if (!name) return <Setup name="" color="pink" onSave={onProfile} />;
-  if (editing) return <Setup name={name} color={color} onSave={async (n, c) => { await onProfile(n, c); setEditing(false); }} onCancel={() => setEditing(false)} />;
+  const taken = (friends ?? []).filter(f => !f.mine).map(f => f.name);
+  if (!name) return <Setup name="" color="pink" taken={taken} onSave={onProfile} />;
+  if (editing) return <Setup name={name} color={color} taken={taken} onSave={async (n, c) => { await onProfile(n, c); setEditing(false); }} onCancel={() => setEditing(false)} />;
 
   // Your own entry comes from this device, so your taps show straight away.
   const me: Friend = { name, color, used: state.used ?? {}, cheers: state.cheers ?? {}, notes: state.notes ?? {}, mine: true };

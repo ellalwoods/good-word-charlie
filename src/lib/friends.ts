@@ -86,3 +86,46 @@ export function news(friends: Friend[], now: number): string[] {
       .map(([k]) => `cheer:${f.name}:${date}:${k}`)) : []),
   ]);
 }
+
+/**
+ * One entry per name. Someone who joined on two devices without a shared sync
+ * link has two records under the same name; show them as one person.
+ */
+export function combine(friends: Friend[]): Friend[] {
+  const byName = new Map<string, Friend>();
+  for (const f of friends) {
+    const key = f.name.trim().toLowerCase();
+    const g = byName.get(key);
+    if (!g) { byName.set(key, f); continue; }
+    byName.set(key, {
+      name: g.mine ? g.name : f.name,
+      color: g.mine ? g.color : f.mine ? f.color : g.color ?? f.color,
+      used: joinStamps(g.used, f.used),
+      cheers: joinStamps(g.cheers, f.cheers),
+      notes: joinNotes(g.notes, f.notes),
+      mine: g.mine || f.mine,
+    });
+  }
+  return [...byName.values()];
+}
+
+function joinStamps(a: Stamps = {}, b: Stamps = {}): Stamps {
+  const out: Stamps = {};
+  for (const d of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    out[d] = { ...a[d] };
+    for (const [k, t] of Object.entries(b[d] ?? {})) {
+      const p = out[d][k];
+      out[d][k] = p === undefined || Math.abs(t) > Math.abs(p) ? t : p;
+    }
+  }
+  return out;
+}
+
+function joinNotes(a: Notes = {}, b: Notes = {}): Notes {
+  const out: Notes = {};
+  for (const d of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    out[d] = { ...a[d] };
+    for (const [w, n] of Object.entries(b[d] ?? {})) if (!out[d][w] || n.at > out[d][w].at) out[d][w] = n;
+  }
+  return out;
+}

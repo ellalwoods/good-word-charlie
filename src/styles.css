@@ -721,3 +721,5 @@ ol.welcome-list { padding-left: 1.3em; }
 .archive-line { font-size: 1.0625rem; }
 .archive-note { font: italic 400 1.0625rem/1.35 var(--serif); margin-top: 2px !important; }
 .archive .tag { margin-top: 4px; display: block; }
+
+.sync-warn { background: var(--yellow); border: var(--line); padding: 8px 10px; margin: 0 0 12px; }
