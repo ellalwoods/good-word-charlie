@@ -65,6 +65,7 @@ function server() {
     },
     listen(_key, fn) { listeners.add(fn); return () => listeners.delete(fn); },
     announce() { listeners.forEach(fn => fn()); },
+    async stats() { return null; },
     async claim(name) {
       return [...rows].find(([, r]) => r.data.name?.value === name)?.[0] ?? null;
     },
@@ -240,5 +241,25 @@ describe('sync', () => {
     expect(cleanKey(`https://ellalwoods.github.io/good-word-charlie/#${k}`)).toBe(k);
     expect(cleanKey(` ${k} `)).toBe(k);
     expect(cleanKey('#short')).toBeNull();
+  });
+});
+
+describe("Ella's stats", () => {
+  it('sums up each person and the words', async () => {
+    const { computeStats } = await import('./stats');
+    let ella = setProfile(ensureToday(fresh(), bank, D), 'Ella', 'pink');
+    ella = practise(ella, ['paucity']);
+    ella = setNote(markUsed(ella, 'farcical', D, true), 'farcical', D, 'At breakfast.');
+    const charlie = markCheer(dismiss(setProfile(ensureToday(fresh(), bank, D), 'Charlie', 'yellow'), bank, 'glut', 'known', D), 'Ella', 'farcical', D, true);
+    const now = new Date().toISOString();
+    const s = computeStats([{ updated_at: now, data: ella }, { updated_at: now, data: charlie }, { updated_at: now, data: fresh() }], bank, D);
+    expect(s.people.map(p => p.name).sort()).toEqual(['Charlie', 'Ella']);
+    expect(s.guests).toBe(1);
+    const e = s.people.find(p => p.name === 'Ella')!;
+    expect(e).toMatchObject({ learned: 3, used: 1, stories: 1, cheersReceived: 1, left: bank.length - 3 });
+    expect(e.accuracy).toBeGreaterThan(0);
+    expect(s.hardest[0].word).toBe('paucity');
+    expect(s.known[0]).toMatchObject({ word: 'glut', n: 1 });
+    expect(s.stories[0]).toMatchObject({ name: 'Ella', word: 'farcical', text: 'At breakfast.' });
   });
 });

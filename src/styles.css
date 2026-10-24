@@ -745,3 +745,16 @@ ol.welcome-list { padding-left: 1.3em; }
 .problem p { margin: 0 0 10px; }
 .sync-warn p { margin: 0 0 8px; }
 .foot .chip-text { background: transparent; box-shadow: none; border-style: dashed; }
+
+/* ---------- Ella's stats ---------- */
+
+.person { --band: var(--c); --band-ink: var(--c-ink); }
+.person .profile-head { margin-bottom: 8px; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; margin: 0; }
+.facts div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px dotted var(--rule); padding: 2px 0; }
+.facts dt { font: 700 0.6875rem/1.6 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; }
+.facts dd { margin: 0; font-variant-numeric: tabular-nums; }
+.tally { margin: 0; padding-left: 1.4em; }
+.tally li { display: flex; justify-content: space-between; gap: 10px; padding: 2px 0; }
+.tally i { font: italic 400 1.15rem/1.3 var(--serif); }
+.stats-page .archive li { border-left-width: 2px; }

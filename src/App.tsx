@@ -15,6 +15,7 @@ import { Practice } from './views/Practice';
 import { Sync as SyncView, syncLabel } from './views/Sync';
 import { Today } from './views/Today';
 import { InstallHelp, installed, useInstall } from './views/Install';
+import { Stats } from './views/Stats';
 import { TextElla } from './views/TextElla';
 import { Welcome } from './views/Welcome';
 import { WhoAreYou } from './views/WhoAreYou';
@@ -23,7 +24,7 @@ const bank = usable(words as Word[]);
 const numbers = new Map(bank.map((w, i) => [w.word, i + 1]));
 const number = (w: string) => numbers.get(w) ?? 0;
 
-type Tab = 'today' | 'lexicon' | 'sync' | 'friends';
+type Tab = 'today' | 'lexicon' | 'sync' | 'friends' | 'stats';
 
 const sync = new Sync(remote, device);
 
@@ -209,6 +210,8 @@ export default function App() {
               onUsed={(w, d, yes) => update(markUsed(latest(), w, d, yes))}
               onNote={(w, d, text) => update(setNote(latest(), w, d, text))}
               onCheer={(n, w, d, yes) => update(markCheer(latest(), n, w, d, yes))} />
+          ) : tab === 'stats' && remote ? (
+            <Stats bank={bank} date={date} load={p => remote!.stats(p)} />
           ) : tab === 'sync' ? (
             <SyncView snap={snap} onLink={() => sync.link()} onJoin={join} onUnlink={() => sync.unlink()} />
           ) : (
@@ -216,11 +219,14 @@ export default function App() {
               onTest={(words, questions) => begin(shuffleTest(state, bank, words, questions), 'lexicon')}
               used={used} onUsed={toggleUsed} />
           )}
-        {settled && !session && tab !== 'sync' && tab !== 'friends' && (
+        {settled && !session && tab !== 'sync' && tab !== 'friends' && tab !== 'stats' && (
           <footer className="foot">
             {!installed() && <button type="button" className="chip" onClick={install.start}>Add to home screen</button>}
             <button type="button" className="chip" onClick={() => go('sync')}>Sync devices · {syncLabel(snap)}</button>
             <TextElla label="Error? Tell Ella" body="Hi Ella, something’s not working on Good Word, Charlie: " />
+            {remote && name.trim().toLowerCase() === 'ella' && (
+              <button type="button" className="chip chip-quiet" onClick={() => go('stats')}>Ella’s stats</button>
+            )}
           </footer>
         )}
       </main>

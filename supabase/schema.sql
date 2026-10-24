@@ -119,4 +119,35 @@ $$;
 revoke all on function public.charlie_claim(text) from public;
 grant execute on function public.charlie_claim(text) to anon, authenticated;
 
+-- Ella's stats: everyone's records, but only for the right password.
+-- Set or change the password with:
+--   insert into public.charlie_owner (id, password_hash)
+--   values (1, extensions.crypt('your password', extensions.gen_salt('bf')))
+--   on conflict (id) do update set password_hash = excluded.password_hash;
+create table if not exists public.charlie_owner (
+  id integer primary key default 1 check (id = 1),
+  password_hash text not null
+);
+alter table public.charlie_owner enable row level security;
+
+create or replace function public.charlie_stats(p_password text)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  if not exists (select 1 from public.charlie_owner o
+                  where o.password_hash = extensions.crypt(p_password, o.password_hash)) then
+    return null;
+  end if;
+  return (select coalesce(jsonb_agg(jsonb_build_object('updated_at', p.updated_at, 'data', p.data)), '[]'::jsonb)
+            from public.charlie_progress p);
+end;
+$$;
+
+revoke all on function public.charlie_stats(text) from public;
+grant execute on function public.charlie_stats(text) to anon, authenticated;
+
 select 'Good Word, Charlie friends are ready' as done;

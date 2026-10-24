@@ -1,4 +1,5 @@
 import type { Friend } from './friends';
+import type { Row } from './stats';
 import { merge, normalise, same } from './merge';
 import type { State } from './types';
 
@@ -18,6 +19,8 @@ export interface Remote {
   friends(key: string, since: string): Promise<Friend[]>;
   /** The sync key of the person with this name, so a new device can be them. */
   claim(name: string): Promise<string | null>;
+  /** Everyone's records, for the owner's stats page. Null if the password is wrong. */
+  stats(password: string): Promise<Row[] | null>;
 }
 
 /** Keeps progress on this device, and in step with a sync link if there is one. */
