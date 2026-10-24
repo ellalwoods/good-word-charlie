@@ -31,6 +31,8 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          # Optional: a different number for the 'Tell Ella' buttons.
+          VITE_HELP_PHONE: ${{ vars.VITE_HELP_PHONE }}
       - name: Publish to gh-pages
         run: |
           cd dist

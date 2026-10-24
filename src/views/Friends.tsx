@@ -5,6 +5,7 @@ import { shortDate } from '../lib/dates';
 import type { Snapshot } from '../lib/sync';
 import type { State, Word } from '../lib/types';
 import { Burst } from './Burst';
+import { Problem, TextElla } from './TextElla';
 
 interface Props {
   snap: Snapshot;
@@ -94,7 +95,7 @@ function Setup({ name, color, taken = [], onSave, onCancel, onClaim }: {
           <p className="small-print">Friends see your name and colour, the words you’ve used (and any story you add), what you’ve celebrated, and how many words and days you’ve practised.</p>
         </div>
       </article>
-      {error && <p className="slip sync-error">{error}</p>}
+      {error && <Problem about={error}>{error}</Problem>}
     </section>
   );
 }
@@ -140,7 +141,7 @@ function AlreadyJoined({ people, onClaim }: { people: Friend[]; onClaim: Props['
             <button type="button" className="chip chip-quiet" onClick={() => setPick(null)}>No</button>
           </div>
         )}
-        {error && <p className="small-print sync-warn">{error}</p>}
+        {error && <div className="small-print sync-warn"><p>{error}</p><TextElla body={`Good Word, Charlie isn’t working for me: ${error}`} /></div>}
       </div>
     </article>
   );
@@ -327,7 +328,7 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
   const name = state.name?.value ?? '';
   const color = colorOf(state.name?.color);
 
-  if (snap.status === 'off') return <p className="slip">Friends isn’t switched on for this site yet. Tell Ella.</p>;
+  if (snap.status === 'off') return <Problem about="Friends isn’t switched on yet.">Friends isn’t switched on for this site yet. Tell Ella.</Problem>;
   const taken = (friends ?? []).filter(f => !f.mine).map(f => f.name);
   if (!name) {
     const others = (friends ?? []).filter(f => !f.mine);
@@ -335,7 +336,7 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
       <>
         <Setup name="" color="pink" taken={taken} onSave={onProfile} onClaim={onClaim} />
         {others.length > 0 && <div className="already"><AlreadyJoined people={others} onClaim={onClaim} /></div>}
-        {failed && !friends && <p className="slip sync-error">Couldn’t load who’s already joined. Check the connection.</p>}
+        {failed && !friends && <Problem about="It couldn’t load who’s already joined.">Couldn’t load who’s already joined. Check the connection.</Problem>}
       </>
     );
   }
@@ -366,7 +367,7 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
           onShare={(w, story) => { onUsed(w, date, true); if (story.trim()) onNote(w, date, story); setPicking(false); }} />
       )}
 
-      {failed && !friends && <p className="slip sync-error">Couldn’t load your friends just now. Check the connection.</p>}
+      {failed && !friends && <Problem about="It couldn’t load my friends.">Couldn’t load your friends just now. Check the connection.</Problem>}
       {!current.length && <p className="slip">No one’s used a word in the last day. Be the first.</p>}
       <div className="cards">
         {current.map(u => (

@@ -740,3 +740,8 @@ ol.welcome-list { padding-left: 1.3em; }
 .profile-close { margin-top: 8px; }
 .who-card .btn { margin: 4px 0 6px; }
 .who-card .sync-warn { margin-top: 4px; }
+
+.chip-text { display: inline-block; text-decoration: none; color: var(--ink); background: var(--card); }
+.problem p { margin: 0 0 10px; }
+.sync-warn p { margin: 0 0 8px; }
+.foot .chip-text { background: transparent; box-shadow: none; border-style: dashed; }

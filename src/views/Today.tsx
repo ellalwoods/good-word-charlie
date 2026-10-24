@@ -2,6 +2,7 @@ import { canDismiss, dueWords, PER_DAY, streak } from '../lib/daily';
 import { practisedToday, sessionSize } from '../lib/session';
 import type { State, Word } from '../lib/types';
 import { UsedChip } from './UsedChip';
+import { TextElla } from './TextElla';
 import { WordCard } from './WordCard';
 
 interface Props {
@@ -76,6 +77,9 @@ function OutOfWords() {
         <p className="sense">You’ve used up every word in the box. Tell Ella it’s time to load more.</p>
         <p className="example">A word app with no new words? Utterly farcical.</p>
         <p className="sense">Your reviews will keep coming in the meantime.</p>
+        <div className="card-actions">
+          <TextElla label="Text Ella for more words" body="I’ve used up every word on Good Word, Charlie. Utterly farcical. Time to load more!" />
+        </div>
       </div>
     </article>
   );

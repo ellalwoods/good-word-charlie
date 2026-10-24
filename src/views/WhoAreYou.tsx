@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { COLORS, type Friend } from '../lib/friends';
 import { Avatar, claimError } from './Friends';
+import { TextElla } from './TextElla';
 
 interface Props {
   people: Friend[];
@@ -54,7 +55,7 @@ export function WhoAreYou({ people, onClaim, onAdd, onGuest }: Props) {
                   <span className="btn-sub">Carry on where you left off</span>
                 </button>
               )}
-              {error && <p className="small-print sync-warn">{error}</p>}
+              {error && <div className="small-print sync-warn"><p>{error}</p><TextElla body={`Good Word, Charlie isn’t working for me: ${error}`} /></div>}
               <h4 className="tag welcome-how">Not on the list?</h4>
               <div className="card-actions">
                 <button type="button" className="chip" onClick={() => { setAdding(true); setError(''); }}>Add me</button>
@@ -85,7 +86,7 @@ export function WhoAreYou({ people, onClaim, onAdd, onGuest }: Props) {
               <button type="button" className="btn" disabled={!name.trim() || !!taken || busy} onClick={() => run(() => onAdd(name, color))}>
                 {busy ? 'One moment…' : 'Add me'}
               </button>
-              {error && <p className="small-print sync-warn">{error}</p>}
+              {error && <div className="small-print sync-warn"><p>{error}</p><TextElla body={`Good Word, Charlie isn’t working for me: ${error}`} /></div>}
               <div className="card-actions">
                 {people.length > 0 && <button type="button" className="chip chip-quiet" onClick={() => setAdding(false)}>Back</button>}
                 <button type="button" className="chip chip-quiet" onClick={onGuest}>Continue as guest</button>

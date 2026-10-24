@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Snapshot } from '../lib/sync';
 import { cleanKey } from '../lib/sync';
+import { Problem } from './TextElla';
 
 interface Props {
   snap: Snapshot;
@@ -35,7 +36,7 @@ export function Sync({ snap, onLink, onJoin, onUnlink }: Props) {
   };
 
   if (snap.status === 'off') {
-    return <p className="slip">Syncing between devices isn’t switched on for this site yet. Tell Ella.</p>;
+    return <Problem about="Syncing isn’t switched on yet.">Syncing between devices isn’t switched on for this site yet. Tell Ella.</Problem>;
   }
 
   if (!snap.key) {
@@ -59,7 +60,7 @@ export function Sync({ snap, onLink, onJoin, onUnlink }: Props) {
             <p className="small-print">Anything on this device is added to that link’s progress.</p>
           </div>
         </article>
-        {error && <p className="slip sync-error">{error}</p>}
+        {error && <Problem about={error}>{error}</Problem>}
       </section>
     );
   }
@@ -67,7 +68,7 @@ export function Sync({ snap, onLink, onJoin, onUnlink }: Props) {
   if (snap.status === 'invalid') {
     return (
       <section className="sync">
-        <p className="slip sync-error">That sync link doesn’t match any progress. Check you copied all of it.</p>
+        <Problem about="My sync link doesn’t match any progress.">That sync link doesn’t match any progress. Check you copied all of it.</Problem>
         <button type="button" className="btn btn-quiet" onClick={onUnlink}>Forget this link</button>
       </section>
     );

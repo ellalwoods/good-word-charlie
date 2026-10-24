@@ -15,6 +15,7 @@ import { Practice } from './views/Practice';
 import { Sync as SyncView, syncLabel } from './views/Sync';
 import { Today } from './views/Today';
 import { InstallHelp, installed, useInstall } from './views/Install';
+import { TextElla } from './views/TextElla';
 import { Welcome } from './views/Welcome';
 import { WhoAreYou } from './views/WhoAreYou';
 
@@ -219,6 +220,7 @@ export default function App() {
           <footer className="foot">
             {!installed() && <button type="button" className="chip" onClick={install.start}>Add to home screen</button>}
             <button type="button" className="chip" onClick={() => go('sync')}>Sync devices · {syncLabel(snap)}</button>
+            <TextElla label="Error? Tell Ella" body="Hi Ella, something’s not working on Good Word, Charlie: " />
           </footer>
         )}
       </main>
