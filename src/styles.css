@@ -485,7 +485,10 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 
 .foot {
   margin-top: 40px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 .foot .chip { background: var(--card); }
@@ -645,4 +648,5 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 .welcome-how { margin: 18px 0 6px; }
 .welcome-list { margin: 0; padding-left: 1.1em; }
 .welcome-list li { margin-bottom: 6px; }
+ol.welcome-list { padding-left: 1.3em; }
 .welcome .card-actions .btn { width: 100%; }

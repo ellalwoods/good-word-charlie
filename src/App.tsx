@@ -14,6 +14,7 @@ import { Lexicon } from './views/Lexicon';
 import { Practice } from './views/Practice';
 import { Sync as SyncView, syncLabel } from './views/Sync';
 import { Today } from './views/Today';
+import { InstallHelp, installed, useInstall } from './views/Install';
 import { Welcome } from './views/Welcome';
 
 const bank = usable(words as Word[]);
@@ -110,6 +111,8 @@ export default function App() {
 
   // The welcome card sits over everything until it's dismissed.
   const welcoming = settled && !state.welcomed;
+  const install = useInstall();
+  const blocked = welcoming || install.open;
 
   const heading = useMemo(() => longDate(new Date(`${date}T12:00`)), [date]);
 
@@ -118,7 +121,7 @@ export default function App() {
 
   return (
     <>
-      <header className="masthead" inert={welcoming}>
+      <header className="masthead" inert={blocked}>
         <span className="overprint" aria-hidden="true" />
         <div className="masthead-inner">
           <div className="masthead-top">
@@ -137,7 +140,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="page" inert={welcoming}>
+      <main className="page" inert={blocked}>
         {!settled ? null
           : session ? (
             <Practice start={session} state={state} bank={bank} number={number} date={date}
@@ -165,10 +168,12 @@ export default function App() {
           )}
         {settled && !session && tab !== 'sync' && tab !== 'friends' && (
           <footer className="foot">
+            {!installed() && <button type="button" className="chip" onClick={install.start}>Add to home screen</button>}
             <button type="button" className="chip" onClick={() => go('sync')}>Sync devices · {syncLabel(snap)}</button>
           </footer>
         )}
       </main>
+      {install.open && <InstallHelp onClose={install.close} />}
       {welcoming && <Welcome onDone={() => update({ ...state, welcomed: true })} />}
     </>
   );
