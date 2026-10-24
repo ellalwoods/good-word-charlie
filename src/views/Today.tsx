@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { canDismiss, dueWords, PER_DAY, streak } from '../lib/daily';
 import { practisedToday, sessionSize } from '../lib/session';
 import type { State, Word } from '../lib/types';
 import { UsedChip } from './UsedChip';
+import { play } from '../lib/sounds';
 import { TextElla } from './TextElla';
 import { WordCard } from './WordCard';
 
@@ -69,6 +71,12 @@ export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo
 }
 
 function OutOfWords({ name, learned }: { name: string; learned: number }) {
+  // A sad "wah-wah", once a day, when the box is empty.
+  useEffect(() => {
+    const key = 'good-word-charlie-empty-sound', day = new Date().toDateString();
+    try { if (localStorage.getItem(key) === day) return; localStorage.setItem(key, day); } catch { /* storage blocked */ }
+    play('wrong');
+  }, []);
   const text = `Hi Ella${name ? `, it’s ${name}` : ''}! I’ve used up every word on Good Word, Charlie (${learned} learned). `
     + 'Utterly farcical. Time to load more, please!';
   return (

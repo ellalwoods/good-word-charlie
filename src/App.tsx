@@ -5,6 +5,7 @@ import { combine, markCheer, markUsed, nameOf, news, setNote, setProfile, usedOn
 import { longDate, today } from './lib/dates';
 import { recordPractised, redoSession, shuffleTest, startSession, type Session } from './lib/session';
 import { device, fresh, linkManifest } from './lib/storage';
+import { play, setSoundOn } from './lib/sounds';
 import { addTime, addVisit, deviceId, trackTime, type Page } from './lib/time';
 import { remote } from './lib/supabase';
 import { cleanKey, Sync } from './lib/sync';
@@ -108,6 +109,9 @@ export default function App() {
   const [seen, setSeen] = useState(readSeen);
   const [fresh, setFresh] = useState<string[]>([]);
   const name = nameOf(state);
+  const soundOn = state.sound?.on ?? true;
+  setSoundOn(soundOn);
+  const toggleSound = () => update({ ...latest(), sound: { on: !soundOn, at: Date.now() } });
 
   const update = (next: State) => sync.update({ ...next, updated: Date.now() });
   // The newest progress, including changes made earlier in the same tap (e.g. a word and its story).
@@ -146,6 +150,8 @@ export default function App() {
   // Opening Friends marks the news as seen, and those cards pop in with confetti.
   useEffect(() => {
     if (tab !== 'friends' || !unseen) return;
+    // Someone celebrated one of your words since you last looked.
+    if (unseenIds.some(id => id.startsWith('cheer:'))) play('celebrate');
     setFresh(f => [...f, ...unseenIds]);
     const next = [...seen, ...unseenIds];
     setSeen(next);
@@ -225,6 +231,7 @@ export default function App() {
         {!settled ? null
           : session ? (
             <Practice start={session} state={state} bank={bank} number={number} date={date}
+              soundOn={soundOn} onSound={toggleSound}
               onState={update} onDone={() => go(from)} />
           ) : tab === 'today' ? (
             <Today state={state} bank={bank} number={number} date={date}
@@ -258,6 +265,7 @@ export default function App() {
           <footer className="foot">
             {!installed() && <button type="button" className="chip" onClick={install.start}>Add to home screen</button>}
             <button type="button" className="chip" onClick={() => go('sync')}>Sync devices · {syncLabel(snap)}</button>
+            <button type="button" className="chip chip-quiet" aria-pressed={soundOn} onClick={toggleSound}>Sound · {soundOn ? 'On' : 'Off'}</button>
             <TextElla label="Error? Tell Ella" body="Hi Ella, something’s not working on Good Word, Charlie: " />
             {remote && name.trim().toLowerCase() === 'ella' && (
               <button type="button" className="chip chip-quiet" onClick={() => go('stats')}>Ella’s stats</button>

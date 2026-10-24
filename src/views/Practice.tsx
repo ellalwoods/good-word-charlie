@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { answer, finish, type Session } from '../lib/session';
+import { play } from '../lib/sounds';
 import type { Question, QuestionType, State, Word } from '../lib/types';
 import { GAP } from '../lib/validate';
 import { ConfusableNote, Headword, WordCard } from './WordCard';
@@ -24,9 +25,11 @@ interface Props {
   date: string;
   onState: (s: State) => void;
   onDone: () => void;
+  soundOn: boolean;
+  onSound: () => void;
 }
 
-export function Practice({ start, state, bank, number, date, onState, onDone }: Props) {
+export function Practice({ start, state, bank, number, date, onState, onDone, soundOn, onSound }: Props) {
   const [session, setSession] = useState(start);
   const [picked, setPicked] = useState<string | null>(null);
   const [finished, setFinished] = useState(start.items.length === 0);
@@ -66,6 +69,8 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
   const choose = (option: string) => {
     if (picked) return;
     const r = answer(state, session, bank, option, date);
+    // A word moving up a level gets its own sound (only today's practice changes levels).
+    play(!r.correct ? 'wrong' : daily && r.session.firstRight > session.firstRight ? 'levelup' : 'right');
     setPicked(option);
     setSession(r.session);
     onState(r.state);
@@ -74,6 +79,7 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
   const advance = () => {
     if (last) {
       if (daily) onState(finish(state, date));
+      play('finish');
       setFinished(true);
     } else {
       setSession({ ...session, i: session.i + 1 });
@@ -87,7 +93,18 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
       <div className="meter" aria-hidden="true"><span style={{ width: `${(session.i / session.items.length) * 100}%` }} /></div>
       <div className="q-head">
         <span className={`qtag qtag-${q.type}`}>{LABEL[q.type]}</span>
-        <span className="tag">{daily ? '' : `${KIND[session.kind]} · `}{item.retry ? 'Once more · ' : ''}{session.i + 1} of {session.items.length}</span>
+        <span className="q-right">
+          <span className="tag">{daily ? '' : `${KIND[session.kind]} · `}{item.retry ? 'Once more · ' : ''}{session.i + 1} of {session.items.length}</span>
+          <button type="button" className="sound-btn" aria-pressed={soundOn} onClick={onSound}
+            aria-label={soundOn ? 'Sound on. Turn it off' : 'Sound off. Turn it on'} title={soundOn ? 'Sound on' : 'Sound off'}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" />
+              {soundOn
+                ? <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                : <path d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
+            </svg>
+          </button>
+        </span>
       </div>
 
       <div className="prompt-card">

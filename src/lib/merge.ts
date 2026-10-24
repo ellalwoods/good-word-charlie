@@ -40,6 +40,9 @@ export function merge(a: State, b: State): State {
   const name = latestOf(a.name, b.name);
   if (name) out.name = name;
   if (a.welcomed || b.welcomed) out.welcomed = true;
+  const sound = !a.sound || !b.sound ? (a.sound ?? b.sound)
+    : a.sound.at !== b.sound.at ? (a.sound.at > b.sound.at ? a.sound : b.sound) : (a.sound.on ? b.sound : a.sound);
+  if (sound) out.sound = sound;
   const started = Math.min(a.started ?? Infinity, b.started ?? Infinity);
   if (started !== Infinity) out.started = started;
   if (a.moved || b.moved) out.moved = true;

@@ -4,6 +4,7 @@ import { celebrators, colorOf, COLORS, isFresh, NOTE_MAX, usedCount, useId, uses
 import { shortDate } from '../lib/dates';
 import type { Snapshot } from '../lib/sync';
 import type { State, Word } from '../lib/types';
+import { play } from '../lib/sounds';
 import { Burst } from './Burst';
 import { Problem, TextElla } from './TextElla';
 
@@ -277,7 +278,7 @@ function UseCard({ use, people, fresh, mineCheered, onUsed, onNote, onCheer }: {
             <div className="card-actions">
               <span className="cheer-wrap">
                 <button type="button" className="chip chip-cheer" aria-pressed={mineCheered}
-                  onClick={() => { if (!mineCheered) setBursts(n => n + 1); onCheer(f.name, w, date, !mineCheered); }}>
+                  onClick={() => { if (!mineCheered) { setBursts(n => n + 1); play('celebrate'); } onCheer(f.name, w, date, !mineCheered); }}>
                   {mineCheered ? 'Celebrated 🎉' : 'Celebrate'}
                 </button>
                 {bursts > 0 && <Burst key={bursts} />}

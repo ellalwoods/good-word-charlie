@@ -805,3 +805,8 @@ ol.welcome-list { padding-left: 1.3em; }
 .archive-link { display: block; margin: -4px 0 8px; font: 400 0.75rem/1.4 var(--mono); opacity: 0.7; }
 .archived-guests { margin-top: 10px; }
 .archived-guests .whoops { font: 400 0.75rem/1.4 var(--mono); opacity: 0.7; }
+
+.q-right { display: inline-flex; align-items: center; gap: 10px; }
+.sound-btn { appearance: none; display: grid; place-items: center; width: 30px; height: 30px; padding: 4px; border: 2px solid var(--ink); background: var(--card); color: var(--ink); cursor: pointer; }
+.sound-btn[aria-pressed='false'] { opacity: 0.6; }
+.sound-btn svg { width: 100%; height: 100%; }
