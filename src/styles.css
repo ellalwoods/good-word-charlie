@@ -455,7 +455,7 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 
 .strength { display: flex; gap: 3px; }
 .strength span { width: 11px; height: 11px; border: 2px solid var(--ink); background: var(--card); }
-.strength span.on { background: var(--blue); }
+.strength span.on { background: var(--band, var(--blue)); }
 
 @media (prefers-reduced-motion: reduce) {
   .meter span, .btn { transition: none; }
