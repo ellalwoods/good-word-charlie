@@ -13,6 +13,8 @@ export interface Friend {
   cheers: Stamps;   // keyed by the day the word was used, then "name:word"
   notes: Notes;
   mine: boolean;
+  learned?: number;   // words met and still in practice
+  done?: string[];    // days a practice was finished
 }
 
 /** One word one person used, as shown on the Friends page. */
@@ -63,6 +65,9 @@ export function uses(friends: Friend[]): Use[] {
     .sort((a, b) => b.at - a.at);
 }
 
+/** How many words someone has marked "I used it", all time. */
+export const usedCount = (f: Friend) => uses([f]).length;
+
 export const isFresh = (u: Use, now: number) => now - u.at < FRESH_FOR;
 
 /** Who celebrated `name` using `word` on `date`. */
@@ -104,6 +109,8 @@ export function combine(friends: Friend[]): Friend[] {
       cheers: joinStamps(g.cheers, f.cheers),
       notes: joinNotes(g.notes, f.notes),
       mine: g.mine || f.mine,
+      learned: Math.max(g.learned ?? 0, f.learned ?? 0),
+      done: [...new Set([...(g.done ?? []), ...(f.done ?? [])])],
     });
   }
   return [...byName.values()];

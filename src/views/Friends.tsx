@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { celebrators, colorOf, COLORS, isFresh, NOTE_MAX, useId, uses, type Friend, type Use } from '../lib/friends';
+import { useEffect, useState } from 'react';
+import { streak } from '../lib/daily';
+import { celebrators, colorOf, COLORS, isFresh, NOTE_MAX, usedCount, useId, uses, type Friend, type Use } from '../lib/friends';
 import { shortDate } from '../lib/dates';
 import type { Snapshot } from '../lib/sync';
 import type { State, Word } from '../lib/types';
@@ -90,7 +91,7 @@ function Setup({ name, color, taken = [], onSave, onCancel, onClaim }: {
             <button type="button" className="chip" disabled={!draft.trim() || clash || busy} onClick={save}>{name ? 'Save' : 'Join'}</button>
             {onCancel && <button type="button" className="chip chip-quiet" onClick={onCancel}>Cancel</button>}
           </div>
-          <p className="small-print">Friends see your name, your colour, the words you’ve used (and any story you add) and what you’ve celebrated. Nothing else.</p>
+          <p className="small-print">Friends see your name and colour, the words you’ve used (and any story you add), what you’ve celebrated, and how many words and days you’ve practised.</p>
         </div>
       </article>
       {error && <p className="slip sync-error">{error}</p>}
@@ -142,6 +143,47 @@ function AlreadyJoined({ people, onClaim }: { people: Friend[]; onClaim: Props['
         {error && <p className="small-print sync-warn">{error}</p>}
       </div>
     </article>
+  );
+}
+
+/** Someone's card: a few numbers and the words they've used lately. */
+function Profile({ friend, date, onClose }: { friend: Friend; date: string; onClose: () => void }) {
+  useEffect(() => {
+    const before = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = before; };
+  }, []);
+  const done = friend.done;
+  const days = done ? streak({ done: Object.fromEntries(done.map(d => [d, true])) } as unknown as State, date) : null;
+  const recent = uses([friend]).slice(0, 5);
+  const n = (v: number | null | undefined) => (v === null || v === undefined ? '–' : v);
+  return (
+    <div className="welcome-overlay" role="dialog" aria-modal="true" aria-labelledby="profile-title" onClick={onClose}>
+      <article className={`card profile c-${colorOf(friend.color)}`} onClick={e => e.stopPropagation()}>
+        <div className="band"><span id="profile-title">{friend.mine ? 'You' : friend.name}</span></div>
+        <div className="ruled">
+          <div className="profile-head">
+            <Avatar friend={friend} big />
+            <h3 className="hw">{friend.name}</h3>
+          </div>
+          <section className="stats profile-stats" aria-label="Stats">
+            <div className="stat"><b>{n(friend.learned)}</b><span className="tag">Words learned</span></div>
+            <div className="stat stat-yellow"><b>{n(days)}</b><span className="tag">Day streak</span></div>
+            <div className="stat"><b>{n(done?.length)}</b><span className="tag">Days practised</span></div>
+            <div className="stat stat-pink"><b>{usedCount(friend)}</b><span className="tag">Words used</span></div>
+          </section>
+          {recent.length > 0 && (
+            <>
+              <h4 className="tag welcome-how">Lately used</h4>
+              <p className="sense profile-words">{recent.map(u => u.word).map((w, i) => <span key={i}>{i > 0 && ', '}<i>{w}</i></span>)}</p>
+            </>
+          )}
+          <div className="card-actions">
+            <button type="button" className="btn btn-quiet profile-close" onClick={onClose}>Close</button>
+          </div>
+        </div>
+      </article>
+    </div>
   );
 }
 
@@ -281,6 +323,7 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
   const [picking, setPicking] = useState(false);
   const [editing, setEditing] = useState(false);
   const [archive, setArchive] = useState(false);
+  const [viewing, setViewing] = useState<Friend | null>(null);
   const name = state.name?.value ?? '';
   const color = colorOf(state.name?.color);
 
@@ -299,7 +342,10 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
   if (editing) return <Setup name={name} color={color} taken={taken} onSave={async (n, c) => { await onProfile(n, c); setEditing(false); }} onCancel={() => setEditing(false)} />;
 
   // Your own entry comes from this device, so your taps show straight away.
-  const me: Friend = { name, color, used: state.used ?? {}, cheers: state.cheers ?? {}, notes: state.notes ?? {}, mine: true };
+  const me: Friend = {
+    name, color, used: state.used ?? {}, cheers: state.cheers ?? {}, notes: state.notes ?? {}, mine: true,
+    learned: Object.keys(state.cards).filter(w => bank.some(b => b.word === w)).length, done: Object.keys(state.done),
+  };
   const people = [me, ...(friends ?? []).filter(f => !f.mine && f.name !== name)];
   const all = uses(people);
   const now = Date.now();
@@ -331,12 +377,14 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
       </div>
 
       <div>
-        <h2 className="tag section-label">Friends</h2>
+        <h2 className="tag section-label">Friends · tap for stats</h2>
         <ul className="roster">
           {people.map(f => (
             <li key={f.name}>
-              <Avatar friend={f} big />
-              <span className="tag">{f.mine ? 'You' : f.name}</span>
+              <button type="button" className="who" onClick={() => setViewing(f)} aria-label={`${f.mine ? 'Your' : `${f.name}’s`} stats`}>
+                <Avatar friend={f} big />
+                <span className="tag">{f.mine ? 'You' : f.name}</span>
+              </button>
             </li>
           ))}
         </ul>
@@ -349,6 +397,7 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
           Archive · {all.length - current.length} older
         </button>
       </div>
+      {viewing && <Profile friend={viewing} date={date} onClose={() => setViewing(null)} />}
     </section>
   );
 }

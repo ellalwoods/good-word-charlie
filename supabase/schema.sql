@@ -75,11 +75,11 @@ as $$
 $$;
 
 -- Friends: everyone who has picked a name, their colour, the words they've marked
--- "I used it" (with the story, if they told it) and the words they've celebrated.
--- Nothing else about anyone's progress is shared.
+-- "I used it" (with the story, if they told it), the words they've celebrated,
+-- how many words they've learned and which days they practised.
 drop function if exists public.charlie_friends(text, text);
 create function public.charlie_friends(p_key text, p_since text)
-returns table (name text, color text, used jsonb, cheers jsonb, notes jsonb, mine boolean)
+returns table (name text, color text, used jsonb, cheers jsonb, notes jsonb, mine boolean, learned integer, done jsonb)
 language sql
 stable
 security definer
@@ -90,7 +90,9 @@ as $$
          public.charlie_since(p.data->'used', p_since),
          public.charlie_since(p.data->'cheers', p_since),
          public.charlie_since(p.data->'notes', p_since),
-         p.secret = p_key
+         p.secret = p_key,
+         (select count(*)::integer from jsonb_object_keys(case when jsonb_typeof(p.data->'cards') = 'object' then p.data->'cards' else '{}'::jsonb end)),
+         (select coalesce(jsonb_agg(k), '[]'::jsonb) from jsonb_object_keys(case when jsonb_typeof(p.data->'done') = 'object' then p.data->'done' else '{}'::jsonb end) k)
     from public.charlie_progress p
    where coalesce(p.data->'name'->>'value', '') <> ''
    order by 1;
