@@ -38,5 +38,37 @@ export const device: Local = {
       else localStorage.removeItem(LINK_KEY);
     } catch { /* storage blocked */ }
     try { history.replaceState(null, '', key ? `#${key}` : location.pathname + location.search); } catch { /* not available */ }
+    linkManifest(key);
   },
 };
+
+/**
+ * A home-screen icon opens the manifest's start address, and on iPhone it has
+ * its own storage, separate from Safari's. So once there's a sync link, point
+ * the manifest at it: an icon added from then on opens with your progress.
+ */
+export function linkManifest(key: string | null) {
+  const link = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+  if (!link) return;
+  const base = new URL('./', location.href).href;
+  if (!link.dataset.original) link.dataset.original = link.getAttribute('href') ?? '';
+  if (!key) { link.setAttribute('href', link.dataset.original); return; }
+  const manifest = {
+    name: 'Good Word, Charlie',
+    short_name: 'Good Word',
+    description: 'Three good words a day, and the practice to keep them.',
+    id: base,
+    start_url: `${base}#${key}`,
+    scope: base,
+    display: 'standalone',
+    orientation: 'portrait-primary',
+    background_color: '#efece4',
+    theme_color: '#1d4ed8',
+    icons: [
+      { src: `${base}icons/icon-192.png`, sizes: '192x192', type: 'image/png', purpose: 'any' },
+      { src: `${base}icons/icon-512.png`, sizes: '512x512', type: 'image/png', purpose: 'any' },
+      { src: `${base}icons/icon-maskable-512.png`, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+    ],
+  };
+  link.setAttribute('href', 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest)));
+}

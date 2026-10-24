@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { celebrators, colorOf, COLORS, isFresh, NOTE_MAX, useId, uses, type Friend, type Use } from '../lib/friends';
 import { shortDate } from '../lib/dates';
-import type { Snapshot } from '../lib/sync';
+import { cleanKey, type Snapshot } from '../lib/sync';
 import type { State, Word } from '../lib/types';
 import { Burst } from './Burst';
 
@@ -15,6 +15,8 @@ interface Props {
   /** News that arrived since you last looked: these pop in with confetti. */
   fresh: string[];
   onProfile: (name: string, color: string) => Promise<unknown>;
+  /** Joins an existing sync link: you, from another device. */
+  onLink: (key: string) => Promise<unknown>;
   onLeave: () => void;
   onUsed: (word: string, date: string, yes: boolean) => void;
   onNote: (word: string, date: string, text: string) => void;
@@ -38,7 +40,9 @@ function Avatar({ friend, big }: { friend: { name: string; color: string | null 
 }
 
 /** Name and colour: the first time, and whenever you change them. */
-function Setup({ name, color, taken = [], onSave, onCancel }: { name: string; color: string; taken?: string[]; onSave: Props['onProfile']; onCancel?: () => void }) {
+function Setup({ name, color, taken = [], onSave, onCancel, onLink }: {
+  name: string; color: string; taken?: string[]; onSave: Props['onProfile']; onCancel?: () => void; onLink?: Props['onLink'];
+}) {
   const [draft, setDraft] = useState(name);
   const [pick, setPick] = useState(color);
   const [busy, setBusy] = useState(false);
@@ -81,7 +85,39 @@ function Setup({ name, color, taken = [], onSave, onCancel }: { name: string; co
         </div>
       </article>
       {error && <p className="slip sync-error">{error}</p>}
+      {onLink && <AlreadyJoined onLink={onLink} />}
     </section>
+  );
+}
+
+/** Joined on another device (or in Safari before adding the icon)? Bring that you here. */
+function AlreadyJoined({ onLink }: { onLink: (key: string) => Promise<unknown> }) {
+  const [paste, setPaste] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const key = cleanKey(paste);
+  const go = async () => {
+    if (!key) return;
+    setBusy(true); setError('');
+    try { await onLink(key); } catch { setError('Couldn’t reach the server. Try again in a moment.'); }
+    setBusy(false);
+  };
+  return (
+    <article className="card">
+      <div className="band"><span>Already joined?</span><span>Another device</span></div>
+      <div className="ruled">
+        <p className="small-print">
+          If you’ve joined before (on another device, or in Safari before adding the icon), don’t join again.
+          On that device, tap <b>Sync devices</b> at the bottom of Today, copy your link, and paste it here.
+        </p>
+        <input className="field" value={paste} onChange={e => setPaste(e.target.value)} placeholder="https://…/#…"
+          aria-label="Your sync link" autoComplete="off" autoCapitalize="off" spellCheck={false} />
+        <div className="card-actions">
+          <button type="button" className="chip" disabled={!key || busy} onClick={go}>That’s me</button>
+        </div>
+        {error && <p className="small-print">{error}</p>}
+      </div>
+    </article>
   );
 }
 
@@ -217,7 +253,7 @@ function Archive({ items, people, onBack }: { items: Use[]; people: Friend[]; on
   );
 }
 
-export function Friends({ snap, state, bank, date, friends, failed, fresh, onProfile, onLeave, onUsed, onNote, onCheer }: Props) {
+export function Friends({ snap, state, bank, date, friends, failed, fresh, onProfile, onLink, onLeave, onUsed, onNote, onCheer }: Props) {
   const [picking, setPicking] = useState(false);
   const [editing, setEditing] = useState(false);
   const [archive, setArchive] = useState(false);
@@ -226,7 +262,7 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
 
   if (snap.status === 'off') return <p className="slip">Friends isn’t switched on for this site yet. Tell Ella.</p>;
   const taken = (friends ?? []).filter(f => !f.mine).map(f => f.name);
-  if (!name) return <Setup name="" color="pink" taken={taken} onSave={onProfile} />;
+  if (!name) return <Setup name="" color="pink" taken={taken} onSave={onProfile} onLink={onLink} />;
   if (editing) return <Setup name={name} color={color} taken={taken} onSave={async (n, c) => { await onProfile(n, c); setEditing(false); }} onCancel={() => setEditing(false)} />;
 
   // Your own entry comes from this device, so your taps show straight away.

@@ -4,7 +4,7 @@ import { dismiss, ensureToday } from './lib/daily';
 import { combine, markCheer, markUsed, nameOf, news, setNote, setProfile, usedOn, type Friend } from './lib/friends';
 import { longDate, today } from './lib/dates';
 import { recordPractised, redoSession, shuffleTest, startSession, type Session } from './lib/session';
-import { device, fresh } from './lib/storage';
+import { device, fresh, linkManifest } from './lib/storage';
 import { remote } from './lib/supabase';
 import { cleanKey, Sync } from './lib/sync';
 import type { State, Word } from './lib/types';
@@ -38,6 +38,9 @@ const join = (key: string) => {
 const fromLink = location.hash.length > 1 ? cleanKey(location.hash) : null;
 if (fromLink && fromLink !== sync.get().key) join(fromLink);
 else { sync.start(); if (sync.get().key) device.writeKey(sync.get().key); }
+linkManifest(sync.get().key ?? fromLink);
+// Ask the browser not to clear progress to save space.
+navigator.storage?.persist?.().catch(() => {});
 window.addEventListener('online', sync.wake);
 
 // Friends' news already looked at, so the header only counts new things.
@@ -164,7 +167,7 @@ export default function App() {
               used={used} onUsed={toggleUsed} />
           ) : tab === 'friends' ? (
             <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}
-              onProfile={joinFriends} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
+              onProfile={joinFriends} onLink={join} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
               fresh={fresh}
               onUsed={(w, d, yes) => update(markUsed(state, w, d, yes))}
               onNote={(w, d, text) => update(setNote(state, w, d, text))}
