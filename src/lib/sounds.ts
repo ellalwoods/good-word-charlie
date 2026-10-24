@@ -7,6 +7,7 @@ type Sound = 'right' | 'wrong' | 'finish' | 'levelup' | 'celebrate';
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let on = true;
+let unlocked = false;
 
 /** Sound on or off, from the person's settings. */
 export function setSoundOn(value: boolean) { on = value; }
@@ -14,6 +15,7 @@ export function setSoundOn(value: boolean) { on = value; }
 function audio(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   try {
+    if (ctx && ctx.state === 'closed') { ctx = null; master = null; }
     if (!ctx) {
       const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!AC) return null;
@@ -22,17 +24,31 @@ function audio(): AudioContext | null {
       master.gain.value = 0.55;
       master.connect(ctx.createDynamicsCompressor()).connect(ctx.destination);
     }
-    if (ctx.state === 'suspended') ctx.resume();
+    // iPhone pauses audio when the site is put away ("interrupted"), not just before the first tap ("suspended").
+    if (ctx.state !== 'running') ctx.resume().catch(() => {});
     return ctx;
   } catch {
     return null;
   }
 }
 
+// Wake the audio on every tap, not just the first: iPhone only lets it start from a tap
+// (touchend or click, not touchstart), and pauses it again whenever the site is put away.
 if (typeof window !== 'undefined') {
-  const unlock = () => { audio(); window.removeEventListener('pointerdown', unlock); window.removeEventListener('keydown', unlock); };
-  window.addEventListener('pointerdown', unlock);
-  window.addEventListener('keydown', unlock);
+  const wake = () => {
+    if (!on) return;
+    const c = audio();
+    if (c && !unlocked) {
+      // A silent blip, played inside the tap, is what unlocks sound on iPhone.
+      const src = c.createBufferSource();
+      src.buffer = c.createBuffer(1, 1, 22050);
+      src.connect(c.destination);
+      src.start(0);
+      unlocked = true;
+    }
+  };
+  for (const e of ['touchend', 'click', 'keydown'] as const) window.addEventListener(e, wake, { capture: true, passive: true });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') unlocked = false; });
 }
 
 // One square-wave note, `at` seconds from now.
