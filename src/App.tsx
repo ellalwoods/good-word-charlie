@@ -5,7 +5,7 @@ import { combine, markCheer, markUsed, nameOf, news, setNote, setProfile, usedOn
 import { longDate, today } from './lib/dates';
 import { recordPractised, redoSession, shuffleTest, startSession, type Session } from './lib/session';
 import { device, fresh, linkManifest } from './lib/storage';
-import { addTime, deviceId, trackTime } from './lib/time';
+import { addTime, addVisit, deviceId, trackTime, type Page } from './lib/time';
 import { remote } from './lib/supabase';
 import { cleanKey, Sync } from './lib/sync';
 import type { State, Word } from './lib/types';
@@ -53,7 +53,8 @@ navigator.storage?.persist?.().catch(() => {});
 window.addEventListener('online', sync.wake);
 // Minutes spent on the site, for Ella's stats.
 const thisDevice = deviceId();
-trackTime(seconds => sync.update(addTime(sync.get().state, today(), thisDevice, seconds)));
+let currentPage: Page = 'today';
+trackTime(() => currentPage, (seconds, pages) => sync.update(addTime(sync.get().state, today(), thisDevice, seconds, pages)));
 
 // Friends' news already looked at, so the header only counts new things.
 const SEEN = 'good-word-charlie-seen-v2';
@@ -152,6 +153,13 @@ export default function App() {
     sync.unlink();
     sync.update({ ...sync.get().state, name: undefined });
   }, [snap.status]);
+
+  // Which page is open, for Ella's stats: counted once each time it's opened.
+  const page: Page = session ? (session.kind === 'daily' ? 'practice' : session.kind) : tab;
+  useEffect(() => {
+    currentPage = page;
+    sync.update(addVisit(sync.get().state, today(), thisDevice, page));
+  }, [page]);
 
   // The welcome card sits over everything until it's dismissed.
   const [welcomedHere, setWelcomedHere] = useState(() => flag(WELCOMED));

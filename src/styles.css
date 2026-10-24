@@ -789,3 +789,11 @@ ol.welcome-list { padding-left: 1.3em; }
 .minutes-list { margin: 8px 0 0; padding: 0; list-style: none; }
 .minutes-list li { display: flex; justify-content: space-between; border-bottom: 1px dotted var(--rule); padding: 3px 0; font-variant-numeric: tabular-nums; }
 .minutes .whoops { font: 400 0.75rem/1.4 var(--mono); opacity: 0.7; }
+
+/* Pages: name, a bar for minutes, then minutes and visits. */
+.pages { margin: 0; padding: 0; list-style: none; }
+.pages li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; padding: 6px 0; border-bottom: 1px dotted var(--rule); }
+.pages .pages-bar { grid-column: 1 / -1; grid-row: 2; }
+.pages-name { font-size: 0.95rem; }
+.pages-bar { height: 12px; }
+.pages-bar span { display: block; height: 100%; min-width: 2px; background: var(--c); border: 1.5px solid var(--ink); border-radius: 0 4px 4px 0; }

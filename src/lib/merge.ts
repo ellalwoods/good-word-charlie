@@ -43,6 +43,8 @@ export function merge(a: State, b: State): State {
   // Each device only ever adds to its own count, so the larger count is the newer one.
   const time = maxCounts(a.time ?? {}, b.time ?? {});
   if (Object.keys(time).length) out.time = time;
+  const visits = maxCounts(a.visits ?? {}, b.visits ?? {});
+  if (Object.keys(visits).length) out.visits = visits;
   const notes = mergeNotes(a.notes ?? {}, b.notes ?? {});
   if (Object.keys(notes).length) out.notes = notes;
   if (latest) out.practised = { [latest]: unionList(a.practised?.[latest] ?? [], b.practised?.[latest] ?? []) };

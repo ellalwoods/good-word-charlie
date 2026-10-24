@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { addDays, shortDate } from '../lib/dates';
 import { colorOf } from '../lib/friends';
 import { computeStats, type Row, type Stats as S, type Tally } from '../lib/stats';
+import { PAGE_NAMES, type PageUse } from '../lib/time';
 import type { Word } from '../lib/types';
 import { Avatar } from './Friends';
 import { Problem } from './TextElla';
@@ -54,6 +55,23 @@ function MinutesChart({ byDay, date, color }: { byDay: Record<string, number>; d
         </ul>
       )}
     </div>
+  );
+}
+
+/** Each page: how many minutes, and how many times it was opened. */
+function Pages({ pages }: { pages: PageUse[] }) {
+  if (!pages.length) return <p className="small-print">No pages recorded yet.</p>;
+  const max = Math.max(...pages.map(p => p.minutes), 1);
+  return (
+    <ul className="pages">
+      {pages.map(p => (
+        <li key={p.page}>
+          <span className="pages-name">{PAGE_NAMES[p.page]}</span>
+          <span className="pages-bar" aria-hidden="true"><span style={{ width: `${(p.minutes / max) * 100}%` }} /></span>
+          <span className="tag">{mins(p.minutes)} min · {p.visits} visit{p.visits === 1 ? '' : 's'}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -164,10 +182,18 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
                 {chart === p.name ? 'Hide minutes by day' : 'Minutes by day'}
               </button>
               {chart === p.name && <MinutesChart byDay={p.byDay} date={date} color={colorOf(p.color)} />}
+              <h4 className="tag welcome-how">Pages</h4>
+              <div className={`c-${colorOf(p.color)}`}><Pages pages={p.pages} /></div>
             </div>
           </article>
         ))}
       </div>
+
+      <h2 className="tag section-label">Pages, everyone</h2>
+      <article className="card">
+        <div className="band"><span>Where the time goes</span><span>All time</span></div>
+        <div className="ruled c-blue"><Pages pages={stats.pages} /></div>
+      </article>
 
       <h2 className="tag section-label">Words</h2>
       <div className="cards">

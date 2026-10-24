@@ -276,3 +276,19 @@ describe('minutes on the site', () => {
     expect(minutesByDay(merge(m, addTime(phone, D, 'phone', 60)))[D]).toBe(9);
   });
 });
+
+describe('pages', () => {
+  it('counts minutes and visits per page, across devices', async () => {
+    const { addTime, addVisit, pageUse, minutesByDay } = await import('./time');
+    let phone = addTime(fresh(), D, 'phone', 120, { today: 60, practice: 60 });
+    phone = addVisit(addVisit(phone, D, 'phone', 'today'), D, 'phone', 'practice');
+    const laptop = addVisit(addTime(fresh(), D, 'laptop', 180, { lexicon: 180 }), D, 'laptop', 'lexicon');
+    const m = merge(phone, laptop);
+    expect(minutesByDay(m)[D]).toBe(5);
+    expect(pageUse(m)).toEqual([
+      { page: 'lexicon', minutes: 3, visits: 1 },
+      { page: 'today', minutes: 1, visits: 1 },
+      { page: 'practice', minutes: 1, visits: 1 },
+    ]);
+  });
+});

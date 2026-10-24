@@ -2,7 +2,7 @@ import { PER_DAY, streak } from './daily';
 import { addDays } from './dates';
 import { on, uses, type Friend } from './friends';
 import { normalise } from './merge';
-import { minutesByDay } from './time';
+import { byUse, minutesByDay, pageUse, type PageUse } from './time';
 import type { State, Word } from './types';
 
 /** One record as the owner's stats function returns it. */
@@ -27,6 +27,7 @@ export interface Person {
   minutes: number;           // on the site, all time (counted since this was added)
   minutesWeek: number;       // the last 7 days, today included
   byDay: Record<string, number>;
+  pages: PageUse[];
 }
 
 export interface Tally { word: string; n: number; extra?: string }
@@ -41,6 +42,7 @@ export interface Stats {
   rejected: Tally[];
   mostUsed: Tally[];
   stories: Story[];
+  pages: PageUse[];          // everyone together
 }
 
 const top = (counts: Map<string, number>, n = 8, extra?: (w: string) => string): Tally[] =>
@@ -83,6 +85,7 @@ export function computeStats(rows: Row[], bank: Word[], date: string): Stats {
       minutes: Object.values(byDay).reduce((a, n) => a + n, 0),
       minutesWeek: Object.entries(byDay).filter(([d]) => week.has(d)).reduce((a, [, n]) => a + n, 0),
       byDay,
+      pages: pageUse(s),
       name: f.name,
       color: f.color,
       lastSeen: at,
@@ -111,5 +114,10 @@ export function computeStats(rows: Row[], bank: Word[], date: string): Stats {
     rejected: top(rejected),
     mostUsed: top(usedCount),
     stories: stories.sort((a, b) => b.date.localeCompare(a.date)),
+    pages: [...people.flatMap(p => p.pages).reduce((m, u) => {
+      const t = m.get(u.page) ?? { page: u.page, minutes: 0, visits: 0 };
+      m.set(u.page, { page: u.page, minutes: t.minutes + u.minutes, visits: t.visits + u.visits });
+      return m;
+    }, new Map<PageUse['page'], PageUse>()).values()].sort(byUse),
   };
 }
