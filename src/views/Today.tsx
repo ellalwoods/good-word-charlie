@@ -92,7 +92,7 @@ function Welcome({ onDone }: { onDone: () => void }) {
         <p className="sense">Charlie uses the word <i>farcical</i>. Ella wishes she used the word <i>farcical</i>. Ella made this app to improve her vocabulary.</p>
         <h4 className="tag welcome-how">How it works</h4>
         <ul className="welcome-list">
-          <li><b>Three new words a day.</b></li>
+          <li><b>Three new words a day.</b> You can swap if you already know one.</li>
           <li><b>Practise them with spaced repetition.</b> Get a word right and it comes back less often; slip up and it’s back tomorrow.</li>
           <li><b>Use them for real.</b> And tell me, so I can celebrate.</li>
         </ul>
