@@ -492,10 +492,9 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 
 /* ---------- Friends ---------- */
 
-.masthead-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.masthead-top { position: relative; margin-bottom: 10px; padding-right: 96px; }
 
 .friends-btn {
-  position: relative;
   z-index: 3;
   appearance: none;
   display: inline-flex;
@@ -509,6 +508,10 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
+  /* Up in the top corner, clear of the title below. */
+  position: absolute;
+  top: -13px;
+  right: 0;
 }
 
 .friends-btn[aria-current='true'] { background: var(--yellow); border-color: var(--ink); color: var(--ink); }
@@ -548,6 +551,7 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 
 .link {
   appearance: none;
+  margin-left: 0.3em;
   border: 0;
   background: none;
   padding: 0;
