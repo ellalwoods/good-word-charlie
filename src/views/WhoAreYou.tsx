@@ -56,9 +56,8 @@ export function WhoAreYou({ people, onClaim, onAdd, onGuest }: Props) {
               )}
               {error && <p className="small-print sync-warn">{error}</p>}
               <h4 className="tag welcome-how">Not on the list?</h4>
-              <p className="small-print who-note">Adding yourself takes a name and a colour. No email, no password.</p>
               <div className="card-actions">
-                <button type="button" className="chip" onClick={() => { setAdding(true); setError(''); }}>Add me · just a name</button>
+                <button type="button" className="chip" onClick={() => { setAdding(true); setError(''); }}>Add me</button>
                 <button type="button" className="chip chip-quiet" onClick={onGuest}>Continue as guest</button>
               </div>
             </>

@@ -52,6 +52,12 @@ window.addEventListener('online', sync.wake);
 // Friends' news already looked at, so the header only counts new things.
 const SEEN = 'good-word-charlie-seen-v2';
 const ASKED = 'good-word-charlie-asked';
+const WELCOMED = 'good-word-charlie-welcomed';
+const flag = (k: string) => { try { return !!localStorage.getItem(k); } catch { return false; } };
+const setFlag = (k: string) => { try { localStorage.setItem(k, '1'); } catch { /* storage blocked */ } };
+// The welcome is shown once per device, so a new device always starts with it, then "Who are you?".
+// Devices that read it before this was per device keep it read.
+if (device.read().welcomed) setFlag(WELCOMED);
 function readSeen(): string[] {
   try { const s = JSON.parse(localStorage.getItem(SEEN) || '[]'); return Array.isArray(s) ? s : []; } catch { return []; }
 }
@@ -140,12 +146,15 @@ export default function App() {
   }, [snap.status]);
 
   // The welcome card sits over everything until it's dismissed.
-  const welcoming = settled && !state.welcomed;
+  const [welcomedHere, setWelcomedHere] = useState(() => flag(WELCOMED));
+  const welcoming = settled && !welcomedHere;
   const install = useInstall();
   // Then, on a device that doesn't know you: are you one of these people? Asked once per device.
-  const [asked, setAsked] = useState(() => { try { return !!localStorage.getItem(ASKED); } catch { return false; } });
-  const doneAsking = () => { setAsked(true); try { localStorage.setItem(ASKED, '1'); } catch { /* storage blocked */ } };
-  const asking = settled && !welcoming && !asked && !name && snap.status !== 'off' && (friends !== null || friendsFailed);
+  const [asked, setAsked] = useState(() => flag(ASKED));
+  const doneAsking = () => { setAsked(true); setFlag(ASKED); };
+  // Only when this device doesn't know who you are: not while it's still fetching your account.
+  const asking = settled && !welcoming && !asked && !name && snap.status !== 'off' && snap.status !== 'saving'
+    && (friends !== null || friendsFailed);
   const blocked = welcoming || install.open || asking;
 
   const heading = useMemo(() => longDate(new Date(`${date}T12:00`)), [date]);
@@ -216,7 +225,7 @@ export default function App() {
         <WhoAreYou people={(friends ?? []).filter(f => !f.mine)} onClaim={async n => { await claim(n); doneAsking(); }}
           onAdd={async (n, c) => { await joinFriends(n, c); doneAsking(); }} onGuest={doneAsking} />
       )}
-      {welcoming && <Welcome onDone={() => update({ ...state, welcomed: true })} />}
+      {welcoming && <Welcome onDone={() => { setFlag(WELCOMED); setWelcomedHere(true); update({ ...state, welcomed: true }); }} />}
     </>
   );
 }
