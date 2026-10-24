@@ -569,6 +569,14 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 .use .sense, .cheered { margin: 0; }
 .cheered { margin-top: 6px; font: 700 0.75rem/1.4 var(--mono); letter-spacing: 0.04em; }
 .chip-cheer { background: var(--yellow); }
+/* Tucked away: the use and its celebrations come first. */
+.use .whoops {
+  display: block;
+  margin: 10px 0 0;
+  font: 400 0.6875rem/1.4 var(--mono);
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+}
 .chip-cheer[aria-pressed='true'] { background: var(--pink); color: var(--ink); }
 
 .avatar {
