@@ -263,3 +263,16 @@ describe("Ella's stats", () => {
     expect(s.stories[0]).toMatchObject({ name: 'Ella', word: 'farcical', text: 'At breakfast.' });
   });
 });
+
+describe('minutes on the site', () => {
+  it('adds up across devices, and merging never double-counts', async () => {
+    const { addTime, minutesByDay } = await import('./time');
+    let phone = addTime(fresh(), D, 'phone', 120);
+    phone = addTime(phone, D, 'phone', 60);
+    const laptop = addTime(fresh(), D, 'laptop', 300);
+    const m = merge(merge(phone, laptop), phone);
+    expect(minutesByDay(m)[D]).toBe(8);
+    // A later sync with more time on the phone keeps the newer count.
+    expect(minutesByDay(merge(m, addTime(phone, D, 'phone', 60)))[D]).toBe(9);
+  });
+});

@@ -40,6 +40,9 @@ export function merge(a: State, b: State): State {
   const name = latestOf(a.name, b.name);
   if (name) out.name = name;
   if (a.welcomed || b.welcomed) out.welcomed = true;
+  // Each device only ever adds to its own count, so the larger count is the newer one.
+  const time = maxCounts(a.time ?? {}, b.time ?? {});
+  if (Object.keys(time).length) out.time = time;
   const notes = mergeNotes(a.notes ?? {}, b.notes ?? {});
   if (Object.keys(notes).length) out.notes = notes;
   if (latest) out.practised = { [latest]: unionList(a.practised?.[latest] ?? [], b.practised?.[latest] ?? []) };
@@ -79,6 +82,15 @@ function mergeStamps(a: Stamps, b: Stamps): Stamps {
       const p = x[w] ?? 0, q = y[w] ?? 0;
       out[d][w] = Math.abs(p) !== Math.abs(q) ? (Math.abs(p) > Math.abs(q) ? p : q) : Math.max(p, q);
     }
+  }
+  return out;
+}
+
+function maxCounts(a: Stamps, b: Stamps): Stamps {
+  const out: Stamps = {};
+  for (const d of keys(a, b)) {
+    out[d] = { ...a[d] };
+    for (const [k, n] of Object.entries(b[d] ?? {})) out[d][k] = Math.max(out[d][k] ?? 0, n);
   }
   return out;
 }

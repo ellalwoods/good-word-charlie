@@ -5,6 +5,7 @@ import { combine, markCheer, markUsed, nameOf, news, setNote, setProfile, usedOn
 import { longDate, today } from './lib/dates';
 import { recordPractised, redoSession, shuffleTest, startSession, type Session } from './lib/session';
 import { device, fresh, linkManifest } from './lib/storage';
+import { addTime, deviceId, trackTime } from './lib/time';
 import { remote } from './lib/supabase';
 import { cleanKey, Sync } from './lib/sync';
 import type { State, Word } from './lib/types';
@@ -50,6 +51,9 @@ linkManifest(sync.get().key ?? fromLink);
 // Ask the browser not to clear progress to save space.
 navigator.storage?.persist?.().catch(() => {});
 window.addEventListener('online', sync.wake);
+// Minutes spent on the site, for Ella's stats.
+const thisDevice = deviceId();
+trackTime(seconds => sync.update(addTime(sync.get().state, today(), thisDevice, seconds)));
 
 // Friends' news already looked at, so the header only counts new things.
 const SEEN = 'good-word-charlie-seen-v2';

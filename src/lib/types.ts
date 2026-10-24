@@ -49,6 +49,7 @@ export interface State {
   name?: { value: string; color?: string; at: number };  // the name and colour friends see; empty once you leave
   cheers?: Record<string, Record<string, number>>;
   notes?: Record<string, Record<string, { text: string; at: number }>>;  // date -> word -> the story of how it was used
-  welcomed?: true;  // the welcome card has been read  // date -> "name:word" celebrated -> when (negative once undone)
+  welcomed?: true;
+  time?: Record<string, Record<string, number>>;  // date -> device -> seconds actively on the site  // the welcome card has been read  // date -> "name:word" celebrated -> when (negative once undone)
   updated: number;
 }

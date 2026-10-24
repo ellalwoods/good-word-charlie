@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { shortDate } from '../lib/dates';
+import { addDays, shortDate } from '../lib/dates';
 import { colorOf } from '../lib/friends';
 import { computeStats, type Row, type Stats as S, type Tally } from '../lib/stats';
 import type { Word } from '../lib/types';
@@ -17,6 +17,45 @@ const ago = (iso: string) => {
   return `${d} day${d === 1 ? '' : 's'} ago`;
 };
 const pct = (v: number | null) => (v === null ? '–' : `${Math.round(v * 100)}%`);
+
+const mins = (m: number) => (m < 1 && m > 0 ? '<1' : String(Math.round(m)));
+
+const DAYS = 30;
+
+/** Minutes each day for the last 30 days. Tap a bar for its day. */
+function MinutesChart({ byDay, date, color }: { byDay: Record<string, number>; date: string; color: string }) {
+  const days = Array.from({ length: DAYS }, (_, i) => addDays(date, i - DAYS + 1));
+  const values = days.map(d => byDay[d] ?? 0);
+  const max = Math.max(...values, 1);
+  const peak = values.indexOf(Math.max(...values));
+  const [picked, setPicked] = useState<number | null>(null);
+  const shown = picked ?? (values[peak] > 0 ? peak : null);
+  const [table, setTable] = useState(false);
+  return (
+    <div className={`minutes c-${color}`}>
+      <p className="minutes-read" aria-live="polite">
+        {shown === null ? 'No time recorded in the last 30 days.'
+          : <><b>{mins(values[shown])} min</b> on {shortDate(days[shown])}{picked === null ? ' (busiest day)' : ''}</>}
+      </p>
+      <div className="bars" role="img" aria-label={`Minutes per day for the last ${DAYS} days`}>
+        {values.map((v, i) => (
+          <button key={days[i]} type="button" className={`bar-hit${i === shown ? ' bar-on' : ''}`}
+            onClick={() => setPicked(i === picked ? null : i)} aria-label={`${shortDate(days[i])}: ${mins(v)} minutes`}>
+            <span className="bar" style={{ height: `${v ? Math.max(4, (v / max) * 100) : 0}%` }} />
+          </button>
+        ))}
+      </div>
+      <div className="bars-axis tag"><span>{shortDate(days[0])}</span><span>Today</span></div>
+      <button type="button" className="link whoops" onClick={() => setTable(!table)}>{table ? 'Hide the list' : 'Show as a list'}</button>
+      {table && (
+        <ul className="minutes-list">
+          {days.map((d, i) => ({ d, v: values[i] })).filter(x => x.v > 0).reverse()
+            .map(x => <li key={x.d}><span>{shortDate(x.d)}</span><span>{mins(x.v)} min</span></li>)}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 function List({ title, items, empty, unit }: { title: string; items: Tally[]; empty: string; unit: [string, string] }) {
   return (
@@ -56,6 +95,7 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
   const [stats, setStats] = useState<S | null>(null);
   const [state, setState] = useState<'locked' | 'loading' | 'failed' | 'open'>('locked');
   const [wrong, setWrong] = useState(0);
+  const [chart, setChart] = useState<string | null>(null);
 
   const open = async (code: string) => {
     setState('loading');
@@ -92,6 +132,7 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
         <div className="stat stat-yellow"><b>{stats.activeWeek}</b><span className="tag">Active this week</span></div>
         <div className="stat stat-pink"><b>{stats.people.reduce((n, p) => n + p.used, 0)}</b><span className="tag">Words used</span></div>
       </section>
+      <p className="small-print">Everyone together: <b>{mins(stats.people.reduce((n, p) => n + p.minutesWeek, 0))} minutes</b> on the site in the last 7 days.</p>
       {soonest && (
         <p className="slip">
           <b>{soonest.name}</b> runs out of words first, around <b>{shortDate(soonest.runsOut!)}</b> ({soonest.left} left).
@@ -115,7 +156,14 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
                 <div><dt>Celebrated / got</dt><dd>{p.cheersGiven} / {p.cheersReceived}</dd></div>
                 <div><dt>Words left</dt><dd>{p.left}</dd></div>
                 <div><dt>Runs out</dt><dd>{p.runsOut ? shortDate(p.runsOut) : '–'}</dd></div>
+                <div><dt>Minutes, all</dt><dd>{mins(p.minutes)}</dd></div>
+                <div><dt>Minutes, 7 days</dt><dd>{mins(p.minutesWeek)}</dd></div>
               </dl>
+              <button type="button" className="chip chip-quiet minutes-btn" aria-expanded={chart === p.name}
+                onClick={() => setChart(chart === p.name ? null : p.name)}>
+                {chart === p.name ? 'Hide minutes by day' : 'Minutes by day'}
+              </button>
+              {chart === p.name && <MinutesChart byDay={p.byDay} date={date} color={colorOf(p.color)} />}
             </div>
           </article>
         ))}

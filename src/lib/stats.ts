@@ -2,6 +2,7 @@ import { PER_DAY, streak } from './daily';
 import { addDays } from './dates';
 import { on, uses, type Friend } from './friends';
 import { normalise } from './merge';
+import { minutesByDay } from './time';
 import type { State, Word } from './types';
 
 /** One record as the owner's stats function returns it. */
@@ -23,6 +24,9 @@ export interface Person {
   cheersReceived: number;
   left: number;              // words still in the box for them
   runsOut: string | null;    // the day they'd see the out-of-words card
+  minutes: number;           // on the site, all time (counted since this was added)
+  minutesWeek: number;       // the last 7 days, today included
+  byDay: Record<string, number>;
 }
 
 export interface Tally { word: string; n: number; extra?: string }
@@ -73,7 +77,12 @@ export function computeStats(rows: Row[], bank: Word[], date: string): Stats {
     const left = bank.filter(w => !s.cards[w.word] && !s.known[w.word] && !s.rejected[w.word]).length;
     const cheersReceived = named.reduce((n, o) => n + Object.keys(o.s.cheers ?? {})
       .reduce((m, d) => m + on(o.s.cheers, d).filter(k => k.startsWith(`${f.name}:`)).length, 0), 0);
+    const byDay = minutesByDay(s);
+    const week = new Set(Array.from({ length: 7 }, (_, i) => addDays(date, -i)));
     return {
+      minutes: Object.values(byDay).reduce((a, n) => a + n, 0),
+      minutesWeek: Object.entries(byDay).filter(([d]) => week.has(d)).reduce((a, [, n]) => a + n, 0),
+      byDay,
       name: f.name,
       color: f.color,
       lastSeen: at,

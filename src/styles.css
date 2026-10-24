@@ -776,3 +776,16 @@ ol.welcome-list { padding-left: 1.3em; }
 .pin-wrong .pin-box { border-color: var(--pink); }
 @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
 @media (prefers-reduced-motion: reduce) { .pin-wrong { animation: none; } }
+
+/* Minutes by day: one bar a day, in the person's colour, outlined in ink. */
+.minutes-btn { margin-top: 12px; }
+.minutes { margin-top: 12px; }
+.minutes-read { margin: 0 0 8px; }
+.bars { display: flex; align-items: flex-end; gap: 2px; height: 120px; border-bottom: 2px solid var(--ink); }
+.bar-hit { appearance: none; flex: 1; height: 100%; display: flex; align-items: flex-end; padding: 0; border: 0; background: none; cursor: pointer; }
+.bar { display: block; width: 100%; background: var(--c); border: 1.5px solid var(--ink); border-bottom: 0; border-radius: 4px 4px 0 0; }
+.bar-on .bar { box-shadow: 0 0 0 2px var(--paper), 0 0 0 3.5px var(--ink); }
+.bars-axis { display: flex; justify-content: space-between; margin: 4px 0 8px; opacity: 0.7; }
+.minutes-list { margin: 8px 0 0; padding: 0; list-style: none; }
+.minutes-list li { display: flex; justify-content: space-between; border-bottom: 1px dotted var(--rule); padding: 3px 0; font-variant-numeric: tabular-nums; }
+.minutes .whoops { font: 400 0.75rem/1.4 var(--mono); opacity: 0.7; }
