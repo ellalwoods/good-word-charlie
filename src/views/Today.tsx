@@ -94,7 +94,7 @@ function Welcome({ onDone }: { onDone: () => void }) {
         <ul className="welcome-list">
           <li><b>Three new words a day.</b></li>
           <li><b>Practise them with spaced repetition.</b> Get a word right and it comes back less often; slip up and it’s back tomorrow.</li>
-          <li><b>Use them for real.</b> And tell us, so we can celebrate.</li>
+          <li><b>Use them for real.</b> And tell me, so I can celebrate.</li>
         </ul>
         <div className="card-actions">
           <button type="button" className="btn" onClick={onDone}>Begin</button>
