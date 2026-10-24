@@ -40,6 +40,9 @@ export function merge(a: State, b: State): State {
   const name = latestOf(a.name, b.name);
   if (name) out.name = name;
   if (a.welcomed || b.welcomed) out.welcomed = true;
+  const started = Math.min(a.started ?? Infinity, b.started ?? Infinity);
+  if (started !== Infinity) out.started = started;
+  if (a.moved || b.moved) out.moved = true;
   // Each device only ever adds to its own count, so the larger count is the newer one.
   const time = maxCounts(a.time ?? {}, b.time ?? {});
   if (Object.keys(time).length) out.time = time;

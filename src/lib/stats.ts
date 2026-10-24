@@ -10,6 +10,9 @@ export interface Row { updated_at: string; data: unknown }
 
 export interface Person {
   name: string;
+  guest: boolean;            // no name yet: "Guest 1", "Guest 2", by when they started
+  started: string | null;    // when the record was first used (ISO), or the first day it was dealt words
+  startedTime: boolean;      // whether `started` has a time of day, not just a date
   color: string | null;
   lastSeen: string;          // ISO time of the last save
   streak: number;
@@ -35,7 +38,7 @@ export interface Story { name: string; word: string; date: string; text: string 
 
 export interface Stats {
   people: Person[];
-  guests: number;            // records with no name
+  guests: number;            // records with no name (shown among the people, as guests)
   activeWeek: number;
   hardest: Tally[];
   known: Tally[];
@@ -52,8 +55,18 @@ const top = (counts: Map<string, number>, n = 8, extra?: (w: string) => string):
 const bump = (m: Map<string, number>, k: string, by = 1) => m.set(k, (m.get(k) ?? 0) + by);
 
 export function computeStats(rows: Row[], bank: Word[], date: string): Stats {
-  const records = rows.map(r => ({ at: r.updated_at, s: normalise(r.data) as State }));
+  // A guest record whose device has since become someone else is left out.
+  const records = rows.map(r => ({ at: r.updated_at, s: normalise(r.data) as State })).filter(r => !r.s.moved);
   const named = records.filter(r => r.s.name?.value);
+  const startOf = (s: State): { started: string | null; startedTime: boolean } => {
+    if (s.started) return { started: new Date(s.started).toISOString(), startedTime: true };
+    const first = Object.keys(s.days).sort()[0];
+    return { started: first ? `${first}T00:00:00` : null, startedTime: false };
+  };
+  // Guests are numbered by when they started.
+  const guestNo = new Map(records.filter(r => !r.s.name?.value)
+    .sort((a, b) => (startOf(a.s).started ?? a.at).localeCompare(startOf(b.s).started ?? b.at))
+    .map((r, i) => [r, i + 1]));
   const inBank = new Set(bank.map(w => w.word));
   const asFriend = (s: State): Friend => ({
     name: s.name?.value ?? '', color: s.name?.color ?? null, used: s.used ?? {}, cheers: s.cheers ?? {}, notes: s.notes ?? {}, mine: false,
@@ -68,8 +81,10 @@ export function computeStats(rows: Row[], bank: Word[], date: string): Stats {
   }
 
   const stories: Story[] = [];
-  const people = named.map(({ at, s }): Person => {
+  const people = records.map((r): Person => {
+    const { at, s } = r;
     const f = asFriend(s);
+    if (!f.name) f.name = `Guest ${guestNo.get(r)}`;
     const all = uses([f]);
     for (const u of all) {
       bump(usedCount, u.word);
@@ -86,6 +101,8 @@ export function computeStats(rows: Row[], bank: Word[], date: string): Stats {
       minutesWeek: Object.entries(byDay).filter(([d]) => week.has(d)).reduce((a, [, n]) => a + n, 0),
       byDay,
       pages: pageUse(s),
+      ...startOf(s),
+      guest: !s.name?.value,
       name: f.name,
       color: f.color,
       lastSeen: at,
@@ -108,7 +125,7 @@ export function computeStats(rows: Row[], bank: Word[], date: string): Stats {
   return {
     people,
     guests: records.length - named.length,
-    activeWeek: people.filter(p => Date.parse(p.lastSeen) > weekAgo).length,
+    activeWeek: people.filter(p => !p.guest && Date.parse(p.lastSeen) > weekAgo).length,
     hardest: top(wrong, 8, w => `${right.get(w) ?? 0} right`),
     known: top(known),
     rejected: top(rejected),

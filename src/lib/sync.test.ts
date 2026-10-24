@@ -252,9 +252,13 @@ describe("Ella's stats", () => {
     ella = setNote(markUsed(ella, 'farcical', D, true), 'farcical', D, 'At breakfast.');
     const charlie = markCheer(dismiss(setProfile(ensureToday(fresh(), bank, D), 'Charlie', 'yellow'), bank, 'glut', 'known', D), 'Ella', 'farcical', D, true);
     const now = new Date().toISOString();
-    const s = computeStats([{ updated_at: now, data: ella }, { updated_at: now, data: charlie }, { updated_at: now, data: fresh() }], bank, D);
-    expect(s.people.map(p => p.name).sort()).toEqual(['Charlie', 'Ella']);
+    const guest = { ...ensureToday(fresh(), bank, D), started: Date.parse('2026-10-23T15:12:00') };
+    const moved = { ...fresh(), moved: true as const };
+    const s = computeStats([{ updated_at: now, data: ella }, { updated_at: now, data: charlie }, { updated_at: now, data: guest }, { updated_at: now, data: moved }], bank, D);
+    expect(s.people.map(p => p.name).sort()).toEqual(['Charlie', 'Ella', 'Guest 1']);
     expect(s.guests).toBe(1);
+    expect(s.people.find(p => p.guest)).toMatchObject({ startedTime: true, learned: 3 });
+    expect(s.people.find(p => p.name === 'Ella')).toMatchObject({ guest: false, started: `${D}T00:00:00`, startedTime: false });
     const e = s.people.find(p => p.name === 'Ella')!;
     expect(e).toMatchObject({ learned: 3, used: 1, stories: 1, cheersReceived: 1, left: bank.length - 3 });
     expect(e.accuracy).toBeGreaterThan(0);

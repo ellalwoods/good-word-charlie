@@ -797,3 +797,7 @@ ol.welcome-list { padding-left: 1.3em; }
 .pages-name { font-size: 0.95rem; }
 .pages-bar { height: 12px; }
 .pages-bar span { display: block; height: 100%; min-width: 2px; background: var(--c); border: 1.5px solid var(--ink); border-radius: 0 4px 4px 0; }
+
+.c-guest { --c: #d8d3c7; --c-ink: var(--ink); }
+.c-guest .avatar { background: var(--paper); }
+.first-seen { margin: 0 0 8px; }

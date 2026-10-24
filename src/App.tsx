@@ -36,8 +36,16 @@ const blank = (s: State) =>
 
 // Opening a sync link joins it. A device with nothing on it yet just takes the link's progress.
 // This device's progress is added to it; its name comes from the link (you, from another device).
+const LOCAL_ONLY = 'good-word-charlie-local-only';
 const join = (key: string) => {
   const s = sync.get().state;
+  const old = sync.get().key;
+  // Leaving a guest record for someone's real one: mark it so it drops off Ella's stats.
+  const r = remote;
+  if (r && old && old !== key && !s.name?.value) {
+    r.load(old).then(res => { if (res !== 'invalid') return r.save(old, { ...res.data, moved: true }, res.version); }).catch(() => {});
+  }
+  try { localStorage.removeItem(LOCAL_ONLY); } catch { /* storage blocked */ }
   if (blank(s)) sync.update(fresh());
   else if (s.name) sync.update({ ...s, name: undefined });
   return sync.join(key);
@@ -47,6 +55,19 @@ const fromLink = location.hash.length > 1 ? cleanKey(location.hash) : null;
 const startKey = fromLink ?? sync.get().key;
 if (fromLink && fromLink !== sync.get().key) join(fromLink);
 else { sync.start(); if (sync.get().key) device.writeKey(sync.get().key); }
+// A brand-new device notes when it started, for Ella's stats.
+if (blank(sync.get().state) && !sync.get().state.started) sync.update({ ...sync.get().state, started: Date.now() });
+// Every device gets its own record (as a guest until it has a name), unless it chose to stay local.
+let linking = false;
+const autoLink = () => {
+  let localOnly = false;
+  try { localOnly = !!localStorage.getItem(LOCAL_ONLY); } catch { /* storage blocked */ }
+  if (!remote || sync.get().key || linking || localOnly) return;
+  linking = true;
+  sync.link().catch(() => {}).finally(() => { linking = false; });
+};
+if (!fromLink) autoLink();
+window.addEventListener('online', autoLink);
 linkManifest(sync.get().key ?? fromLink);
 // Ask the browser not to clear progress to save space.
 navigator.storage?.persist?.().catch(() => {});
@@ -152,6 +173,7 @@ export default function App() {
     if (snap.status !== 'invalid' || snap.key !== startKey) return;
     sync.unlink();
     sync.update({ ...sync.get().state, name: undefined });
+    autoLink();
   }, [snap.status]);
 
   // Which page is open, for Ella's stats: counted once each time it's opened.
@@ -225,7 +247,8 @@ export default function App() {
           ) : tab === 'stats' && remote ? (
             <Stats bank={bank} date={date} load={p => remote!.stats(p)} />
           ) : tab === 'sync' ? (
-            <SyncView snap={snap} onLink={() => sync.link()} onJoin={join} onUnlink={() => sync.unlink()} />
+            <SyncView snap={snap} onLink={() => sync.link()} onJoin={join}
+              onUnlink={() => { try { localStorage.setItem(LOCAL_ONLY, '1'); } catch { /* storage blocked */ } sync.unlink(); }} />
           ) : (
             <Lexicon state={state} bank={bank} number={number} date={date}
               onTest={(words, questions) => begin(shuffleTest(state, bank, words, questions), 'lexicon')}

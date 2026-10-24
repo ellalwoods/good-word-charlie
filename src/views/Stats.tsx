@@ -17,6 +17,11 @@ const ago = (iso: string) => {
   const d = Math.floor(h / 24);
   return `${d} day${d === 1 ? '' : 's'} ago`;
 };
+const started = (iso: string, withTime: boolean) => {
+  const d = new Date(iso);
+  const day = d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+  return withTime ? `${day}, ${d.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })}` : day;
+};
 const pct = (v: number | null) => (v === null ? '–' : `${Math.round(v * 100)}%`);
 
 const mins = (m: number) => (m < 1 && m > 0 ? '<1' : String(Math.round(m)));
@@ -142,11 +147,11 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
   if (state === 'failed') return <Problem about="Ella’s stats wouldn’t load.">Couldn’t load the stats. Check the connection.</Problem>;
   if (!stats) return <p className="slip">Loading…</p>;
 
-  const soonest = stats.people.filter(p => p.runsOut).sort((a, b) => a.runsOut!.localeCompare(b.runsOut!))[0];
+  const soonest = stats.people.filter(p => p.runsOut && !p.guest).sort((a, b) => a.runsOut!.localeCompare(b.runsOut!))[0];
   return (
     <section className="sync stats-page">
       <section className="stats" aria-label="Overview">
-        <div className="stat"><b>{stats.people.length}</b><span className="tag">People</span></div>
+        <div className="stat"><b>{stats.people.length - stats.guests}</b><span className="tag">People{stats.guests ? ` + ${stats.guests} guest${stats.guests === 1 ? '' : 's'}` : ''}</span></div>
         <div className="stat stat-yellow"><b>{stats.activeWeek}</b><span className="tag">Active this week</span></div>
         <div className="stat stat-pink"><b>{stats.people.reduce((n, p) => n + p.used, 0)}</b><span className="tag">Words used</span></div>
       </section>
@@ -154,17 +159,22 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
       {soonest && (
         <p className="slip">
           <b>{soonest.name}</b> runs out of words first, around <b>{shortDate(soonest.runsOut!)}</b> ({soonest.left} left).
-          {stats.guests > 0 && <> Plus {stats.guests} guest{stats.guests === 1 ? '' : 's'} with no name.</>}
         </p>
       )}
 
       <h2 className="tag section-label">People</h2>
       <div className="cards">
         {stats.people.map(p => (
-          <article key={p.name} className={`card person c-${colorOf(p.color)}`}>
+          <article key={p.name} className={`card person ${p.guest ? 'c-guest' : `c-${colorOf(p.color)}`}`}>
             <div className="band"><span>{p.name}</span><span>Seen {ago(p.lastSeen)}</span></div>
             <div className="ruled">
-              <div className="profile-head"><Avatar friend={p} /><span className="tag">{p.streak}-day streak · practised {p.practised} of {p.dealt} days</span></div>
+              {p.started && (
+                <p className="small-print first-seen">
+                  {p.guest ? 'First visit' : 'Started'}: <b>{started(p.started, p.startedTime)}</b>
+                  {p.guest && <> · no name yet</>}
+                </p>
+              )}
+              <div className="profile-head"><Avatar friend={p.guest ? { name: '?', color: null } : p} /><span className="tag">{p.streak}-day streak · practised {p.practised} of {p.dealt} days</span></div>
               <dl className="facts">
                 <div><dt>Learned</dt><dd>{p.learned}</dd></div>
                 <div><dt>Firmly (5–6)</dt><dd>{p.strong}</dd></div>

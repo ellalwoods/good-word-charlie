@@ -50,6 +50,8 @@ export interface State {
   cheers?: Record<string, Record<string, number>>;
   notes?: Record<string, Record<string, { text: string; at: number }>>;  // date -> word -> the story of how it was used
   welcomed?: true;
+  started?: number;  // when this record was first used (ms), for Ella's stats
+  moved?: true;      // a guest record whose device has since become someone else
   time?: Record<string, Record<string, number>>;    // date -> device (or device|page) -> seconds actively on the site
   visits?: Record<string, Record<string, number>>;  // date -> device|page -> times that page was opened  // the welcome card has been read  // date -> "name:word" celebrated -> when (negative once undone)
   updated: number;
