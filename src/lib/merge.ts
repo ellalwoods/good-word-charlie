@@ -1,3 +1,4 @@
+import { tidyDays } from './daily';
 import { fresh } from './storage';
 import type { Card, State } from './types';
 
@@ -42,7 +43,7 @@ export function merge(a: State, b: State): State {
   const notes = mergeNotes(a.notes ?? {}, b.notes ?? {});
   if (Object.keys(notes).length) out.notes = notes;
   if (latest) out.practised = { [latest]: unionList(a.practised?.[latest] ?? [], b.practised?.[latest] ?? []) };
-  return out;
+  return tidyDays(out);
 }
 
 /** Fills in anything missing from progress saved by an older version, or nothing at all. */

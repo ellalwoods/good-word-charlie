@@ -9,6 +9,31 @@ export function unseen(state: State, bank: Word[]): Word[] {
   return bank.filter(w => !state.cards[w.word] && !state.known[w.word] && !state.rejected[w.word]);
 }
 
+/**
+ * Each day keeps just its own three new words. Two devices that each picked a
+ * day's words before syncing would otherwise end up with six: a word already
+ * dealt on an earlier day isn't new, and anything past three is put back for
+ * another day (unless it's already been practised).
+ */
+export function tidyDays(state: State): State {
+  const seen = new Set<string>();
+  const days: Record<string, string[]> = {};
+  let changed = false;
+  for (const d of Object.keys(state.days).sort()) {
+    const list = state.days[d].filter(w => !seen.has(w)).slice(0, PER_DAY);
+    if (list.length !== state.days[d].length) changed = true;
+    state.days[d].forEach(w => seen.add(w));
+    days[d] = list;
+  }
+  if (!changed) return state;
+  const kept = new Set(Object.values(days).flat());
+  const cards = { ...state.cards };
+  for (const [w, c] of Object.entries(cards)) {
+    if (!kept.has(w) && c.asked === 0 && c.right + c.wrong === 0) delete cards[w];
+  }
+  return { ...state, days, cards };
+}
+
 function withCards(state: State, date: string, words: string[]): State {
   const cards = { ...state.cards };
   for (const w of words) cards[w] = newCard(date);

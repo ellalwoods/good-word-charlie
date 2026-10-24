@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import words from './data/words.json';
-import { dismiss, ensureToday } from './lib/daily';
+import { dismiss, ensureToday, tidyDays } from './lib/daily';
 import { combine, markCheer, markUsed, nameOf, news, setNote, setProfile, usedOn, type Friend } from './lib/friends';
 import { longDate, today } from './lib/dates';
 import { recordPractised, redoSession, shuffleTest, startSession, type Session } from './lib/session';
@@ -86,7 +86,7 @@ export default function App() {
 
   useEffect(() => {
     if (!settled || session) return;
-    const next = ensureToday(state, bank, date);
+    const next = ensureToday(tidyDays(state), bank, date);
     if (next !== state) update(next);
   }, [date, settled, state, session]);
 

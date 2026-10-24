@@ -89,6 +89,26 @@ function memory(state = fresh()): Local & { key: string | null } {
 
 const settle = () => new Promise(r => setTimeout(r, 650));
 
+describe("today's words", () => {
+  it('stay three after merging two devices that each picked them', () => {
+    // The account met words 1–3 yesterday and 4–6 today; a new device dealt itself 1–3 for today.
+    const account = ensureToday(ensureToday(fresh(), bank, '2026-10-22'), bank, D);
+    const stray = ensureToday(fresh(), bank, D);
+    const m = merge(account, stray);
+    expect(m.days[D]).toEqual(account.days[D]);
+    expect(m.days[D]).toHaveLength(3);
+    expect(Object.keys(m.cards)).toHaveLength(6);
+  });
+
+  it('put back extra words that were never practised', () => {
+    const a = ensureToday(fresh(), bank, D);
+    const b = { ...a, days: { [D]: ['glut', 'risible', 'specious'] }, cards: Object.fromEntries(['glut', 'risible', 'specious'].map(w => [w, a.cards.farcical])) };
+    const m = merge(a, b);
+    expect(m.days[D]).toHaveLength(3);
+    expect(Object.keys(m.cards)).toHaveLength(3);
+  });
+});
+
 describe('friends', () => {
   const start = ensureToday(fresh(), bank, D);
 
