@@ -52,7 +52,7 @@ function Setup({ name, color, taken = [], onSave, onCancel, onClaim }: {
     if (!onClaim) return;
     setBusy(true); setError('');
     try { await onClaim(taken.find(t => t.trim().toLowerCase() === draft.trim().toLowerCase()) ?? draft.trim()); }
-    catch { setError('Couldn’t reach the server. Try again in a moment.'); }
+    catch (e) { setError(claimError(e)); }
     setBusy(false);
   };
   const save = async () => {
@@ -88,7 +88,7 @@ function Setup({ name, color, taken = [], onSave, onCancel, onClaim }: {
           )}
           <div className="card-actions">
             <button type="button" className="chip" disabled={!draft.trim() || clash || busy} onClick={save}>{name ? 'Save' : 'Join'}</button>
-            {onCancel && <button type="button" className="chip chip-quiet" onClick={onCancel}>{name ? 'Cancel' : 'Back'}</button>}
+            {onCancel && <button type="button" className="chip chip-quiet" onClick={onCancel}>Cancel</button>}
           </div>
           <p className="small-print">Friends see your name, your colour, the words you’ve used (and any story you add) and what you’ve celebrated. Nothing else.</p>
         </div>
@@ -98,48 +98,50 @@ function Setup({ name, color, taken = [], onSave, onCancel, onClaim }: {
   );
 }
 
-/** A new device: pick who you are from everyone who's joined, or join as someone new. */
-function WhoAreYou({ people, onClaim, onNew }: { people: Friend[]; onClaim: Props['onClaim']; onNew: () => void }) {
+/** Why "That's me" didn't work, in words someone can act on. */
+export function claimError(e: unknown): string {
+  const msg = String((e as { message?: string })?.message ?? e);
+  if (/charlie_claim|PGRST202|function/i.test(msg)) return 'This needs the latest Supabase setup. Tell Ella (run the charlie_claim SQL).';
+  if (/not found/i.test(msg)) return 'Couldn’t find that person. Try again in a moment.';
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return 'You’re offline. Try again when you’re connected.';
+  return `That didn’t work: ${msg}`;
+}
+
+/** Everyone who's joined: tap yourself to carry on as you on this device. */
+function AlreadyJoined({ people, onClaim }: { people: Friend[]; onClaim: Props['onClaim'] }) {
   const [pick, setPick] = useState<Friend | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const yes = async () => {
     if (!pick) return;
     setBusy(true); setError('');
-    try { await onClaim(pick.name); } catch { setError('Couldn’t reach the server. Try again in a moment.'); }
+    try { await onClaim(pick.name); } catch (e) { setError(claimError(e)); }
     setBusy(false);
   };
   return (
-    <section className="sync">
-      <article className="card">
-        <div className="band"><span>Who are you?</span></div>
-        <div className="ruled">
-          <ul className="roster roster-pick">
-            {people.map(f => (
-              <li key={f.name}>
-                <button type="button" className="who" aria-pressed={pick?.name === f.name} onClick={() => setPick(f)}>
-                  <Avatar friend={f} big />
-                  <span className="tag">{f.name}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-          {pick
-            ? (
-              <div className="card-actions">
-                <button type="button" className="chip" disabled={busy} onClick={yes}>Yes, I’m {pick.name}</button>
-                <button type="button" className="chip chip-quiet" onClick={() => setPick(null)}>No</button>
-              </div>
-            )
-            : <p className="small-print">Tap yourself to carry on where you left off.</p>}
-          {error && <p className="small-print">{error}</p>}
-        </div>
-      </article>
-      <button type="button" className="btn btn-quiet" onClick={onNew}>
-        I’m new here
-        <span className="btn-sub">Pick a name and colour</span>
-      </button>
-    </section>
+    <article className="card">
+      <div className="band"><span>Already joined?</span></div>
+      <div className="ruled">
+        <p className="small-print">Tap yourself to carry on where you left off.</p>
+        <ul className="roster roster-pick">
+          {people.map(f => (
+            <li key={f.name}>
+              <button type="button" className="who" aria-pressed={pick?.name === f.name} onClick={() => { setPick(f); setError(''); }}>
+                <Avatar friend={f} big />
+                <span className="tag">{f.name}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        {pick && (
+          <div className="card-actions">
+            <button type="button" className="chip" disabled={busy} onClick={yes}>{busy ? 'One moment…' : `Yes, I’m ${pick.name}`}</button>
+            <button type="button" className="chip chip-quiet" onClick={() => setPick(null)}>No</button>
+          </div>
+        )}
+        {error && <p className="small-print sync-warn">{error}</p>}
+      </div>
+    </article>
   );
 }
 
@@ -279,7 +281,6 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
   const [picking, setPicking] = useState(false);
   const [editing, setEditing] = useState(false);
   const [archive, setArchive] = useState(false);
-  const [isNew, setIsNew] = useState(false);
   const name = state.name?.value ?? '';
   const color = colorOf(state.name?.color);
 
@@ -287,9 +288,13 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
   const taken = (friends ?? []).filter(f => !f.mine).map(f => f.name);
   if (!name) {
     const others = (friends ?? []).filter(f => !f.mine);
-    if (!friends && !failed) return <p className="slip">Loading…</p>;
-    if (others.length && !isNew) return <WhoAreYou people={others} onClaim={onClaim} onNew={() => setIsNew(true)} />;
-    return <Setup name="" color="pink" taken={taken} onSave={onProfile} onClaim={onClaim} onCancel={others.length ? () => setIsNew(false) : undefined} />;
+    return (
+      <>
+        <Setup name="" color="pink" taken={taken} onSave={onProfile} onClaim={onClaim} />
+        {others.length > 0 && <div className="already"><AlreadyJoined people={others} onClaim={onClaim} /></div>}
+        {failed && !friends && <p className="slip sync-error">Couldn’t load who’s already joined. Check the connection.</p>}
+      </>
+    );
   }
   if (editing) return <Setup name={name} color={color} taken={taken} onSave={async (n, c) => { await onProfile(n, c); setEditing(false); }} onCancel={() => setEditing(false)} />;
 

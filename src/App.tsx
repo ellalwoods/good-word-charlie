@@ -167,7 +167,12 @@ export default function App() {
           ) : tab === 'friends' ? (
             <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}
               onProfile={joinFriends}
-              onClaim={async n => { const key = await remote!.claim(n); if (!key) throw new Error('not found'); await join(key); }} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
+              onClaim={async n => {
+                const key = await remote!.claim(n);
+                if (!key) throw new Error('not found');
+                await join(key);
+                if (sync.get().status === 'invalid') throw new Error('not found');
+              }} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
               fresh={fresh}
               onUsed={(w, d, yes) => update(markUsed(state, w, d, yes))}
               onNote={(w, d, text) => update(setNote(state, w, d, text))}
