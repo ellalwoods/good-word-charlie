@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { answer, finish, type Session } from '../lib/session';
+import { answer, countsFor, finish, type Session } from '../lib/session';
 import { play } from '../lib/sounds';
 import type { Question, QuestionType, State, Word } from '../lib/types';
 import { GAP } from '../lib/validate';
@@ -37,16 +37,18 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
   useEffect(() => { if (picked) next.current?.focus({ preventScroll: true }); }, [picked]);
 
   const daily = session.kind === 'daily';
+  // Today's practice, or a shuffle test of due words: results change levels.
+  const graded = daily || !!session.counts?.length;
 
   if (finished) {
     const missed = session.missed.map(w => byWord.get(w)).filter((w): w is Word => !!w);
     return (
       <section className="practice">
         <span className="tag">{KIND[session.kind]} complete</span>
-        {daily
-          ? <p className="score"><b>{session.firstRight}</b> of {session.total} word{session.total === 1 ? '' : 's'} with every question right first time.</p>
+        {graded
+          ? <p className="score"><b>{session.firstRight}</b> of {session.total} {daily ? '' : 'due '}word{session.total === 1 ? '' : 's'} {daily ? 'with every question right first time' : 'moved up a level'}.</p>
           : <p className="score"><b>{session.questionsRight}</b> of {session.questionsAsked} question{session.questionsAsked === 1 ? '' : 's'} right first time.</p>}
-        {missed.length > 0 && <h2 className="tag section-label">{daily ? 'Back tomorrow' : 'Worth another look'}</h2>}
+        {missed.length > 0 && <h2 className="tag section-label">{graded ? 'Back tomorrow' : 'Worth another look'}</h2>}
         <div className="cards">
           {missed.map(w => <WordCard key={w.word} word={w} number={number(w.word)} note />)}
         </div>
@@ -68,7 +70,7 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
     if (picked) return;
     const r = answer(state, session, bank, option, date);
     // A word moving up a level gets its own sound (only today's practice changes levels).
-    play(!r.correct ? 'wrong' : daily && r.session.firstRight > session.firstRight ? 'levelup' : 'right');
+    play(!r.correct ? 'wrong' : countsFor(session, item.word) && r.session.firstRight > session.firstRight ? 'levelup' : 'right');
     setPicked(option);
     setSession(r.session);
     onState(r.state);

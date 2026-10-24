@@ -41,9 +41,9 @@ The **Friends** button in the top corner opens the Friends page. **I used a word
 
 - **Today:** one practice a day, never more than 21 questions. Today's three new words get 3 questions each, then the most overdue reviews get 2 each until the 21 are used; any other reviews wait for tomorrow. Only this practice moves words up or down a level.
 - **Redo today's practice** (on Today, once the day's practice is done) goes over the same words with fresh questions.
-- **Shuffle test** (on Lexicon) picks random words you've met; you choose how many words (5, 10, 20 or all) and questions (10 to 50).
+- **Shuffle test** (on Lexicon): choose **Due** words, which count towards levels like today's practice (once a day per word; handy for reviews that didn't fit in the 21), or **Any word** for practice only. Then how many words and questions.
 
-Redo and shuffle tests are practice only: they never change levels, review dates or the streak.
+Redo and any-word shuffle tests are practice only. Neither kind of shuffle test changes the streak.
 
 ## Loading more words
 

@@ -258,7 +258,7 @@ export default function App() {
               onUnlink={() => { try { localStorage.setItem(LOCAL_ONLY, '1'); } catch { /* storage blocked */ } sync.unlink(); }} />
           ) : (
             <Lexicon state={state} bank={bank} number={number} date={date}
-              onTest={(words, questions) => begin(shuffleTest(state, bank, words, questions), 'lexicon')}
+              onTest={(words, questions, dueOnly) => begin(shuffleTest(state, bank, words, questions, Math.random, { dueOnly, date }), 'lexicon')}
               used={used} onUsed={toggleUsed} />
           )}
         {settled && !session && tab !== 'sync' && tab !== 'friends' && tab !== 'stats' && (

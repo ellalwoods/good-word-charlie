@@ -79,6 +79,8 @@ export interface Session {
   questionsAsked: number;   // first-attempt questions in the session
   missed: string[];
   words: Record<string, Progress>;
+  /** In a shuffle test of due words: the words whose results change their levels. */
+  counts?: string[];
 }
 
 function item(word: Word, question: Question, retry: boolean, rand: Rand): Item {
@@ -162,15 +164,35 @@ export function testableWords(state: State, bank: Word[]): string[] {
 }
 
 /**
- * A random test: `wordCount` words picked from those met so far, with `questionCount`
- * questions shared out between them as evenly as possible. Practice only.
+ * Words a shuffle test can count towards levels: reviews that are due (or overdue),
+ * such as those that didn't fit in today's 21 questions. Today's new words are left
+ * to today's practice. Once graded, a word isn't due again today, so it counts once a day.
  */
-export function shuffleTest(state: State, bank: Word[], wordCount: number, questionCount: number, rand: Rand = Math.random): Session {
-  const words = shuffle(testableWords(state, bank), rand).slice(0, Math.max(1, wordCount));
+export function dueForShuffle(state: State, bank: Word[], date: string): string[] {
+  const todays = new Set(state.days[date] ?? []);
+  return dueWords(state, bank, date).filter(w => !todays.has(w));
+}
+
+/**
+ * A random test: `wordCount` words, with `questionCount` questions shared out between
+ * them as evenly as possible. From due words it counts towards their levels, as
+ * today's practice does; from any words met so far it's practice only.
+ */
+export function shuffleTest(
+  state: State, bank: Word[], wordCount: number, questionCount: number, rand: Rand = Math.random,
+  { dueOnly = false, date = '' }: { dueOnly?: boolean; date?: string } = {},
+): Session {
+  const from = dueOnly ? dueForShuffle(state, bank, date) : testableWords(state, bank);
+  const words = shuffle(from, rand).slice(0, Math.max(1, wordCount));
   const total = Math.min(questionCount, words.length * MAX_PER_WORD);
   const plan = words.map((w, k): [string, number] => [w, Math.floor(total / words.length) + (k < total % words.length ? 1 : 0)]);
-  return deal('shuffle', state, bank, plan.filter(([, n]) => n > 0), rand);
+  const session = deal('shuffle', state, bank, plan.filter(([, n]) => n > 0), rand);
+  return dueOnly ? { ...session, counts: Object.keys(session.words) } : session;
 }
+
+/** Whether this word's answers in this session change its level. */
+export const countsFor = (session: Session, word: string) =>
+  session.kind === 'daily' || !!session.counts?.includes(word);
 
 export function answer(
   state: State,
@@ -187,7 +209,7 @@ export function answer(
 
   if (!it.retry) {
     const p = { ...next.words[it.word], left: next.words[it.word].left - 1 };
-    const graded = session.kind === 'daily';
+    const graded = countsFor(session, it.word);
     if (correct) next.questionsRight++;
     if (!correct) {
       // First miss on this word: back to level 0, due tomorrow (in today's practice only).
@@ -198,7 +220,7 @@ export function answer(
       p.failed = true;
       // Ask again at the end, with a question not already seen today if there is one
       // (in today's practice, only while it stays within the day's questions).
-      if (!graded || next.items.length < DAILY_MAX) {
+      if (session.kind !== 'daily' || next.items.length < DAILY_MAX) {
         const word = bank.find(w => w.word === it.word)!;
         const seen = next.items.filter(x => x.word === it.word).map(x => x.question);
         const fresh = questionsFor(word, card.asked, 1, seen)[0] ?? it.question;

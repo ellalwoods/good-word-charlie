@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import words from '../data/words.json';
 import { canDismiss, dismiss, dueWords, ensureToday, streak, unseen } from './daily';
-import { answer, DAILY_MAX, finish, MAX_PER_WORD, pool, practisedToday, questionsFor, recordPractised, redoSession, sessionSize, shuffleTest, startSession } from './session';
+import { answer, DAILY_MAX, dueForShuffle, finish, MAX_PER_WORD, pool, practisedToday, questionsFor, recordPractised, redoSession, sessionSize, shuffleTest, startSession } from './session';
 import { grade, newCard } from './srs';
 import { fresh } from './storage';
 import type { Word } from './types';
@@ -195,4 +195,42 @@ describe('practice session', () => {
     }
     expect(se.items).toHaveLength(DAILY_MAX);
   });
+
+  it('a shuffle test of due words changes their levels, once a day; any words stays practice', () => {
+    // Words from the last four days, all due today; plus today's three new ones.
+    let s = fresh();
+    for (const d of ['2026-10-19', '2026-10-20', '2026-10-21', '2026-10-22']) s = ensureToday(s, bank, d);
+    s = ensureToday(s, bank, D);
+    const due = dueForShuffle(s, bank, D);
+    expect(due).toHaveLength(12);
+    expect(due.some(w => s.days[D].includes(w))).toBe(false);   // today's new words are left to today's practice
+
+    const run = (st: typeof s, sess: ReturnType<typeof shuffleTest>, wrong: string[] = []) => {
+      for (let j = 0; j < sess.items.length; j++) {
+        const it = sess.items[j];
+        const r = answer(st, { ...sess, i: j }, bank, wrong.includes(it.word) ? it.question.distractors[0] : it.question.answer, D, fixed);
+        st = r.state; sess = r.session;
+      }
+      return { st, sess };
+    };
+
+    // Practice only: nothing changes.
+    const any = run(s, shuffleTest(s, bank, 4, 8, fixed));
+    expect(Object.values(any.st.cards).every(c => c.level === 0 && c.due <= D)).toBe(true);
+
+    // Due words: all right moves them up, a wrong one goes back to the start.
+    const first = shuffleTest(s, bank, 4, 8, fixed, { dueOnly: true, date: D });
+    expect(first.counts).toHaveLength(4);
+    const [miss] = first.counts!;
+    const done = run(s, first, [miss]);
+    for (const w of first.counts!) {
+      expect(done.st.cards[w]).toMatchObject(w === miss ? { level: 0, due: '2026-10-24' } : { level: 1, due: '2026-10-24' });
+    }
+    expect(done.sess.firstRight).toBe(3);
+    // Those words are no longer due, so they can't count again today.
+    const again = dueForShuffle(done.st, bank, D);
+    expect(again).toHaveLength(8);
+    expect(again.some(w => first.counts!.includes(w))).toBe(false);
+  });
 });
+
