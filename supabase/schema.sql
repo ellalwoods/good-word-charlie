@@ -1,6 +1,6 @@
 -- Run once in Supabase: Dashboard → SQL Editor → New query → paste → Run.
 -- Safe to run in a project that's already used for something else: it only
--- adds the charlie_progress table and three charlie_* functions.
+-- adds the charlie_progress table and the charlie_* functions. Running it again is fine.
 
 -- One row per sync link. `secret` is the key at the end of the link; `version`
 -- goes up on every save so two devices can't silently overwrite each other.
@@ -61,4 +61,27 @@ grant execute on function public.charlie_new(jsonb) to anon, authenticated;
 grant execute on function public.charlie_load(text) to anon, authenticated;
 grant execute on function public.charlie_save(text, jsonb, integer) to anon, authenticated;
 
-select 'Good Word, Charlie sync is ready' as done;
+
+-- Friends: everyone who has picked a name, and the words they've marked
+-- "I used it" since p_since. Nothing else about anyone's progress is shared.
+create or replace function public.charlie_friends(p_key text, p_since text)
+returns table (name text, used jsonb, mine boolean)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select p.data->'name'->>'value',
+         coalesce((select jsonb_object_agg(e.key, e.value)
+                     from jsonb_each(case when jsonb_typeof(p.data->'used') = 'object' then p.data->'used' else '{}'::jsonb end) e
+                    where e.key >= p_since), '{}'::jsonb),
+         p.secret = p_key
+    from public.charlie_progress p
+   where coalesce(p.data->'name'->>'value', '') <> ''
+   order by 1;
+$$;
+
+revoke all on function public.charlie_friends(text, text) from public;
+grant execute on function public.charlie_friends(text, text) to anon, authenticated;
+
+select 'Good Word, Charlie friends are ready' as done;

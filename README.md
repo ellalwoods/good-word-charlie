@@ -33,6 +33,10 @@ Syncing uses its own Supabase project, "good-word-charlie", kept separate from t
 
 Until then the Sync page just says it isn't switched on yet.
 
+## Friends
+
+The **Friends** button in the top corner shows everyone who has picked a name, and cheers when they've tapped **I used it today** on a word card (on Today, or on a word in the Lexicon). That's all that's shared: names and the words used today. It needs syncing switched on (above).
+
 ## Practising
 
 - **Today:** today's new words get 5 questions each and due reviews get 2. Only this practice moves words up or down a level.

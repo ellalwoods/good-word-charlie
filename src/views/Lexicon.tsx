@@ -3,6 +3,7 @@ import { shortDate } from '../lib/dates';
 import { MAX_PER_WORD } from '../lib/session';
 import { MAX_LEVEL } from '../lib/srs';
 import type { State, Word } from '../lib/types';
+import { UsedChip } from './UsedChip';
 import { POS_LABEL, WordCard } from './WordCard';
 
 interface Props {
@@ -11,6 +12,8 @@ interface Props {
   number: (word: string) => number;
   date: string;
   onTest: (words: number, questions: number) => void;
+  used: string[];
+  onUsed: (word: string) => void;
 }
 
 const WORD_CHOICES = [5, 10, 20];
@@ -69,7 +72,7 @@ function ShuffleTest({ met, onTest }: { met: number; onTest: Props['onTest'] }) 
   );
 }
 
-export function Lexicon({ state, bank, number, date, onTest }: Props) {
+export function Lexicon({ state, bank, number, date, onTest, used, onUsed }: Props) {
   const [open, setOpen] = useState<string | null>(null);
   const words = bank.filter(w => state.cards[w.word]).sort((a, b) => a.word.localeCompare(b.word));
 
@@ -97,7 +100,11 @@ export function Lexicon({ state, bank, number, date, onTest }: Props) {
                   <span className="tag">{c.due <= date ? 'Due now' : `Next ${shortDate(c.due)}`}</span>
                 </span>
               </button>
-              {isOpen && <WordCard word={w} number={number(w.word)} note />}
+              {isOpen && (
+                <WordCard word={w} number={number(w.word)} note>
+                  <div className="card-actions"><UsedChip used={used.includes(w.word)} onToggle={() => onUsed(w.word)} /></div>
+                </WordCard>
+              )}
             </li>
           );
         })}

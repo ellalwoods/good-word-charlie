@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import words from '../data/words.json';
 import { dismiss, ensureToday } from './daily';
+import { markUsed, setName, usedOn } from './friends';
 import { merge, same } from './merge';
 import { answer, startSession } from './session';
 import { fresh } from './storage';
@@ -64,6 +65,9 @@ function server() {
     },
     listen(_key, fn) { listeners.add(fn); return () => listeners.delete(fn); },
     announce() { listeners.forEach(fn => fn()); },
+    async friends(key) {
+      return [...rows].filter(([, r]) => r.data.name?.value).map(([k, r]) => ({ name: r.data.name!.value, used: r.data.used ?? {}, mine: k === key }));
+    },
   };
   return r;
 }
@@ -81,6 +85,40 @@ function memory(state = fresh()): Local & { key: string | null } {
 }
 
 const settle = () => new Promise(r => setTimeout(r, 650));
+
+describe('friends', () => {
+  const start = ensureToday(fresh(), bank, D);
+
+  it('un-tapping "I used it" on one device sticks after merging', async () => {
+    const phone = markUsed(start, 'farcical', D, true);
+    await new Promise(r => setTimeout(r, 5));
+    const later = markUsed(phone, 'farcical', D, false);
+    expect(usedOn(merge(phone, later).used, D)).toEqual([]);
+    expect(usedOn(merge(later, phone).used, D)).toEqual([]);
+    expect(usedOn(merge(start, phone).used, D)).toEqual(['farcical']);
+  });
+
+  it('keeps the latest name', async () => {
+    const a = setName(start, 'Charlie');
+    await new Promise(r => setTimeout(r, 5));
+    const b = setName(start, 'Ella');
+    expect(merge(a, b).name?.value).toBe('Ella');
+    expect(merge(b, a).name?.value).toBe('Ella');
+  });
+
+  it("shows friends' names and what they used, and nothing else", async () => {
+    const srv = server();
+    const ella = new Sync(srv, memory(setName(markUsed(start, 'paucity', D, true), 'Ella')));
+    const charlie = new Sync(srv, memory(setName(start, 'Charlie')));
+    await ella.link();
+    const key = await charlie.link();
+    const friends = await srv.friends(key, D);
+    const e = friends.find(f => f.name === 'Ella')!;
+    expect(e.mine).toBe(false);
+    expect(usedOn(e.used, D)).toEqual(['paucity']);
+    expect(friends.find(f => f.name === 'Charlie')!.mine).toBe(true);
+  });
+});
 
 describe('sync', () => {
   it('stays on the device when sync is not set up', () => {

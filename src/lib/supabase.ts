@@ -1,4 +1,5 @@
 import { createClient, type RealtimeChannel, type SupabaseClient } from '@supabase/supabase-js';
+import type { Friend } from './friends';
 import type { Remote } from './sync';
 import type { State } from './types';
 
@@ -49,6 +50,11 @@ function supabaseRemote(sb: SupabaseClient): Remote {
     },
     announce(key) {
       channels.get(key)?.send({ type: 'broadcast', event: 'saved', payload: {} });
+    },
+    async friends(key, since) {
+      const { data, error } = await sb.rpc('charlie_friends', { p_key: key, p_since: since });
+      if (error) throw error;
+      return (data ?? []) as Friend[];
     },
   };
 }

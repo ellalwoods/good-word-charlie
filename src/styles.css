@@ -489,3 +489,70 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 }
 
 .foot .chip { background: var(--card); }
+
+/* ---------- Friends ---------- */
+
+.masthead-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+.friends-btn {
+  position: relative;
+  z-index: 3;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 2px solid var(--paper);
+  background: transparent;
+  color: var(--paper);
+  padding: 4px 9px 3px;
+  font: 700 0.6875rem/1.3 var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.friends-btn[aria-current='true'] { background: var(--yellow); border-color: var(--ink); color: var(--ink); }
+
+.badge {
+  min-width: 18px;
+  padding: 1px 4px 0;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--pink);
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.chip-used[aria-pressed='true'] { background: var(--pink); color: var(--ink); }
+
+.friend .sense { margin: 0; }
+.friend .quiet { opacity: 0.6; }
+.friend-used { --band: var(--pink); --band-ink: var(--ink); }
+.friend-used .ruled { position: relative; overflow: hidden; }
+.friend-used .hw { position: relative; }
+
+/* Riso confetti: overprinted dots in the three spot colours. */
+.confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, var(--yellow) 5px, transparent 6px) 99% 70% / 34px 30px no-repeat,
+    radial-gradient(circle, var(--pink) 4px, transparent 5px) 92% 92% / 30px 30px no-repeat,
+    radial-gradient(circle, var(--blue) 3px, transparent 4px) 84% 74% / 26px 26px no-repeat,
+    radial-gradient(circle, var(--yellow) 3px, transparent 4px) 76% 96% / 22px 22px no-repeat,
+    radial-gradient(circle, var(--pink) 6px, transparent 7px) 97% 100% / 40px 40px no-repeat;
+  mix-blend-mode: multiply;
+}
+
+.link {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

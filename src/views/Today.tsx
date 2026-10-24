@@ -1,6 +1,7 @@
 import { canDismiss, dueWords, PER_DAY, streak } from '../lib/daily';
 import { practisedToday, sessionSize } from '../lib/session';
 import type { State, Word } from '../lib/types';
+import { UsedChip } from './UsedChip';
 import { WordCard } from './WordCard';
 
 interface Props {
@@ -11,9 +12,11 @@ interface Props {
   onDismiss: (word: string, reason: 'known' | 'rejected') => void;
   onPractise: () => void;
   onRedo: () => void;
+  used: string[];
+  onUsed: (word: string) => void;
 }
 
-export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo }: Props) {
+export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo, used, onUsed }: Props) {
   const byWord = new Map(bank.map(w => [w.word, w]));
   const news = (state.days[date] ?? []).map(w => byWord.get(w)).filter((w): w is Word => !!w);
   const due = dueWords(state, bank, date).length;
@@ -42,7 +45,6 @@ export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo
         {canRedo && (
           <button type="button" className="btn btn-quiet" onClick={onRedo}>
             Redo today’s practice
-            <span className="btn-sub">Practice only · won’t change your levels</span>
           </button>
         )}
       </div>
@@ -51,12 +53,13 @@ export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo
       <div className="cards">
         {news.map(w => (
           <WordCard key={w.word} word={w} number={number(w.word)}>
-            {canDismiss(state, w.word) && (
-              <div className="card-actions">
+            <div className="card-actions">
+              {canDismiss(state, w.word) && <>
                 <button type="button" className="chip" onClick={() => onDismiss(w.word, 'known')}>Already know it</button>
                 <button type="button" className="chip chip-quiet" onClick={() => onDismiss(w.word, 'rejected')}>Not for me</button>
-              </div>
-            )}
+              </>}
+              <UsedChip used={used.includes(w.word)} onToggle={() => onUsed(w.word)} />
+            </div>
           </WordCard>
         ))}
         {news.length < PER_DAY && <OutOfWords />}

@@ -1,3 +1,4 @@
+import type { Friend } from './friends';
 import { merge, normalise, same } from './merge';
 import type { State } from './types';
 
@@ -13,6 +14,8 @@ export interface Remote {
   listen(key: string, onSaved: () => void): () => void;
   /** Tells other devices we saved. */
   announce(key: string): void;
+  /** Everyone with a name, with the words they've used since `since` (a date). */
+  friends(key: string, since: string): Promise<Friend[]>;
 }
 
 /** Keeps progress on this device, and in step with a sync link if there is one. */
