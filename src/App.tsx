@@ -14,6 +14,7 @@ import { Lexicon } from './views/Lexicon';
 import { Practice } from './views/Practice';
 import { Sync as SyncView, syncLabel } from './views/Sync';
 import { Today } from './views/Today';
+import { Welcome } from './views/Welcome';
 
 const bank = usable(words as Word[]);
 const numbers = new Map(bank.map((w, i) => [w.word, i + 1]));
@@ -107,6 +108,9 @@ export default function App() {
     setTimeout(loadFriends, 1500);   // once the name has saved
   };
 
+  // The welcome card sits over everything until it's dismissed.
+  const welcoming = settled && !state.welcomed;
+
   const heading = useMemo(() => longDate(new Date(`${date}T12:00`)), [date]);
 
   const go = (t: Tab) => { setSession(null); setTab(t); window.scrollTo(0, 0); };
@@ -114,7 +118,7 @@ export default function App() {
 
   return (
     <>
-      <header className="masthead">
+      <header className="masthead" inert={welcoming}>
         <span className="overprint" aria-hidden="true" />
         <div className="masthead-inner">
           <div className="masthead-top">
@@ -133,7 +137,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="page">
+      <main className="page" inert={welcoming}>
         {!settled ? null
           : session ? (
             <Practice start={session} state={state} bank={bank} number={number} date={date}
@@ -147,8 +151,7 @@ export default function App() {
                 begin(s, 'today');
               }}
               onRedo={() => begin(redoSession(state, bank, date), 'today')}
-              used={used} onUsed={toggleUsed}
-              onWelcomed={() => update({ ...state, welcomed: true })} />
+              used={used} onUsed={toggleUsed} />
           ) : tab === 'friends' ? (
             <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}
               onProfile={joinFriends} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
@@ -166,6 +169,7 @@ export default function App() {
           </footer>
         )}
       </main>
+      {welcoming && <Welcome onDone={() => update({ ...state, welcomed: true })} />}
     </>
   );
 }

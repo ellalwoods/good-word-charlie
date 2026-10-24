@@ -14,10 +14,9 @@ interface Props {
   onRedo: () => void;
   used: string[];
   onUsed: (word: string) => void;
-  onWelcomed: () => void;
 }
 
-export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo, used, onUsed, onWelcomed }: Props) {
+export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo, used, onUsed }: Props) {
   const byWord = new Map(bank.map(w => [w.word, w]));
   const news = (state.days[date] ?? []).map(w => byWord.get(w)).filter((w): w is Word => !!w);
   const due = dueWords(state, bank, date).length;
@@ -28,7 +27,6 @@ export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo
 
   return (
     <>
-      {!state.welcomed && <Welcome onDone={onWelcomed} />}
       <section className="stats" aria-label="Progress">
         <div className="stat"><b>{learned}</b><span className="tag">Words learned</span></div>
         <div className="stat stat-yellow"><b>{days}</b><span className="tag">Day streak</span></div>
@@ -83,23 +81,3 @@ function OutOfWords() {
   );
 }
 
-/** Shown once, the first time someone opens the site. */
-function Welcome({ onDone }: { onDone: () => void }) {
-  return (
-    <article className="card welcome">
-      <div className="band"><span>WTF is this?</span><span>GWC v.5</span></div>
-      <div className="ruled">
-        <p className="sense">Charlie uses the word <i>farcical</i>. Ella wishes she used the word <i>farcical</i>. Ella made this app to improve her vocabulary.</p>
-        <h4 className="tag welcome-how">How it works</h4>
-        <ul className="welcome-list">
-          <li><b>Three new words a day.</b> You can swap if you already know one.</li>
-          <li><b>Practise them with spaced repetition.</b> Get a word right and it comes back less often; slip up and it’s back tomorrow.</li>
-          <li><b>Use them for real.</b> And tell me, so I can celebrate.</li>
-        </ul>
-        <div className="card-actions">
-          <button type="button" className="btn" onClick={onDone}>Begin</button>
-        </div>
-      </div>
-    </article>
-  );
-}
