@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import words from './data/words.json';
 import { dismiss, ensureToday } from './lib/daily';
-import { markCheer, markUsed, nameOf, news, setProfile, usedOn, type Friend } from './lib/friends';
-import { addDays, longDate, today } from './lib/dates';
+import { markCheer, markUsed, nameOf, news, setNote, setProfile, usedOn, type Friend } from './lib/friends';
+import { longDate, today } from './lib/dates';
 import { recordPractised, redoSession, shuffleTest, startSession, type Session } from './lib/session';
 import { device, fresh } from './lib/storage';
 import { remote } from './lib/supabase';
@@ -40,13 +40,13 @@ if (fromLink && fromLink !== sync.get().key) join(fromLink);
 else { sync.start(); if (sync.get().key) device.writeKey(sync.get().key); }
 window.addEventListener('online', sync.wake);
 
-// Friends' uses already looked at today, so the header only counts new ones.
-const SEEN = 'good-word-charlie-seen';
-function readSeen(date: string): string[] {
-  try { const s = JSON.parse(localStorage.getItem(SEEN) || 'null'); return s?.date === date ? s.ids : []; } catch { return []; }
+// Friends' news already looked at, so the header only counts new things.
+const SEEN = 'good-word-charlie-seen-v2';
+function readSeen(): string[] {
+  try { const s = JSON.parse(localStorage.getItem(SEEN) || '[]'); return Array.isArray(s) ? s : []; } catch { return []; }
 }
-function writeSeen(date: string, ids: string[]) {
-  try { localStorage.setItem(SEEN, JSON.stringify({ date, ids })); } catch { /* storage blocked */ }
+function writeSeen(ids: string[]) {
+  try { localStorage.setItem(SEEN, JSON.stringify(ids.slice(-300))); } catch { /* storage blocked */ }
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') sync.wake(); });
 
@@ -61,7 +61,8 @@ export default function App() {
   const [date, setDate] = useState(today);
   const [friends, setFriends] = useState<Friend[] | null>(null);
   const [friendsFailed, setFriendsFailed] = useState(false);
-  const [seen, setSeen] = useState(() => readSeen(today()));
+  const [seen, setSeen] = useState(readSeen);
+  const [fresh, setFresh] = useState<string[]>([]);
   const name = nameOf(state);
 
   const update = (next: State) => sync.update({ ...next, updated: Date.now() });
@@ -83,7 +84,7 @@ export default function App() {
   const loadFriends = () => {
     const key = sync.get().key;
     if (!remote || !key || !nameOf(sync.get().state)) return;
-    remote.friends(key, addDays(today(), -1))
+    remote.friends(key, '')
       .then(f => { setFriends(f); setFriendsFailed(false); })
       .catch(() => setFriendsFailed(true));
   };
@@ -94,10 +95,16 @@ export default function App() {
     return () => document.removeEventListener('visibilitychange', check);
   }, []);
 
-  const uses = friends ? news(friends, date) : [];
-  const unseen = uses.filter(id => !seen.includes(id)).length;
+  const newsIds = friends ? news(friends, Date.now()) : [];
+  const unseenIds = newsIds.filter(id => !seen.includes(id));
+  const unseen = unseenIds.length;
+  // Opening Friends marks the news as seen, and those cards pop in with confetti.
   useEffect(() => {
-    if (tab === 'friends' && unseen) { setSeen(uses); writeSeen(date, uses); }
+    if (tab !== 'friends' || !unseen) return;
+    setFresh(f => [...f, ...unseenIds]);
+    const next = [...seen, ...unseenIds];
+    setSeen(next);
+    writeSeen(next);
   }, [tab, unseen]);
 
   const used = usedOn(state.used, date);
@@ -158,7 +165,10 @@ export default function App() {
           ) : tab === 'friends' ? (
             <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}
               onProfile={joinFriends} onLeave={() => { update(setProfile(state, '', state.name?.color ?? 'pink')); setFriends(null); }}
-              onUsed={toggleUsed} onCheer={(n, w, yes) => update(markCheer(state, n, w, date, yes))} />
+              fresh={fresh}
+              onUsed={(w, d, yes) => update(markUsed(state, w, d, yes))}
+              onNote={(w, d, text) => update(setNote(state, w, d, text))}
+              onCheer={(n, w, d, yes) => update(markCheer(state, n, w, d, yes))} />
           ) : tab === 'sync' ? (
             <SyncView snap={snap} onLink={() => sync.link()} onJoin={join} onUnlink={() => sync.unlink()} />
           ) : (

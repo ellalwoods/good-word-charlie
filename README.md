@@ -35,7 +35,7 @@ Until then the Sync page just says it isn't switched on yet.
 
 ## Friends
 
-The **Friends** button in the top corner shows everyone who has picked a name, and cheers when they've tapped **I used it today** on a word card (on Today, or on a word in the Lexicon). That's all that's shared: names and the words used today. It needs syncing switched on (above).
+The **Friends** button in the top corner opens the Friends page. **I used a word** picks one of your words (with an optional story of how you used it); friends see a "Good word, Name!" card and can **Celebrate** it. Cards stay up for 24 hours, then move to the **Archive**. Shared: names, colours, words used, their stories and celebrations. It needs syncing switched on (above).
 
 ## Practising
 

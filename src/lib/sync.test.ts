@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import words from '../data/words.json';
 import { dismiss, ensureToday } from './daily';
-import { celebrators, markCheer, markUsed, news, setProfile, usedOn } from './friends';
+import { celebrators, FRESH_FOR, isFresh, markCheer, markUsed, news, setNote, setProfile, usedOn, uses } from './friends';
 import { merge, same } from './merge';
 import { answer, startSession } from './session';
 import { fresh } from './storage';
@@ -66,7 +66,7 @@ function server() {
     listen(_key, fn) { listeners.add(fn); return () => listeners.delete(fn); },
     announce() { listeners.forEach(fn => fn()); },
     async friends(key) {
-      return [...rows].filter(([, r]) => r.data.name?.value).map(([k, r]) => ({ name: r.data.name!.value, color: r.data.name!.color ?? null, used: r.data.used ?? {}, cheers: r.data.cheers ?? {}, mine: k === key }));
+      return [...rows].filter(([, r]) => r.data.name?.value).map(([k, r]) => ({ name: r.data.name!.value, color: r.data.name!.color ?? null, used: r.data.used ?? {}, cheers: r.data.cheers ?? {}, notes: r.data.notes ?? {}, mine: k === key }));
     },
   };
   return r;
@@ -98,6 +98,23 @@ describe('friends', () => {
     expect(usedOn(merge(start, phone).used, D)).toEqual(['farcical']);
   });
 
+  it('keeps the story, and the latest edit of it', async () => {
+    const a = setNote(markUsed(start, 'glut', D, true), 'glut', D, 'At the market, about avocados.');
+    await new Promise(r => setTimeout(r, 5));
+    const b = setNote(a, 'glut', D, 'At the market. Nobody noticed.');
+    expect(merge(start, a).notes?.[D].glut.text).toBe('At the market, about avocados.');
+    expect(merge(a, b).notes?.[D].glut.text).toBe('At the market. Nobody noticed.');
+    expect(merge(b, a).notes?.[D].glut.text).toBe('At the market. Nobody noticed.');
+  });
+
+  it('a use is current for 24 hours, then goes to the archive', () => {
+    const s = setNote(markUsed(start, 'glut', D, true), 'glut', D, 'Story');
+    const [u] = uses([{ name: 'Ella', color: 'pink', used: s.used!, cheers: {}, notes: s.notes!, mine: true }]);
+    expect(u).toMatchObject({ word: 'glut', date: D, note: 'Story' });
+    expect(isFresh(u, u.at + FRESH_FOR - 1)).toBe(true);
+    expect(isFresh(u, u.at + FRESH_FOR)).toBe(false);
+  });
+
   it('keeps the latest name', async () => {
     const a = setProfile(start, 'Charlie', 'pink');
     await new Promise(r => setTimeout(r, 5));
@@ -118,14 +135,14 @@ describe('friends', () => {
     expect(usedOn(e.used, D)).toEqual(['paucity']);
     expect(friends.find(f => f.name === 'Charlie')!.mine).toBe(true);
     expect(e.color).toBe('blue');
-    expect(news(friends, D)).toEqual(['use:Ella:paucity']);
+    expect(news(friends, Date.now())).toEqual([`use:Ella:${D}:paucity`]);
 
     // Charlie celebrates; Ella hears about it.
     charlie.update(markCheer(charlie.get().state, 'Ella', 'paucity', D, true));
     await settle();
     const after = await srv.friends(ella.get().key!, D);
     expect(celebrators(after, 'Ella', 'paucity', D).map(f => f.name)).toEqual(['Charlie']);
-    expect(news(after, D)).toEqual(['cheer:Charlie:Ella:paucity']);
+    expect(news(after, Date.now())).toContain(`cheer:Charlie:${D}:Ella:paucity`);
   });
 });
 

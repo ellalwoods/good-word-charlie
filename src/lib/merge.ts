@@ -39,6 +39,8 @@ export function merge(a: State, b: State): State {
   const name = latestOf(a.name, b.name);
   if (name) out.name = name;
   if (a.welcomed || b.welcomed) out.welcomed = true;
+  const notes = mergeNotes(a.notes ?? {}, b.notes ?? {});
+  if (Object.keys(notes).length) out.notes = notes;
   if (latest) out.practised = { [latest]: unionList(a.practised?.[latest] ?? [], b.practised?.[latest] ?? []) };
   return out;
 }
@@ -75,6 +77,19 @@ function mergeStamps(a: Stamps, b: Stamps): Stamps {
     for (const w of keys(x, y)) {
       const p = x[w] ?? 0, q = y[w] ?? 0;
       out[d][w] = Math.abs(p) !== Math.abs(q) ? (Math.abs(p) > Math.abs(q) ? p : q) : Math.max(p, q);
+    }
+  }
+  return out;
+}
+
+function mergeNotes(a: NonNullable<State['notes']>, b: NonNullable<State['notes']>): NonNullable<State['notes']> {
+  const out: NonNullable<State['notes']> = {};
+  for (const d of keys(a, b)) {
+    const x = a[d] ?? {}, y = b[d] ?? {};
+    out[d] = {};
+    for (const w of keys(x, y)) {
+      const p = x[w], q = y[w];
+      out[d][w] = !p || !q ? (p ?? q) : p.at !== q.at ? (p.at > q.at ? p : q) : (p.text >= q.text ? p : q);
     }
   }
   return out;

@@ -573,9 +573,8 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 .cheered { margin-top: 6px; font: 700 0.75rem/1.4 var(--mono); letter-spacing: 0.04em; }
 .chip-cheer { background: var(--yellow); }
 /* Tucked away: the use and its celebrations come first. */
+.own-links { display: flex; gap: 16px; margin: 10px 0 0; }
 .use .whoops {
-  display: block;
-  margin: 10px 0 0;
   font: 400 0.6875rem/1.4 var(--mono);
   letter-spacing: 0.04em;
   opacity: 0.55;
@@ -650,3 +649,75 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 .welcome-list li { margin-bottom: 6px; }
 ol.welcome-list { padding-left: 1.3em; }
 .welcome .card-actions .btn { width: 100%; }
+
+.story-text { margin: 8px 0 0; }
+.story { margin-top: 10px; }
+.story textarea { resize: vertical; min-height: 4.5em; font: 400 1rem/1.4 var(--sans); }
+.story .card-actions { margin-top: 0; }
+
+/* ---------- Celebration ---------- */
+
+.cheer-wrap { position: relative; display: inline-block; }
+
+.burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; z-index: 5; }
+.burst span {
+  position: absolute;
+  left: calc(var(--s) / -2);
+  top: calc(var(--s) / -2);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: var(--c);
+  mix-blend-mode: multiply;
+  opacity: 0;
+  animation: burst 0.9s cubic-bezier(0.15, 0.7, 0.3, 1) both;
+}
+@keyframes burst {
+  0% { opacity: 1; transform: rotate(var(--a)) translateX(0) scale(0.4); }
+  60% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)) scale(1); }
+}
+.burst-head { left: 30%; top: 46px; }
+.burst-head span { animation-duration: 1.3s; animation-delay: 0.25s !important; }
+
+/* New since you last looked: the card lands like a stamped card. */
+.pop { animation: pop 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+@keyframes pop {
+  0% { transform: scale(0.92) rotate(-2deg); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+.pop .hw { animation: wiggle 0.7s 0.35s ease-in-out both; transform-origin: 10% 80%; }
+@keyframes wiggle {
+  0%, 100% { transform: none; }
+  30% { transform: rotate(-3deg) scale(1.04); }
+  60% { transform: rotate(2deg) scale(1.02); }
+}
+.cheered-new { width: fit-content; background: linear-gradient(var(--yellow), var(--yellow)) no-repeat 0 60% / 0% 70%; animation: marker 0.8s 0.5s ease-out forwards; }
+@keyframes marker { to { background-size: 100% 70%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .burst { display: none; }
+  .pop, .pop .hw { animation: none; }
+  .cheered-new { animation: none; background-size: 100% 70%; }
+}
+
+/* ---------- Archive ---------- */
+
+.archive-btn { margin-top: 10px; }
+.archive-back { margin-top: 0; }
+.archive { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.archive li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: var(--line);
+  border-left: 8px solid var(--c);
+  background: var(--card);
+  box-shadow: 2px 2px 0 var(--ink);
+  padding: 10px 12px;
+}
+.archive li .avatar { flex: none; }
+.archive p { margin: 0; }
+.archive-line { font-size: 1.0625rem; }
+.archive-note { font: italic 400 1.0625rem/1.35 var(--serif); margin-top: 2px !important; }
+.archive .tag { margin-top: 4px; display: block; }
