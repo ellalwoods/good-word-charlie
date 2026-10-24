@@ -24,7 +24,7 @@ It's hosted on GitHub Pages. On every push to `main`, `.github/workflows/deploy.
 
 Tap **Sync devices** at the bottom of the page, then **Make my sync link**, and open that link on your other phone or laptop. Both then share the same progress, and changes show on the other device within seconds. There are no accounts: the link is the key, so each person makes their own and keeps it to themselves. Without a connection the site carries on as normal and catches up later.
 
-Syncing uses the household Supabase project (its own `charlie_progress` table, separate from the household data). To set it up once:
+Syncing uses its own Supabase project, "good-word-charlie", kept separate from the household app. To set it up once:
 
 1. In Supabase, open the project → **SQL Editor** → **New query**, paste all of `supabase/schema.sql`, and press **Run**.
 2. In Supabase, open **Project Settings → API** and copy the **Project URL** and the **anon public** key.
