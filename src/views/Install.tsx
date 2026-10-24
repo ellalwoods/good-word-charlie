@@ -88,7 +88,7 @@ export function InstallHelp({ onClose }: { onClose: () => void }) {
       <article className="card welcome" onClick={e => e.stopPropagation()}>
         <div className="band"><span id="install-title">Add to home screen</span></div>
         <div className="ruled">
-          <p className="sense">Put Good Word, Charlie on your home screen, and it opens like an app: its own icon, full screen, and it works offline.</p>
+          <p className="sense">You might want to add Good Word, Charlie, to your home screen. Then it will appear and open like an app. It will also work offline. Here’s how:</p>
           <h4 className="tag welcome-how">{d.title}</h4>
           <ol className="welcome-list">
             {d.steps.map((s, i) => <li key={i}>{s}</li>)}
