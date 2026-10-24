@@ -723,6 +723,8 @@ ol.welcome-list { padding-left: 1.3em; }
 .archive .tag { margin-top: 4px; display: block; }
 
 .sync-warn { background: var(--yellow); border: var(--line); padding: 8px 10px; margin: 0 0 12px; }
+.sync-warn .small-print { margin: 0 0 8px; }
+.sync-warn .chip { background: var(--card); }
 
 .roster-pick { margin: 4px 0 8px; }
 .who { appearance: none; border: 0; background: none; padding: 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; color: var(--ink); }

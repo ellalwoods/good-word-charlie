@@ -40,14 +40,21 @@ function Avatar({ friend, big }: { friend: { name: string; color: string | null 
 }
 
 /** Name and colour: the first time, and whenever you change them. */
-function Setup({ name, color, taken = [], onSave, onCancel }: {
-  name: string; color: string; taken?: string[]; onSave: Props['onProfile']; onCancel?: () => void;
+function Setup({ name, color, taken = [], onSave, onCancel, onClaim }: {
+  name: string; color: string; taken?: string[]; onSave: Props['onProfile']; onCancel?: () => void; onClaim?: Props['onClaim'];
 }) {
   const [draft, setDraft] = useState(name);
   const [pick, setPick] = useState(color);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const clash = taken.some(t => t.trim().toLowerCase() === draft.trim().toLowerCase() && t.trim().toLowerCase() !== name.trim().toLowerCase());
+  const claim = async () => {
+    if (!onClaim) return;
+    setBusy(true); setError('');
+    try { await onClaim(taken.find(t => t.trim().toLowerCase() === draft.trim().toLowerCase()) ?? draft.trim()); }
+    catch { setError('Couldn’t reach the server. Try again in a moment.'); }
+    setBusy(false);
+  };
   const save = async () => {
     setBusy(true); setError('');
     try { await onSave(draft, pick); } catch { setError('Couldn’t reach the server. Try again in a moment.'); }
@@ -72,9 +79,12 @@ function Setup({ name, color, taken = [], onSave, onCancel }: {
             </div>
           </fieldset>
           {clash && (
-            <p className="small-print sync-warn">
-              Someone called {draft.trim()} is already here. If that’s you, tap Back and pick yourself.
-            </p>
+            <div className="sync-warn">
+              <p className="small-print">Someone called {draft.trim()} is already here.</p>
+              {onClaim && !name && (
+                <button type="button" className="chip" disabled={busy} onClick={claim}>That’s me, I’m {taken.find(t => t.trim().toLowerCase() === draft.trim().toLowerCase())}</button>
+              )}
+            </div>
           )}
           <div className="card-actions">
             <button type="button" className="chip" disabled={!draft.trim() || clash || busy} onClick={save}>{name ? 'Save' : 'Join'}</button>
@@ -279,7 +289,7 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
     const others = (friends ?? []).filter(f => !f.mine);
     if (!friends && !failed) return <p className="slip">Loading…</p>;
     if (others.length && !isNew) return <WhoAreYou people={others} onClaim={onClaim} onNew={() => setIsNew(true)} />;
-    return <Setup name="" color="pink" taken={taken} onSave={onProfile} onCancel={others.length ? () => setIsNew(false) : undefined} />;
+    return <Setup name="" color="pink" taken={taken} onSave={onProfile} onClaim={onClaim} onCancel={others.length ? () => setIsNew(false) : undefined} />;
   }
   if (editing) return <Setup name={name} color={color} taken={taken} onSave={async (n, c) => { await onProfile(n, c); setEditing(false); }} onCancel={() => setEditing(false)} />;
 
