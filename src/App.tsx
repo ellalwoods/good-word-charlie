@@ -31,8 +31,11 @@ const blank = (s: State) =>
   && Object.values(s.cards).every(c => c.right + c.wrong === 0);
 
 // Opening a sync link joins it. A device with nothing on it yet just takes the link's progress.
+// This device's progress is added to it; its name comes from the link (you, from another device).
 const join = (key: string) => {
-  if (blank(sync.get().state)) sync.update(fresh());
+  const s = sync.get().state;
+  if (blank(s)) sync.update(fresh());
+  else if (s.name) sync.update({ ...s, name: undefined });
   return sync.join(key);
 };
 const fromLink = location.hash.length > 1 ? cleanKey(location.hash) : null;
