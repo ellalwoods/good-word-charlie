@@ -62,13 +62,15 @@ export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo
             </div>
           </WordCard>
         ))}
-        {news.length < PER_DAY && <OutOfWords />}
+        {news.length < PER_DAY && <OutOfWords name={state.name?.value ?? ''} learned={learned} />}
       </div>
     </>
   );
 }
 
-function OutOfWords() {
+function OutOfWords({ name, learned }: { name: string; learned: number }) {
+  const text = `Hi Ella${name ? `, it’s ${name}` : ''}! I’ve used up every word on Good Word, Charlie (${learned} learned). `
+    + 'Utterly farcical. Time to load more, please!';
   return (
     <article className="card empty">
       <div className="band"><span>Card box</span><span>Empty</span></div>
@@ -78,7 +80,7 @@ function OutOfWords() {
         <p className="example">A word app with no new words? Utterly farcical.</p>
         <p className="sense">Your reviews will keep coming in the meantime.</p>
         <div className="card-actions">
-          <TextElla label="Text Ella for more words" body="I’ve used up every word on Good Word, Charlie. Utterly farcical. Time to load more!" />
+          <TextElla label="Text Ella for more words" body={text} />
         </div>
       </div>
     </article>
