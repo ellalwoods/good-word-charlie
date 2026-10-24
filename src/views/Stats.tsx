@@ -6,9 +6,8 @@ import type { Word } from '../lib/types';
 import { Avatar } from './Friends';
 import { Problem } from './TextElla';
 
-const SAVED = 'good-word-charlie-owner';
-const readSaved = () => { try { return localStorage.getItem(SAVED) ?? ''; } catch { return ''; } };
-const save = (p: string) => { try { if (p) localStorage.setItem(SAVED, p); else localStorage.removeItem(SAVED); } catch { /* storage blocked */ } };
+// The code is never kept; clear one saved by an earlier version.
+try { localStorage.removeItem('good-word-charlie-owner'); } catch { /* storage blocked */ }
 
 const ago = (iso: string) => {
   const h = (Date.now() - Date.parse(iso)) / 36e5;
@@ -32,37 +31,51 @@ function List({ title, items, empty, unit }: { title: string; items: Tally[]; em
   );
 }
 
-/** Ella's stats: how everyone's using the site. Behind a password checked by Supabase. */
-export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: (password: string) => Promise<Row[] | null> }) {
-  const [password, setPassword] = useState(readSaved);
-  const [draft, setDraft] = useState('');
-  const [stats, setStats] = useState<S | null>(null);
-  const [state, setState] = useState<'idle' | 'loading' | 'wrong' | 'failed'>('idle');
+/** Four boxes for the four-digit code. It checks itself as soon as the fourth digit goes in. */
+function Pin({ onCode, wrong, busy }: { onCode: (code: string) => void; wrong: number; busy: boolean }) {
+  const [code, setCode] = useState('');
+  useEffect(() => { if (wrong) setCode(''); }, [wrong]);
+  return (
+    <label className={`pin${wrong ? ' pin-wrong' : ''}`} key={wrong}>
+      <input className="pin-input" inputMode="numeric" pattern="[0-9]*" autoComplete="one-time-code" autoFocus maxLength={4}
+        value={code} disabled={busy} aria-label="Four-digit code"
+        onChange={e => {
+          const v = e.target.value.replace(/\D/g, '').slice(0, 4);
+          setCode(v);
+          if (v.length === 4) onCode(v);
+        }} />
+      {[0, 1, 2, 3].map(i => (
+        <span key={i} className={`pin-box${i === code.length ? ' pin-next' : ''}`} aria-hidden="true">{code[i] ? '●' : ''}</span>
+      ))}
+    </label>
+  );
+}
 
-  const open = async (p: string) => {
+/** Ella's stats: how everyone's using the site. Behind a four-digit code checked by Supabase, asked every time. */
+export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: (password: string) => Promise<Row[] | null> }) {
+  const [stats, setStats] = useState<S | null>(null);
+  const [state, setState] = useState<'locked' | 'loading' | 'failed' | 'open'>('locked');
+  const [wrong, setWrong] = useState(0);
+
+  const open = async (code: string) => {
     setState('loading');
     try {
-      const rows = await load(p);
-      if (!rows) { save(''); setPassword(''); setState('wrong'); return; }
-      save(p); setPassword(p); setStats(computeStats(rows, bank, date)); setState('idle');
+      const rows = await load(code);
+      if (!rows) { setWrong(n => n + 1); setState('locked'); return; }
+      setStats(computeStats(rows, bank, date)); setState('open');
     } catch { setState('failed'); }
   };
-  useEffect(() => { if (password) open(password); }, []);
 
-  if (!password || state === 'wrong') {
+  if (state === 'locked' || (state === 'loading' && !stats)) {
     return (
       <section className="sync">
-        <article className="card">
+        <article className="card lock">
           <div className="band"><span>Ella’s stats</span><span>Private</span></div>
           <div className="ruled">
-            <label className="tag" htmlFor="owner-pw">Password</label>
-            <input id="owner-pw" className="field" type="password" value={draft} onChange={e => setDraft(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && draft) open(draft); }} autoComplete="current-password" />
-            {state === 'wrong' && <p className="small-print sync-warn">That’s not it.</p>}
-            <div className="card-actions">
-              <button type="button" className="chip" disabled={!draft || state === 'loading'} onClick={() => open(draft)}>Open</button>
-            </div>
-            <p className="small-print">This device remembers it once it’s right.</p>
+            <h3 className="hw lock-title">Nice try, biatch!</h3>
+            <p className="sense">These are <b>MY</b> stats.</p>
+            <Pin onCode={open} wrong={wrong} busy={state === 'loading'} />
+            <p className="small-print lock-note">{wrong ? 'Nope. Try again.' : 'Enter the code.'}</p>
           </div>
         </article>
       </section>
@@ -132,9 +145,6 @@ export function Stats({ bank, date, load }: { bank: Word[]; date: string; load: 
         )
         : <p className="slip">No stories yet.</p>}
 
-      <button type="button" className="chip chip-quiet" onClick={() => { save(''); setPassword(''); setStats(null); setDraft(''); }}>
-        Forget the password on this device
-      </button>
     </section>
   );
 }
