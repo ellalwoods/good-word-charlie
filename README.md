@@ -2,7 +2,7 @@
 
 A phone-first vocabulary site. Each day it deals three new words onto index cards. Practice is multiple choice, and reviews come back on a spaced-repetition schedule. It's named after Charlie, who says "farsicle".
 
-Everything is static. All the words are written ahead of time and published with the site, so visitors never trigger any AI calls or costs, and there's no server. Each person's progress is saved in their own browser.
+Everything is static. All the words are written ahead of time and published with the site, so visitors never trigger any AI calls or costs. Each person's progress is saved in their own browser, and can be synced between their devices with a personal sync link (see below).
 
 ## Run it locally
 
@@ -19,6 +19,19 @@ npm test         # logic tests, plus checks on every word in the bank
 It's hosted on GitHub Pages. On every push to `main`, `.github/workflows/deploy.yml` tests and builds the site and publishes it to the `gh-pages` branch, which Pages serves. If any word fails its checks, the deploy stops, so a bad batch never goes live.
 
 **On a phone:** open the address, then **Share → Add to Home Screen** (iPhone) or **⋮ → Install app** (Android). The site then opens full screen with its own icon and works offline.
+
+## Syncing between devices
+
+Tap **Sync devices** at the bottom of the page, then **Make my sync link**, and open that link on your other phone or laptop. Both then share the same progress, and changes show on the other device within seconds. There are no accounts: the link is the key, so each person makes their own and keeps it to themselves. Without a connection the site carries on as normal and catches up later.
+
+Syncing uses the household Supabase project (its own `charlie_progress` table, separate from the household data). To set it up once:
+
+1. In Supabase, open the project → **SQL Editor** → **New query**, paste all of `supabase/schema.sql`, and press **Run**.
+2. In Supabase, open **Project Settings → API** and copy the **Project URL** and the **anon public** key.
+3. In this GitHub repo, open **Settings → Secrets and variables → Actions → Variables** and add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` with those two values.
+4. Re-run the deploy (**Actions → Deploy to GitHub Pages → Run workflow**).
+
+Until then the Sync page just says it isn't switched on yet.
 
 ## Practising
 
@@ -56,11 +69,15 @@ The site also runs these checks at startup and quietly skips any entry that fail
 src/
   data/words.json      the word bank (entries + question pools)
   data/rejected.json   words never to use
-  lib/storage.ts       load/save progress: the one place to swap in Supabase later
+  lib/storage.ts       progress and the sync key on this device
+  lib/sync.ts          keeps a device in step with its sync link
+  lib/merge.ts         combines two devices' progress without losing either
+  lib/supabase.ts      the Supabase connection
   lib/daily.ts         three a day, "Already know it", "Not for me", streak
   lib/srs.ts           levels 0–6, intervals 0/1/3/7/14/30/60 days
   lib/session.ts       today's practice (5 questions per new word, 2 per review), redo, shuffle test
   lib/validate.ts      the checks above
-  views/               Today, Practice, Lexicon, index card
+  views/               Today, Practice, Lexicon, Sync, index card
 public/                manifest, icons, offline service worker
+supabase/schema.sql    run once in Supabase to switch on syncing
 ```
