@@ -87,7 +87,7 @@ function OutOfWords() {
 function Welcome({ onDone }: { onDone: () => void }) {
   return (
     <article className="card welcome">
-      <div className="band"><span>WTF is this?</span><span>No. 000</span></div>
+      <div className="band"><span>WTF is this?</span><span>GWC v.5</span></div>
       <div className="ruled">
         <p className="sense">Charlie uses the word <i>farcical</i>. Ella wishes she used the word <i>farcical</i>. Ella made this app to improve her vocabulary.</p>
         <h4 className="tag welcome-how">How it works</h4>
