@@ -39,6 +39,8 @@ const join = (key: string) => {
   return sync.join(key);
 };
 const fromLink = location.hash.length > 1 ? cleanKey(location.hash) : null;
+// The link this device opened with; if its record has been deleted, the device starts over as nobody.
+const startKey = fromLink ?? sync.get().key;
 if (fromLink && fromLink !== sync.get().key) join(fromLink);
 else { sync.start(); if (sync.get().key) device.writeKey(sync.get().key); }
 linkManifest(sync.get().key ?? fromLink);
@@ -120,6 +122,12 @@ export default function App() {
     update(setProfile(sync.get().state, n, color));
     setTimeout(loadFriends, 1500);   // once the name has saved
   };
+
+  useEffect(() => {
+    if (snap.status !== 'invalid' || snap.key !== startKey) return;
+    sync.unlink();
+    sync.update({ ...sync.get().state, name: undefined });
+  }, [snap.status]);
 
   // The welcome card sits over everything until it's dismissed.
   const welcoming = settled && !state.welcomed;
