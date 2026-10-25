@@ -12,7 +12,8 @@ try { localStorage.removeItem('good-word-charlie-owner'); } catch { /* storage b
 
 const ago = (iso: string) => {
   const h = (Date.now() - Date.parse(iso)) / 36e5;
-  if (h < 1) return 'within the hour';
+  if (h < 1 / 12) return 'just now';
+  if (h < 1) return `${Math.floor(h * 60)} min ago`;
   if (h < 24) return `${Math.floor(h)}h ago`;
   const d = Math.floor(h / 24);
   return `${d} day${d === 1 ? '' : 's'} ago`;
@@ -194,14 +195,13 @@ export function Stats({ bank, date, load, archive }: {
       <div className="cards">
         {stats.people.filter(p => !p.archived).map(p => (
           <article key={p.id} className={`card person ${p.guest ? 'c-guest' : `c-${colorOf(p.color)}`}`}>
-            <div className="band"><span>{p.name}</span><span>Seen {ago(p.lastSeen)}</span></div>
+            <div className="band"><span>{p.name}</span><span>Active {ago(p.lastSeen)}</span></div>
             <div className="ruled">
-              {p.started && (
-                <p className="small-print first-seen">
-                  {p.guest ? 'First visit' : 'Started'}: <b>{started(p.started, p.startedTime)}</b>
-                  {p.guest && <> · no name yet</>}
-                </p>
-              )}
+              <p className="small-print first-seen">
+                Last active: <b>{started(p.lastSeen, true)}</b> ({ago(p.lastSeen)})
+                {p.started && <><br />{p.guest ? 'First visit' : 'Started'}: <b>{started(p.started, p.startedTime)}</b></>}
+                {p.guest && <> · no name yet</>}
+              </p>
               {p.guest && <button type="button" className="link whoops archive-link" onClick={() => setArchived(p.id, true)}>Archive this guest</button>}
               <div className="profile-head"><Avatar friend={p.guest ? { name: '?', color: null } : p} /><span className="tag">{p.streak}-day streak · practised {p.practised} of {p.dealt} days</span></div>
               <dl className="facts">
