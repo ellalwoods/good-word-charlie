@@ -277,7 +277,7 @@ function UseCard({ use, people, fresh, mineCheered, onUsed, onNote, onCheer }: {
           : (
             <div className="card-actions">
               <span className="cheer-wrap">
-                <button type="button" className="chip chip-cheer" aria-pressed={mineCheered}
+                <button type="button" className="chip chip-cheer" data-sound="own" aria-pressed={mineCheered}
                   onClick={() => { if (!mineCheered) { setBursts(n => n + 1); play('celebrate'); } onCheer(f.name, w, date, !mineCheered); }}>
                   {mineCheered ? 'Celebrated 🎉' : 'Celebrate'}
                 </button>

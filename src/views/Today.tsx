@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { canDismiss, dueWords, PER_DAY, streak } from '../lib/daily';
+import { canDismiss, dueWords, PER_DAY, streak, unseen } from '../lib/daily';
 import { practisedToday, sessionSize } from '../lib/session';
 import type { State, Word } from '../lib/types';
 import { UsedChip } from './UsedChip';
@@ -65,7 +65,8 @@ export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo
             </div>
           </WordCard>
         ))}
-        {news.length < PER_DAY && <OutOfWords name={state.name?.value ?? ''} learned={learned} />}
+        {/* Only when the box is really empty, not in the moment before today's words are dealt. */}
+        {news.length < PER_DAY && unseen(state, bank).length === 0 && <OutOfWords name={state.name?.value ?? ''} learned={learned} />}
       </div>
     </>
   );

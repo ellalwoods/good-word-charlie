@@ -104,7 +104,7 @@ export function Practice({ start, state, bank, number, date, onState, onDone }: 
         {item.options.map(o => {
           const state = !picked ? '' : o === q.answer ? ' right' : o === picked ? ' wrong' : ' faded';
           return (
-            <button key={o} type="button" className={`opt${isWords ? ' opt-word' : ''}${state}`} disabled={!!picked} onClick={() => choose(o)}>
+            <button key={o} type="button" data-sound="own" className={`opt${isWords ? ' opt-word' : ''}${state}`} disabled={!!picked} onClick={() => choose(o)}>
               {o}
             </button>
           );
