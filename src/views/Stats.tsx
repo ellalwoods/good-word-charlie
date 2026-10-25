@@ -127,9 +127,24 @@ export function Stats({ bank, date, load, archive }: {
   const [wrong, setWrong] = useState(0);
   const [chart, setChart] = useState<string | null>(null);
 
-  const setArchived = async (id: string, archived: boolean) => {
+  const [problem, setProblem] = useState('');
+  // Records only have ids once the stats SQL is up to date; without them archiving can't stick.
+  const [setupOld, setSetupOld] = useState(false);
+  const flip = (id: string, archived: boolean) =>
     setStats(s => s && { ...s, people: s.people.map(p => (p.id === id ? { ...p, archived } : p)), guests: s.guests + (archived ? -1 : 1) });
-    try { await archive(code, id, archived); } catch { /* shown again next time it loads */ }
+  const setArchived = async (id: string, archived: boolean) => {
+    if (setupOld) { setProblem('Archiving needs the latest Supabase setup. Run the archive SQL, then reopen this page.'); return; }
+    flip(id, archived);
+    setProblem('');
+    try {
+      if (!(await archive(code, id, archived))) throw new Error('refused');
+    } catch (e) {
+      flip(id, !archived);
+      const msg = String((e as { message?: string })?.message ?? e);
+      setProblem(/charlie_archive|PGRST202|function/i.test(msg)
+        ? 'Archiving needs the latest Supabase setup. Run the archive SQL, then reopen this page.'
+        : 'That didn’t save. Check the connection and try again.');
+    }
   };
 
   const open = async (code: string) => {
@@ -137,7 +152,7 @@ export function Stats({ bank, date, load, archive }: {
     try {
       const rows = await load(code);
       if (!rows) { setWrong(n => n + 1); setState('locked'); return; }
-      setCode(code); setStats(computeStats(rows, bank, date)); setState('open');
+      setCode(code); setSetupOld(rows.some(r => !r.id)); setStats(computeStats(rows, bank, date)); setState('open');
     } catch { setState('failed'); }
   };
 
@@ -174,6 +189,7 @@ export function Stats({ bank, date, load, archive }: {
         </p>
       )}
 
+      {problem && <Problem about={problem}>{problem}</Problem>}
       <h2 className="tag section-label">People</h2>
       <div className="cards">
         {stats.people.filter(p => !p.archived).map(p => (
