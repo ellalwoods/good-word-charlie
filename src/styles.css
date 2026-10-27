@@ -595,9 +595,10 @@ button:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 }
 .avatar-big { width: 52px; height: 52px; font-size: 1.9rem; }
 
-.roster { display: flex; flex-wrap: wrap; gap: 14px 16px; margin: 0 0 12px; padding: 0; list-style: none; }
-.roster li { display: flex; flex-direction: column; align-items: center; gap: 6px; max-width: 64px; }
-.roster .tag { max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.roster { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px 8px; margin: 0 0 12px; padding: 0; list-style: none; }
+.roster li { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+.roster .who { max-width: 100%; }
+.roster .tag { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.5625rem; letter-spacing: 0.03em; }
 
 .swatches { display: flex; flex-wrap: wrap; gap: 10px; }
 .swatch {

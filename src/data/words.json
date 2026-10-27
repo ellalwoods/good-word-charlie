@@ -15610,88 +15610,88 @@
     "synonym": "harmonious"
   },
   {
-    "word": "ribald",
+    "word": "intrepid",
     "pos": "adjective",
-    "pron": "RIB-uld",
-    "definition": "Referring to sex in an amusingly rude or irreverent way.",
-    "example": "The best man told a ribald story about the stag night.",
+    "pron": "in-TREP-id",
+    "definition": "Adventurous and unafraid of danger.",
+    "example": "The intrepid explorers crossed the ice cap on foot.",
     "groups": [
-      "indecent"
+      "brave"
     ],
     "questions": [
       {
         "type": "pick-meaning",
-        "prompt": "ribald",
-        "answer": "Cheeky and smutty in a jolly way.",
+        "prompt": "intrepid",
+        "answer": "Bold enough to head into risk without flinching.",
         "distractors": [
-          "Always grumbling and moaning in a petulant tone.",
-          "Liable to flare up or swing wildly.",
-          "Borrowed from earlier work rather than fresh."
+          "Worn out from being said too many times.",
+          "So poor it is a real shame.",
+          "Grimy and wretched, or grubbily immoral."
         ]
       },
       {
         "type": "pick-word",
-        "prompt": "Cheeky and smutty in a jolly way.",
-        "answer": "ribald",
+        "prompt": "Bold enough to head into risk without flinching.",
+        "answer": "intrepid",
         "distractors": [
-          "squalid",
-          "arcane",
-          "abstruse"
+          "trite",
+          "lamentable",
+          "squalid"
         ]
       },
       {
         "type": "synonym",
-        "prompt": "ribald",
-        "answer": "racy",
+        "prompt": "intrepid",
+        "answer": "fearless",
         "distractors": [
-          "conscientious",
-          "loud",
-          "obscure"
+          "clichéd",
+          "dreadful",
+          "grimy"
         ]
       },
       {
         "type": "rewrite",
-        "prompt": "The crowd sang {rude and cheeky} songs on the bus home.",
-        "answer": "ribald",
+        "prompt": "The {daring, unafraid} reporter walked straight into the storm.",
+        "answer": "intrepid",
         "distractors": [
-          "sheepish",
-          "petulant",
-          "tetchy"
+          "trite",
+          "meagre",
+          "squalid"
         ]
       },
       {
         "type": "gap",
-        "prompt": "The play's ___ humour shocked some older viewers.",
-        "answer": "ribald",
+        "prompt": "Only the most ___ climbers attempt the north face in winter.",
+        "answer": "intrepid",
         "distractors": [
-          "peevish",
-          "contrite",
-          "rueful"
+          "meagre",
+          "trite",
+          "lamentable"
         ]
       },
       {
         "type": "gap",
-        "prompt": "Her grandmother loved a ___ joke.",
-        "answer": "ribald",
+        "prompt": "Our ___ cat chased the dog right out of the garden.",
+        "answer": "intrepid",
         "distractors": [
-          "sheepish",
-          "contrite",
-          "rueful"
+          "squalid",
+          "meagre",
+          "lamentable"
         ]
       },
       {
         "type": "usage",
-        "prompt": "ribald",
-        "answer": "The comedian's ribald jokes made the grandparents blush.",
+        "prompt": "intrepid",
+        "answer": "The intrepid divers swam into the flooded cave to find the missing boys.",
         "distractors": [
-          "Her ribald hymn was solemn and reverent.",
-          "The ribald sermon was prim and proper.",
-          "He told a ribald, squeaky-clean joke for the kids."
+          "The intrepid child hid under the bed, terrified of the thunder.",
+          "He was too intrepid to leave the house after dark.",
+          "Her intrepid fear of heights kept her off the ladder."
         ]
       }
     ],
-    "testDefinition": "Cheeky and smutty in a jolly way.",
-    "synonym": "racy"
+    "testDefinition": "Bold enough to head into risk without flinching.",
+    "synonym": "fearless"
   },
   {
     "word": "lucid",
@@ -15803,7 +15803,7 @@
         "answer": "pedantic",
         "distractors": [
           "salutary",
-          "ribald",
+          "intrepid",
           "rueful"
         ]
       },
@@ -16216,7 +16216,7 @@
         "prompt": "flagrant",
         "answer": "Done openly, with no attempt to hide it.",
         "distractors": [
-          "Cheeky and smutty in a jolly way.",
+          "Bold enough to head into risk without flinching.",
           "So good it should be held up for others to copy.",
           "Afraid to say plainly what you mean."
         ]
@@ -18497,7 +18497,7 @@
         "prompt": "provisional",
         "answer": "For now, until it can be confirmed.",
         "distractors": [
-          "Cheeky and smutty in a jolly way.",
+          "Bold enough to head into risk without flinching.",
           "Red-faced and a bit guilty at being caught out.",
           "Weighty and solemn, as if announcing something momentous; also foreboding."
         ]
@@ -20280,7 +20280,7 @@
         "distractors": [
           "banal",
           "ingratiating",
-          "ribald"
+          "intrepid"
         ]
       },
       {
@@ -21567,7 +21567,7 @@
         "answer": "unruly",
         "distractors": [
           "precise",
-          "racy",
+          "fearless",
           "biting"
         ]
       },
@@ -30856,7 +30856,7 @@
         "prompt": "iniquitous",
         "answer": "So unjust it offends the conscience.",
         "distractors": [
-          "Cheeky and smutty in a jolly way.",
+          "Bold enough to head into risk without flinching.",
           "Changing on a whim, without warning.",
           "Stingingly sarcastic, or able to eat away at the skin."
         ]
@@ -32392,7 +32392,7 @@
         "distractors": [
           "remiss",
           "truculent",
-          "ribald"
+          "intrepid"
         ]
       },
       {
