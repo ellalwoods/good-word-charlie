@@ -1135,7 +1135,7 @@
         "answer": "Always grumbling and moaning in a petulant tone.",
         "distractors": [
           "Stingingly sarcastic, or able to eat away at the skin.",
-          "Nosily and unhealthily curious about sex.",
+          "Unruffled and slow to show any feeling.",
           "Overflowing with warmth and enthusiasm."
         ]
       },
@@ -2685,7 +2685,7 @@
         "answer": "Numerous and of every sort.",
         "distractors": [
           "So syrupy it turns your stomach.",
-          "Nosily and unhealthily curious about sex.",
+          "Unruffled and slow to show any feeling.",
           "A small gesture made mainly for show."
         ]
       },
@@ -10054,7 +10054,7 @@
         "answer": "parlous",
         "distractors": [
           "sardonic",
-          "prurient",
+          "phlegmatic",
           "petulant"
         ]
       },
@@ -18750,7 +18750,7 @@
         "prompt": "indecorous",
         "answer": "Breaching etiquette in an embarrassing way.",
         "distractors": [
-          "Nosily and unhealthily curious about sex.",
+          "Unruffled and slow to show any feeling.",
           "Set in a habit for life.",
           "Too relaxed about rules and standards."
         ]
@@ -28215,88 +28215,88 @@
     "synonym": "iota"
   },
   {
-    "word": "prurient",
+    "word": "phlegmatic",
     "pos": "adjective",
-    "pron": "PROOR-ee-unt",
-    "definition": "Having or encouraging an excessive interest in sexual matters.",
-    "example": "The documentary avoids prurient detail.",
+    "pron": "fleg-MAT-ik",
+    "definition": "Calm and unemotional; not easily excited or upset.",
+    "example": "Her phlegmatic reply settled the panicking room.",
     "groups": [
-      "indecent"
+      "calm"
     ],
     "questions": [
       {
         "type": "pick-meaning",
-        "prompt": "prurient",
-        "answer": "Nosily and unhealthily curious about sex.",
+        "prompt": "phlegmatic",
+        "answer": "Unruffled and slow to show any feeling.",
         "distractors": [
-          "Rickety and thrown together.",
-          "Working against something, like an enemy.",
-          "Aimed at mending a rift or calming a quarrel."
+          "Always grumbling and moaning in a petulant tone.",
+          "Numerous and of every sort.",
+          "So poor it is a real shame."
         ]
       },
       {
         "type": "pick-word",
-        "prompt": "Nosily and unhealthily curious about sex.",
-        "answer": "prurient",
+        "prompt": "Unruffled and slow to show any feeling.",
+        "answer": "phlegmatic",
         "distractors": [
+          "querulous",
           "squalid",
-          "curt",
-          "banal"
+          "lamentable"
         ]
       },
       {
         "type": "synonym",
-        "prompt": "prurient",
-        "answer": "voyeuristic",
+        "prompt": "phlegmatic",
+        "answer": "unflappable",
         "distractors": [
-          "convenient",
-          "copycat",
-          "scornful"
+          "grumpy",
+          "plentiful",
+          "shabby"
         ]
       },
       {
         "type": "rewrite",
-        "prompt": "The press showed {nosy, unhealthily sexual} interest in the case.",
-        "answer": "prurient",
+        "prompt": "The pilot stayed {calm and unemotional} as the engine failed.",
+        "answer": "phlegmatic",
         "distractors": [
-          "copious",
-          "pyrrhic",
-          "ornate"
+          "querulous",
+          "lamentable",
+          "manifold"
         ]
       },
       {
         "type": "gap",
-        "prompt": "The ___ questions of the interviewer made her walk out.",
-        "answer": "prurient",
+        "prompt": "Even news of the fire left the ___ caretaker unmoved.",
+        "answer": "phlegmatic",
         "distractors": [
-          "tatty",
-          "vestigial",
-          "derelict"
+          "querulous",
+          "squalid",
+          "manifold"
         ]
       },
       {
         "type": "gap",
-        "prompt": "Critics accused the show of feeding ___ curiosity.",
-        "answer": "prurient",
+        "prompt": "Nothing could rattle his ___ temperament, not even the flood.",
+        "answer": "phlegmatic",
         "distractors": [
-          "copious",
-          "vestigial",
-          "derelict"
+          "lamentable",
+          "manifold",
+          "squalid"
         ]
       },
       {
         "type": "usage",
-        "prompt": "prurient",
-        "answer": "The prurient documentary dwelt on the victims' private lives.",
+        "prompt": "phlegmatic",
+        "answer": "The phlegmatic referee calmly waved away the players' shouting.",
         "distractors": [
-          "Her prurient innocence never thought about such things.",
-          "The prurient nun had never once thought about romance.",
-          "His prurient, purely academic interest was in bird migration."
+          "The phlegmatic toddler screamed and stamped for an hour.",
+          "Her phlegmatic outburst shocked everyone in the office.",
+          "He turned phlegmatic with rage when the bus left without him."
         ]
       }
     ],
-    "testDefinition": "Nosily and unhealthily curious about sex.",
-    "synonym": "voyeuristic"
+    "testDefinition": "Unruffled and slow to show any feeling.",
+    "synonym": "unflappable"
   },
   {
     "word": "obfuscate",
@@ -30006,7 +30006,7 @@
         "prompt": "overwrought",
         "answer": "Straining too hard for effect, or worked up and agitated.",
         "distractors": [
-          "Nosily and unhealthily curious about sex.",
+          "Unruffled and slow to show any feeling.",
           "Disorganised and done any old how.",
           "Grinding on and impossible to halt."
         ]
@@ -33311,7 +33311,7 @@
         "prompt": "lamentable",
         "answer": "So poor it is a real shame.",
         "distractors": [
-          "Nosily and unhealthily curious about sex.",
+          "Unruffled and slow to show any feeling.",
           "Bowing and scraping to win favour.",
           "So numerous you couldn't count them."
         ]
