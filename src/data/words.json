@@ -1324,7 +1324,7 @@
         "distractors": [
           "persuasive",
           "skimpy",
-          "raunchy"
+          "upbeat"
         ]
       },
       {
@@ -4633,7 +4633,7 @@
         "prompt": "trite",
         "answer": "Worn out from being said too many times.",
         "distractors": [
-          "Dwelling on sex for cheap thrills.",
+          "Overflowing with lively high spirits.",
           "So numerous you couldn't count them.",
           "Pushing one side's case while pretending to be fair."
         ]
@@ -9295,7 +9295,7 @@
         "answer": "paltry",
         "distractors": [
           "emollient",
-          "bawdy",
+          "sanguine",
           "incipient"
         ]
       },
@@ -10213,7 +10213,7 @@
         "distractors": [
           "Bad to breathe in, or just plain vile.",
           "Foolishly vacant, with a pleased-with-itself air.",
-          "Dwelling on sex for cheap thrills."
+          "Overflowing with lively high spirits."
         ]
       },
       {
@@ -17071,7 +17071,7 @@
         "answer": "utopian",
         "distractors": [
           "salutary",
-          "salacious",
+          "ebullient",
           "facetious"
         ]
       },
@@ -19327,88 +19327,88 @@
     "synonym": "random"
   },
   {
-    "word": "salacious",
+    "word": "ebullient",
     "pos": "adjective",
-    "pron": "suh-LAY-shus",
-    "definition": "Having or showing an inappropriate interest in sexual matters.",
-    "example": "The magazine ran salacious stories about celebrities.",
+    "pron": "ih-BUL-ee-unt",
+    "definition": "Cheerful and full of energy and enthusiasm.",
+    "example": "The ebullient host greeted every guest by name.",
     "groups": [
-      "indecent"
+      "lively"
     ],
     "questions": [
       {
         "type": "pick-meaning",
-        "prompt": "salacious",
-        "answer": "Dwelling on sex for cheap thrills.",
+        "prompt": "ebullient",
+        "answer": "Overflowing with lively high spirits.",
         "distractors": [
-          "Barely begun, with everything still to take shape.",
-          "Twisting every which way, easy to get lost in.",
-          "Pitifully bad; also sorrowful."
+          "Disappointingly sparse; not enough to satisfy.",
+          "Grimy and wretched, or grubbily immoral.",
+          "Worn out from being said too many times."
         ]
       },
       {
         "type": "pick-word",
-        "prompt": "Dwelling on sex for cheap thrills.",
-        "answer": "salacious",
+        "prompt": "Overflowing with lively high spirits.",
+        "answer": "ebullient",
         "distractors": [
-          "fulsome",
-          "putative",
-          "herculean"
+          "meagre",
+          "squalid",
+          "trite"
         ]
       },
       {
         "type": "synonym",
-        "prompt": "salacious",
-        "answer": "titillating",
+        "prompt": "ebullient",
+        "answer": "bubbly",
         "distractors": [
-          "promising",
-          "smarmy",
-          "blunt"
+          "stingy",
+          "filthy",
+          "hackneyed"
         ]
       },
       {
         "type": "rewrite",
-        "prompt": "The tabloids printed every {lurid, sexual} detail of the affair.",
-        "answer": "salacious",
+        "prompt": "Her {enthusiastic, high-spirited} speech lifted the whole team.",
+        "answer": "ebullient",
         "distractors": [
-          "sheepish",
-          "petulant",
-          "tetchy"
+          "meagre",
+          "squalid",
+          "inane"
         ]
       },
       {
         "type": "gap",
-        "prompt": "Readers lapped up the ___ gossip.",
-        "answer": "salacious",
+        "prompt": "Even after the long flight, the ___ children wanted to explore.",
+        "answer": "ebullient",
         "distractors": [
-          "peevish",
-          "contrite",
-          "rueful"
+          "meagre",
+          "squalid",
+          "trite"
         ]
       },
       {
         "type": "gap",
-        "prompt": "The trial attracted ___ interest from the press.",
-        "answer": "salacious",
+        "prompt": "His ___ mood after the win was catching.",
+        "answer": "ebullient",
         "distractors": [
-          "sheepish",
-          "contrite",
-          "rueful"
+          "inane",
+          "squalid",
+          "meagre"
         ]
       },
       {
         "type": "usage",
-        "prompt": "salacious",
-        "answer": "The tabloid ran salacious photos of the actor's holiday.",
+        "prompt": "ebullient",
+        "answer": "The ebullient crowd cheered every goal and sang all the way home.",
         "distractors": [
-          "Her salacious lecture on accounting was dry and technical.",
-          "The salacious salad was crisp and fresh.",
-          "He told a salacious, innocent bedtime story."
+          "The ebullient mourners sat in grim silence.",
+          "Her ebullient sigh showed how exhausted she was.",
+          "He felt ebullient and drained after the bad news."
         ]
       }
     ],
-    "testDefinition": "Dwelling on sex for cheap thrills.",
-    "synonym": "titillating"
+    "testDefinition": "Overflowing with lively high spirits.",
+    "synonym": "bubbly"
   },
   {
     "word": "propitious",
@@ -22573,7 +22573,7 @@
         "distractors": [
           "squalid",
           "extraneous",
-          "bawdy"
+          "sanguine"
         ]
       },
       {
@@ -23995,7 +23995,7 @@
         "answer": "Utterly pointless and brainless.",
         "distractors": [
           "Broken up, coming and going in spurts.",
-          "Dwelling on sex for cheap thrills.",
+          "Overflowing with lively high spirits.",
           "Kept on long after its best years."
         ]
       },
@@ -25009,7 +25009,7 @@
         "answer": "Unnecessary and unprovoked, often offensively so.",
         "distractors": [
           "Sluggish and weighing everything down.",
-          "Rowdy and smutty, the way old drinking songs are.",
+          "Hopeful even when things look bad.",
           "Genuinely sorry and wanting to make amends."
         ]
       },
@@ -26981,7 +26981,7 @@
         "distractors": [
           "rife",
           "obstinate",
-          "titillating"
+          "bubbly"
         ]
       },
       {
@@ -31969,7 +31969,7 @@
         "prompt": "Head in name, with someone else really in charge.",
         "answer": "titular",
         "distractors": [
-          "bawdy",
+          "sanguine",
           "blinkered",
           "fitful"
         ]
@@ -32233,7 +32233,7 @@
         "distractors": [
           "instructive",
           "booming",
-          "titillating"
+          "bubbly"
         ]
       },
       {
@@ -32571,7 +32571,7 @@
         "distractors": [
           "erratic",
           "blistering",
-          "titillating"
+          "bubbly"
         ]
       },
       {
@@ -38711,88 +38711,88 @@
     "synonym": "sluggishness"
   },
   {
-    "word": "bawdy",
+    "word": "sanguine",
     "pos": "adjective",
-    "pron": "BAW-dee",
-    "definition": "Humorously indecent about sex.",
-    "example": "The pub was known for its bawdy singalongs.",
+    "pron": "SANG-gwin",
+    "definition": "Optimistic, especially in a difficult situation.",
+    "example": "She remained sanguine about the team's chances.",
     "groups": [
-      "indecent"
+      "hopeful"
     ],
     "questions": [
       {
         "type": "pick-meaning",
-        "prompt": "bawdy",
-        "answer": "Rowdy and smutty, the way old drinking songs are.",
+        "prompt": "sanguine",
+        "answer": "Hopeful even when things look bad.",
         "distractors": [
-          "Slippery and gushing in a way that makes you distrust them.",
-          "Overstated for effect.",
-          "So awful it stands out a mile."
+          "Always grumbling and moaning in a petulant tone.",
+          "So poor it is a real shame.",
+          "Numerous and of every sort."
         ]
       },
       {
         "type": "pick-word",
-        "prompt": "Rowdy and smutty, the way old drinking songs are.",
-        "answer": "bawdy",
+        "prompt": "Hopeful even when things look bad.",
+        "answer": "sanguine",
         "distractors": [
-          "far-fetched",
-          "emollient",
-          "flagrant"
+          "querulous",
+          "lamentable",
+          "manifold"
         ]
       },
       {
         "type": "synonym",
-        "prompt": "bawdy",
-        "answer": "raunchy",
+        "prompt": "sanguine",
+        "answer": "upbeat",
         "distractors": [
-          "scruffy",
-          "spiteful",
-          "penitent"
+          "whiny",
+          "dreadful",
+          "varied"
         ]
       },
       {
         "type": "rewrite",
-        "prompt": "Shakespeare's comedies are full of {rude, saucy} jokes.",
-        "answer": "bawdy",
+        "prompt": "The coach was {quietly hopeful} despite the injuries.",
+        "answer": "sanguine",
         "distractors": [
-          "sheepish",
-          "petulant",
-          "tetchy"
+          "querulous",
+          "lamentable",
+          "manifold"
         ]
       },
       {
         "type": "gap",
-        "prompt": "The ___ songs of the shearers were never written down.",
-        "answer": "bawdy",
+        "prompt": "Investors were ___ that prices would recover by spring.",
+        "answer": "sanguine",
         "distractors": [
-          "peevish",
-          "contrite",
-          "rueful"
+          "querulous",
+          "lamentable",
+          "squalid"
         ]
       },
       {
         "type": "gap",
-        "prompt": "The show is a bit ___ for children.",
-        "answer": "bawdy",
+        "prompt": "Despite three rejections, he stayed ___ about the next interview.",
+        "answer": "sanguine",
         "distractors": [
-          "sheepish",
-          "contrite",
-          "rueful"
+          "manifold",
+          "lamentable",
+          "squalid"
         ]
       },
       {
         "type": "usage",
-        "prompt": "bawdy",
-        "answer": "The rugby club's bawdy songs aren't for the family barbecue.",
+        "prompt": "sanguine",
+        "answer": "Though the forecast was grim, the farmer stayed sanguine about the harvest.",
         "distractors": [
-          "Her bawdy, prim manners suited the convent.",
-          "The bawdy lullaby was gentle and innocent.",
-          "He told a bawdy story with nothing rude in it."
+          "She was sanguine and certain the trip would be a disaster.",
+          "His sanguine despair kept him in bed all week.",
+          "The sanguine pessimist expected the worst of everyone."
         ]
       }
     ],
-    "testDefinition": "Rowdy and smutty, the way old drinking songs are.",
-    "synonym": "raunchy"
+    "testDefinition": "Hopeful even when things look bad.",
+    "synonym": "upbeat"
   },
   {
     "word": "cagey",
@@ -42276,7 +42276,7 @@
         "distractors": [
           "Sharp-minded and quick to get to the heart of things.",
           "So predictable and ordinary it says nothing.",
-          "Dwelling on sex for cheap thrills."
+          "Overflowing with lively high spirits."
         ]
       },
       {
