@@ -14,11 +14,11 @@ export function deviceId(): string {
 }
 
 /** The parts of the site whose use is counted. */
-export const PAGES = ['today', 'practice', 'redo', 'shuffle', 'lexicon', 'friends', 'sync', 'stats'] as const;
+export const PAGES = ['today', 'practice', 'redo', 'shuffle', 'lexicon', 'friends', 'games', 'sync', 'stats'] as const;
 export type Page = typeof PAGES[number];
 export const PAGE_NAMES: Record<Page, string> = {
   today: 'Today', practice: 'Practice', redo: 'Redo', shuffle: 'Shuffle test',
-  lexicon: 'Lexicon', friends: 'Friends', sync: 'Sync devices', stats: 'Ella’s stats',
+  lexicon: 'Lexicon', friends: 'Friends', games: 'Games', sync: 'Sync devices', stats: 'Ella’s stats',
 };
 
 // time[date] holds "device" (all seconds) and "device|page" (seconds on that page);

@@ -50,6 +50,7 @@ export interface State {
   cheers?: Record<string, Record<string, number>>;
   notes?: Record<string, Record<string, { text: string; at: number }>>;  // date -> word -> the story of how it was used
   welcomed?: true;
+  games?: Record<string, Partial<Record<'wordle' | 'fuse' | 'gravity', { at: number; score: number; level?: number; answered?: number }>>>;  // date -> game -> that day's one go
   sound?: { on: boolean; at: number };  // sound effects on or off (on unless turned off)
   started?: number;  // when this record was first used (ms), for Ella's stats
   moved?: true;      // a guest record whose device has since become someone else

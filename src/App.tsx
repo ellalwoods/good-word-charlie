@@ -12,6 +12,8 @@ import { cleanKey, Sync } from './lib/sync';
 import type { State, Word } from './lib/types';
 import { usable } from './lib/validate';
 import { Friends } from './views/Friends';
+import { Games } from './views/Games';
+import { saveResult } from './lib/games';
 import { Lexicon } from './views/Lexicon';
 import { Practice } from './views/Practice';
 import { Sync as SyncView, syncLabel } from './views/Sync';
@@ -27,7 +29,7 @@ const bank = usable(words as Word[]);
 const numbers = new Map(bank.map((w, i) => [w.word, i + 1]));
 const number = (w: string) => numbers.get(w) ?? 0;
 
-type Tab = 'today' | 'lexicon' | 'sync' | 'friends' | 'stats';
+type Tab = 'today' | 'lexicon' | 'sync' | 'friends' | 'stats' | 'games';
 
 const sync = new Sync(remote, device);
 
@@ -242,7 +244,12 @@ export default function App() {
                 begin(s, 'today');
               }}
               onRedo={() => begin(redoSession(state, bank, date), 'today')}
+              onGames={() => go('games')}
               used={used} onUsed={toggleUsed} />
+          ) : tab === 'games' ? (
+            <Games state={state} bank={bank} date={date} friends={friends} unlocked={!!state.done[date]}
+              onPractise={() => go('today')}
+              onResult={(g, r) => { update(saveResult(latest(), g, date, r)); setTimeout(loadFriends, 1500); }} />
           ) : tab === 'friends' ? (
             <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}
               onProfile={joinFriends}
@@ -261,7 +268,7 @@ export default function App() {
               onTest={(words, questions, dueOnly) => begin(shuffleTest(state, bank, words, questions, Math.random, { dueOnly, date }), 'lexicon')}
               used={used} onUsed={toggleUsed} />
           )}
-        {settled && !session && tab !== 'sync' && tab !== 'friends' && tab !== 'stats' && (
+        {settled && !session && tab !== 'sync' && tab !== 'friends' && tab !== 'stats' && tab !== 'games' && (
           <footer className="foot">
             {!installed() && <button type="button" className="chip" onClick={install.start}>Add to home screen</button>}
             <button type="button" className="chip" onClick={() => go('sync')}>Sync devices · {syncLabel(snap)}</button>

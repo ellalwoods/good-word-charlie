@@ -40,6 +40,17 @@ export function merge(a: State, b: State): State {
   const name = latestOf(a.name, b.name);
   if (name) out.name = name;
   if (a.welcomed || b.welcomed) out.welcomed = true;
+  // Each game is once a day: if two devices both played, the earlier go stands.
+  const games: NonNullable<State['games']> = {};
+  for (const d of keys(a.games ?? {}, b.games ?? {})) {
+    const x = a.games?.[d] ?? {}, y = b.games?.[d] ?? {};
+    games[d] = {};
+    for (const g of keys(x, y) as ('wordle' | 'fuse' | 'gravity')[]) {
+      const p = x[g], q = y[g];
+      games[d][g] = !p || !q ? (p ?? q) : p.at !== q.at ? (p.at < q.at ? p : q) : (p.score >= q.score ? p : q);
+    }
+  }
+  if (Object.keys(games).length) out.games = games;
   const sound = !a.sound || !b.sound ? (a.sound ?? b.sound)
     : a.sound.at !== b.sound.at ? (a.sound.at > b.sound.at ? a.sound : b.sound) : (a.sound.on ? b.sound : a.sound);
   if (sound) out.sound = sound;

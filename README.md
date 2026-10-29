@@ -37,6 +37,16 @@ Until then the Sync page just says it isn't switched on yet.
 
 The **Friends** button in the top corner opens the Friends page. **I used a word** picks one of your words (with an optional story of how you used it); friends see a "Good word, Name!" card and can **Celebrate** it. Cards stay up for 24 hours, then move to the **Archive**. Shared: names, colours, words used, their stories and celebrations. It needs syncing switched on (above).
 
+## Games
+
+Once today's practice is done, **Go to games** opens three once-a-day games, each with a daily leaderboard of friends' results:
+
+- **Good Wordle:** the same word for everyone (from the whole bank), its meaning as the clue, six guesses. Ranked by fewest guesses.
+- **The Fuse:** bet ×1, ×2 or ×3 on each question against a burning fuse. Your own words until 200 points, then the whole bank.
+- **Gravity:** meanings fall in three lanes; tap the word for the lowest card. Three lives. Speeds up quickly to level 5, then words go beyond your own and the pace drops back.
+
+While `GAMES_IN_PROGRESS` is true in `src/views/Games.tsx`, the page shows a "Works in progress" notice; only an account named Ella can step past it.
+
 ## Practising
 
 - **Today:** one practice a day, never more than 21 questions. Today's three new words get 3 questions each, then the most overdue reviews get 2 each until the 21 are used; any other reviews wait for tomorrow. Only this practice moves words up or down a level.

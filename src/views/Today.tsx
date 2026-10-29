@@ -15,11 +15,12 @@ interface Props {
   onDismiss: (word: string, reason: 'known' | 'rejected') => void;
   onPractise: () => void;
   onRedo: () => void;
+  onGames: () => void;
   used: string[];
   onUsed: (word: string) => void;
 }
 
-export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo, used, onUsed }: Props) {
+export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo, onGames, used, onUsed }: Props) {
   const byWord = new Map(bank.map(w => [w.word, w]));
   const news = (state.days[date] ?? []).map(w => byWord.get(w)).filter((w): w is Word => !!w);
   const due = dueWords(state, bank, date).length;
@@ -46,6 +47,12 @@ export function Today({ state, bank, number, date, onDismiss, onPractise, onRedo
             </button>
           )
           : <p className="slip">All done for today. Three new words tomorrow{due > 0 ? `, and ${due} review${due === 1 ? '' : 's'} waiting` : ''}.</p>}
+        {state.done[date] && (
+          <button type="button" className="btn games-btn" onClick={onGames}>
+            Go to games
+            <span className="btn-sub">Good Wordle · The Fuse · Gravity</span>
+          </button>
+        )}
         {canRedo && (
           <button type="button" className="btn btn-quiet" onClick={onRedo}>
             Redo today’s practice

@@ -79,7 +79,7 @@ $$;
 -- how many words they've learned and which days they practised.
 drop function if exists public.charlie_friends(text, text);
 create function public.charlie_friends(p_key text, p_since text)
-returns table (name text, color text, used jsonb, cheers jsonb, notes jsonb, mine boolean, learned integer, done jsonb)
+returns table (name text, color text, used jsonb, cheers jsonb, notes jsonb, mine boolean, learned integer, done jsonb, games jsonb)
 language sql
 stable
 security definer
@@ -92,7 +92,8 @@ as $$
          public.charlie_since(p.data->'notes', p_since),
          p.secret = p_key,
          (select count(*)::integer from jsonb_object_keys(case when jsonb_typeof(p.data->'cards') = 'object' then p.data->'cards' else '{}'::jsonb end)),
-         (select coalesce(jsonb_agg(k), '[]'::jsonb) from jsonb_object_keys(case when jsonb_typeof(p.data->'done') = 'object' then p.data->'done' else '{}'::jsonb end) k)
+         (select coalesce(jsonb_agg(k), '[]'::jsonb) from jsonb_object_keys(case when jsonb_typeof(p.data->'done') = 'object' then p.data->'done' else '{}'::jsonb end) k),
+         public.charlie_since(p.data->'games', to_char(now() - interval '2 days', 'YYYY-MM-DD'))
     from public.charlie_progress p
    where coalesce(p.data->'name'->>'value', '') <> ''
    order by 1;

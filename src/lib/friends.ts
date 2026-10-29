@@ -15,6 +15,7 @@ export interface Friend {
   mine: boolean;
   learned?: number;   // words met and still in practice
   done?: string[];    // days a practice was finished
+  games?: State['games'];   // each day's game results, for the leaderboards
 }
 
 /** One word one person used, as shown on the Friends page. */
@@ -111,6 +112,7 @@ export function combine(friends: Friend[]): Friend[] {
       mine: g.mine || f.mine,
       learned: Math.max(g.learned ?? 0, f.learned ?? 0),
       done: [...new Set([...(g.done ?? []), ...(f.done ?? [])])],
+      games: { ...f.games, ...g.games },
     });
   }
   return [...byName.values()];
