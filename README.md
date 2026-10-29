@@ -45,7 +45,6 @@ Once today's practice is done, **Go to games** opens three once-a-day games, eac
 - **The Fuse:** bet ×1, ×2 or ×3 on each question against a burning fuse. Your own words until 200 points, then the whole bank.
 - **Gravity:** meanings fall in three lanes; tap the word for the lowest card. Three lives. Speeds up quickly to level 5, then words go beyond your own and the pace drops back.
 
-While `GAMES_IN_PROGRESS` is true in `src/views/Games.tsx`, the page shows a "Works in progress" notice; only an account named Ella can step past it.
 
 ## Practising
 

@@ -13,7 +13,7 @@ import type { State, Word } from './lib/types';
 import { usable } from './lib/validate';
 import { Friends } from './views/Friends';
 import { Games } from './views/Games';
-import { resetGames, saveResult } from './lib/games';
+import { saveResult } from './lib/games';
 import { Lexicon } from './views/Lexicon';
 import { Practice } from './views/Practice';
 import { Sync as SyncView, syncLabel } from './views/Sync';
@@ -250,7 +250,6 @@ export default function App() {
           ) : tab === 'games' ? (
             <Games state={state} bank={bank} date={date} friends={friends} unlocked={!!state.done[date]}
               onPractise={() => go('today')}
-              onReset={() => update(resetGames(latest(), date))}
               onResult={(g, r) => { update(saveResult(latest(), g, date, r)); setTimeout(loadFriends, 1500); }} />
           ) : tab === 'friends' ? (
             <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}

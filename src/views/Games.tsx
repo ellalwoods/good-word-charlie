@@ -4,6 +4,7 @@ import { dailyWordle, leaderboard, playedToday, type GameId, type GameResult } f
 import { POS_LABEL } from './WordCard';
 import type { State, Word } from '../lib/types';
 import { Avatar } from './Friends';
+import { TextElla } from './TextElla';
 import { Fuse } from './games/Fuse';
 import { Gravity } from './games/Gravity';
 import { Wordle } from './games/Wordle';
@@ -17,12 +18,8 @@ interface Props {
   unlocked: boolean;
   onResult: (game: GameId, result: GameResult) => void;
   onPractise: () => void;
-  /** Testing only: lets Ella play today's games again. */
-  onReset: () => void;
 }
 
-/** While the games are being built they sit behind a notice; only Ella can step past it to test. */
-export const GAMES_IN_PROGRESS = true;
 
 const GAMES: { id: GameId; title: string; band: string; blurb: string }[] = [
   { id: 'wordle', title: 'Good Wordle', band: 'c-green',
@@ -95,31 +92,10 @@ function Board({ game, state, date, friends }: { game: GameId; state: State; dat
   );
 }
 
-export function Games({ state, bank, date, friends, unlocked, onResult, onPractise, onReset }: Props) {
+export function Games({ state, bank, date, friends, unlocked, onResult, onPractise }: Props) {
   const [open, setOpen] = useState<GameId | null>(null);
-  const [past, setPast] = useState(false);
   // Good Wordle shows the word and its meaning first; the leaderboard waits until they're ready.
   const [reveal, setReveal] = useState(false);
-  const isElla = (state.name?.value ?? '').trim().toLowerCase() === 'ella';
-
-  if (GAMES_IN_PROGRESS && !past) {
-    return (
-      <section className="sync">
-        <article className="card">
-          <div className="band board-band"><span>Games</span><span>Coming soon</span></div>
-          <div className="ruled">
-            <h3 className="hw">Works in progress</h3>
-            <p className="sense">Three games are on their way: Good Wordle, The Fuse and Gravity. Check back soon.</p>
-            {isElla && (
-              <div className="card-actions">
-                <button type="button" className="chip" onClick={() => setPast(true)}>Ella: open the games to test</button>
-              </div>
-            )}
-          </div>
-        </article>
-      </section>
-    );
-  }
 
   if (open) {
     const g = GAMES.find(x => x.id === open)!;
@@ -152,20 +128,13 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
             </div>
           </article>
         )}
+      <div className="games-help"><TextElla label="Error? Tell Ella" body="Hi Ella, something’s not working in the games on Good Word, Charlie: " /></div>
       </section>
     );
   }
 
   return (
     <section className="sync games">
-      {GAMES_IN_PROGRESS && (
-        <div className="slip">
-          <p>Testing mode: only you can see the games until the “works in progress” notice comes off.</p>
-          {isElla && GAMES.some(g => playedToday(state, g.id, date)) && (
-            <button type="button" className="chip" onClick={onReset}>Reset my games today</button>
-          )}
-        </div>
-      )}
       {!unlocked && (
         <article className="card">
           <div className="band board-band"><span>Locked</span><span>Practice first</span></div>
@@ -193,6 +162,7 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
           </article>
         );
       })}
+      <div className="games-help"><TextElla label="Error? Tell Ella" body="Hi Ella, something’s not working in the games on Good Word, Charlie: " /></div>
     </section>
   );
 }
