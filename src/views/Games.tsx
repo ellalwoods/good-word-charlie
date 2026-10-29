@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { colorOf, type Friend } from '../lib/friends';
 import { leaderboard, playedToday, type GameId, type GameResult } from '../lib/games';
 import type { State, Word } from '../lib/types';
@@ -27,11 +27,26 @@ const GAMES: { id: GameId; title: string; band: string; blurb: string }[] = [
   { id: 'fuse', title: 'The Fuse', band: 'c-yellow',
     blurb: 'A lit fuse and a stack of questions. Bet ×1, ×2 or ×3 on each. Right answers add fuse; wrong ones burn it, harder the more you bet. Your words first, then the whole bank once you pass 200 points.' },
   { id: 'gravity', title: 'Gravity', band: 'c-violet',
-    blurb: 'Meanings fall towards the ground. Tap the right word before each one lands. It speeds up fast; from level 5 it eases off but goes beyond your words to the whole bank.' },
+    blurb: 'Definitions fall towards the ground. Match the right word to each definition before it lands. Levels 1 to 4 use only words from your Lexicon, and get faster quickly. At level 5 it slows down a little, but words can come from the whole word bank, including ones you haven’t met yet. Three lives: a definition that lands, or a wrong match, costs one.' },
 ];
 
 const showScore = (game: GameId, r: GameResult) =>
   game === 'wordle' ? `${r.score > 6 ? 'X' : r.score}/6` : game === 'gravity' ? `${r.score} pts · level ${r.level ?? 1}` : `${r.score} pts`;
+
+/** "New game in 5 hours": time until midnight, when every game resets. Minutes in the last hour. */
+export function untilNext(now = new Date()): string {
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  const mins = Math.max(1, Math.ceil((midnight.getTime() - now.getTime()) / 60000));
+  if (mins < 60) return `New game in ${mins} minute${mins === 1 ? '' : 's'}`;
+  const hours = Math.round(mins / 60);
+  return `New game in ${hours} hour${hours === 1 ? '' : 's'}`;
+}
+
+function NextGame() {
+  const [, tick] = useState(0);
+  useEffect(() => { const t = setInterval(() => tick(n => n + 1), 30000); return () => clearInterval(t); }, []);
+  return <>{untilNext()}</>;
+}
 
 function Board({ game, state, date, friends }: { game: GameId; state: State; date: string; friends: Friend[] | null }) {
   const rows = leaderboard(game, date, friends ?? [], { name: state.name?.value ?? '', color: state.name?.color ?? null, result: playedToday(state, game, date) });
@@ -96,7 +111,7 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
               <div className="band"><span>{g.title}</span><span>Played today ✓</span></div>
               <div className="ruled">
                 <p className="game-result">{showScore(open, result)}</p>
-                <p className="small-print">That’s your go for today. It opens again tomorrow.</p>
+                <p className="small-print"><NextGame /></p>
               </div>
             </article>
             <Board game={open} state={state} date={date} friends={friends} />

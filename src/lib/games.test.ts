@@ -86,3 +86,29 @@ describe('Gravity', () => {
     expect([gravityPoints(1, 0), gravityPoints(1, 1), gravityPoints(3, 0.5)]).toEqual([20, 10, 35]);
   });
 });
+
+describe('answer options', () => {
+  it('come only from your own words while the game uses your words', async () => {
+    const { choiceQuestion, seeded } = await import('./games');
+    let s = fresh();
+    for (const d of ['2026-10-25', '2026-10-26', '2026-10-27', '2026-10-28']) s = ensureToday(s, bank, d);
+    const mine = metWords(s, bank), names = new Set(mine.map(w => w.word));
+    const rand = seeded('t');
+    for (let i = 0; i < 40; i++) {
+      const q = choiceQuestion(mine, bank, rand, 'word');
+      expect(q.options.every(o => names.has(o))).toBe(true);
+      expect(q.options).toContain(q.answer);
+      expect(new Set(q.options).size).toBe(3);
+    }
+  });
+});
+
+describe('new game countdown', () => {
+  it('counts hours to midnight, then minutes in the last hour', async () => {
+    const { untilNext } = await import('../views/Games');
+    expect(untilNext(new Date(2026, 9, 29, 19, 0))).toBe('New game in 5 hours');
+    expect(untilNext(new Date(2026, 9, 29, 22, 40))).toBe('New game in 1 hour');
+    expect(untilNext(new Date(2026, 9, 29, 23, 15))).toBe('New game in 45 minutes');
+    expect(untilNext(new Date(2026, 9, 29, 23, 59, 30))).toBe('New game in 1 minute');
+  });
+});

@@ -24,6 +24,7 @@ export function Gravity({ state, bank, onDone }: { state: State; bank: Word[]; o
   const [, render] = useState(0);
   const [flash, setFlash] = useState('');
   const [breather, setBreather] = useState(false);
+  const [banner, setBanner] = useState(0);   // the level just reached, shown big for a moment
   const draw = () => render(n => n + 1);
 
   // The card that matters: the lowest one still falling.
@@ -34,7 +35,8 @@ export function Gravity({ state, bank, onDone }: { state: State; bank: Word[]; o
     if (!t) { g.current.options = []; g.current.targetId = 0; return; }
     if (g.current.targetId === t.id) return;
     g.current.targetId = t.id;
-    const q = choiceQuestion([t.word], bank, rand, 'word');
+    // Before level 5 the wrong options are your own words too, so none can be ruled out as unfamiliar.
+    const q = choiceQuestion([t.word], bank, rand, 'word', [], gravitySource(state, bank, g.current.level));
     g.current.options = q.options;
   };
 
@@ -69,7 +71,12 @@ export function Gravity({ state, bank, onDone }: { state: State; bank: Word[]; o
         setTimeout(() => setBreather(false), PAUSE_AT_BEYOND);
       }
       play('levelup');
-      setFlash(s.level === GRAVITY_BEYOND ? '' : `Level ${s.level}!`);
+      setFlash('');
+      if (s.level !== GRAVITY_BEYOND) {
+        const reached = s.level;
+        setBanner(reached);
+        setTimeout(() => setBanner(b => (b === reached ? 0 : b)), 1300);
+      }
     } else {
       play('right');
       setFlash(`+${pts}`);
@@ -119,7 +126,10 @@ export function Gravity({ state, bank, onDone }: { state: State; bank: Word[]; o
   return (
     <div className="gravity">
       <div className="hud">
-        <span><span className="tag">Level</span><br /><span className="big">{s.level}</span></span>
+        <span>
+          <span className="tag">Level</span><br /><span className="big">{s.level}</span>
+          <span className="to-next">{GRAVITY_PER_LEVEL - (s.cleared % GRAVITY_PER_LEVEL)} to level {s.level + 1}</span>
+        </span>
         <span className="lives" aria-label={`${s.lives} lives left`}>{'♥'.repeat(Math.max(0, s.lives))}{'♡'.repeat(GRAVITY_LIVES - Math.max(0, s.lives))}</span>
         <span className="hud-right"><span className="tag">Score</span><br /><span className="big">{s.score}</span></span>
       </div>
@@ -130,10 +140,12 @@ export function Gravity({ state, bank, onDone }: { state: State; bank: Word[]; o
             {c.word.testDefinition}
           </div>
         ))}
+        {banner > 0 && !breather && <div className="level-up" role="status" key={banner}>Level {banner}!</div>}
         {breather && (
           <div className="breather" role="status">
-            <b>Whoa, that was tough!</b>
-            <span>Take a deep breath. We'll slow down now that we're going beyond your vocabulary.</span>
+            <span className="tag">You've reached</span>
+            <b>Level {GRAVITY_BEYOND}!</b>
+            <span><strong>New words from here:</strong> anything in the bank can fall, not just yours. Take a breath; we'll slow down a little.</span>
           </div>
         )}
         <div className="ground" />

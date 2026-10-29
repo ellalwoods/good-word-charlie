@@ -85,14 +85,22 @@ const shuffle = <T,>(a: T[], rand: () => number): T[] => {
 };
 
 /**
- * A three-option question about one word from `from`. Wrong options come from the
- * whole bank but never share a meaning group with the word.
+ * A three-option question about one word from `from`. Wrong options come from `wrongFrom`
+ * (the same words the question is drawn from, so a word you've never met can't give the
+ * answer away), never share a meaning group with the word, and match its part of speech
+ * where there are enough to choose from.
  */
-export function choiceQuestion(from: Word[], bank: Word[], rand: () => number, kind?: 'meaning' | 'word', avoid: string[] = []): Choice {
+export function choiceQuestion(
+  from: Word[], bank: Word[], rand: () => number, kind?: 'meaning' | 'word', avoid: string[] = [], wrongFrom: Word[] = from,
+): Choice {
   const pool = from.filter(w => !avoid.includes(w.word));
   const word = (pool.length ? pool : from)[Math.floor(rand() * (pool.length || from.length))];
   const groups = new Set(word.groups ?? []);
-  const others = shuffle(bank.filter(w => w.word !== word.word && w.pos === word.pos && !(w.groups ?? []).some(g => groups.has(g))), rand).slice(0, 2);
+  const fits = (w: Word) => w.word !== word.word && !(w.groups ?? []).some(g => groups.has(g));
+  const samePos = wrongFrom.filter(w => fits(w) && w.pos === word.pos);
+  const anyPos = wrongFrom.filter(fits);
+  const candidates = samePos.length >= 2 ? samePos : anyPos.length >= 2 ? anyPos : bank.filter(w => fits(w) && w.pos === word.pos);
+  const others = shuffle(candidates, rand).slice(0, 2);
   const k = kind ?? (rand() < 0.5 ? 'meaning' : 'word');
   return k === 'meaning'
     ? { word, kind: k, prompt: word.word, answer: word.testDefinition, options: shuffle([word, ...others].map(w => w.testDefinition), rand) }
