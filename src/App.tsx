@@ -226,6 +226,7 @@ export default function App() {
           <nav className="tabs" aria-label="Sections">
             <button type="button" aria-current={tab === 'today' && !session} onClick={() => go('today')}>Today</button>
             <button type="button" aria-current={tab === 'lexicon'} onClick={() => go('lexicon')}>Lexicon</button>
+            <button type="button" aria-current={tab === 'games' && !session} onClick={() => go('games')}>Games</button>
           </nav>
         </div>
       </header>

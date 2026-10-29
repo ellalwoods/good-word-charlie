@@ -829,7 +829,7 @@ ol.welcome-list { padding-left: 1.3em; }
 
 /* ---------- Games ---------- */
 
-.games-btn { margin-top: 14px; background: var(--yellow); }
+.games-btn { margin-top: 14px; background: var(--right); }
 .games .hw { margin: 0 0 6px; }
 .games .sense { margin: 0 0 10px; }
 .game-card { --band: var(--c); --band-ink: var(--c-ink); }
