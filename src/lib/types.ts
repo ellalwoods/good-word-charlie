@@ -51,7 +51,7 @@ export interface State {
   notes?: Record<string, Record<string, { text: string; at: number }>>;  // date -> word -> the story of how it was used
   welcomed?: true;
   gamesReset?: Record<string, number>;  // date -> when that day's games were reset (testing); older results don't count
-  games?: Record<string, Partial<Record<'wordle' | 'fuse' | 'gravity', { at: number; score: number; level?: number; answered?: number }>>>;  // date -> game -> that day's one go
+  games?: Record<string, Partial<Record<'wordle' | 'fuse' | 'gravity', { at: number; score: number; level?: number; answered?: number; grid?: string[]; sparks?: number; best?: true }>>>;  // date -> game -> that day's one go
   sound?: { on: boolean; at: number };  // sound effects on or off (on unless turned off)
   started?: number;  // when this record was first used (ms), for Ella's stats
   moved?: true;      // a guest record whose device has since become someone else

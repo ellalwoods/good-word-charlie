@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { streak } from '../lib/daily';
-import { celebrators, colorOf, COLORS, isFresh, NOTE_MAX, usedCount, useId, uses, type Friend, type Use } from '../lib/friends';
+import { celebrators, colorOf, COLORS, FRESH_FOR, isFresh, NOTE_MAX, usedCount, useId, uses, type Friend, type Use } from '../lib/friends';
 import { shortDate } from '../lib/dates';
 import type { Snapshot } from '../lib/sync';
 import type { State, Word } from '../lib/types';
 import { play } from '../lib/sounds';
 import { Burst } from './Burst';
+import { GamesCardView } from './GamesCard';
+import { gamesCardId, gamesCards, type GamesCard } from '../lib/games';
 import { Problem, TextElla } from './TextElla';
 
 interface Props {
@@ -347,6 +349,7 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
   const me: Friend = {
     name, color, used: state.used ?? {}, cheers: state.cheers ?? {}, notes: state.notes ?? {}, mine: true,
     learned: Object.keys(state.cards).filter(w => bank.some(b => b.word === w)).length, done: Object.keys(state.done),
+    games: state.games,
   };
   const people = [me, ...(friends ?? []).filter(f => !f.mine && f.name !== name)];
   const all = uses(people);
@@ -355,6 +358,9 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
   if (archive) return <Archive items={all.filter(u => !isFresh(u, now))} people={people} onBack={() => setArchive(false)} />;
 
   const current = all.filter(u => isFresh(u, now));
+  // Games cards (all three games done) sit in the same feed, newest first, for the same 24 hours.
+  const cards = gamesCards(people).filter(c => now - c.at < FRESH_FOR);
+  const feed: { at: number; use?: Use; card?: GamesCard }[] = [...current.map(u => ({ at: u.at, use: u })), ...cards.map(c => ({ at: c.at, card: c }))].sort((a, b) => b.at - a.at);
   const met = bank.filter(w => state.cards[w.word] || state.known[w.word]).map(w => w.word).sort();
 
   return (
@@ -369,13 +375,18 @@ export function Friends({ snap, state, bank, date, friends, failed, fresh, onPro
       )}
 
       {failed && !friends && <Problem about="It couldn’t load my friends.">Couldn’t load your friends just now. Check the connection.</Problem>}
-      {!current.length && <p className="slip">No one’s used a word in the last day. Be the first.</p>}
+      {!feed.length && <p className="slip">No one’s used a word in the last day. Be the first.</p>}
       <div className="cards">
-        {current.map(u => (
-          <UseCard key={useId(u)} use={u} people={people} fresh={fresh}
-            mineCheered={me.cheers[u.date]?.[`${u.friend.name}:${u.word}`] > 0}
-            onUsed={onUsed} onNote={onNote} onCheer={onCheer} />
-        ))}
+        {feed.map(item => (item.use
+          ? (
+            <UseCard key={useId(item.use)} use={item.use} people={people} fresh={fresh}
+              mineCheered={me.cheers[item.use.date]?.[`${item.use.friend.name}:${item.use.word}`] > 0}
+              onUsed={onUsed} onNote={onNote} onCheer={onCheer} />
+          )
+          : (
+            <GamesCardView key={gamesCardId(item.card!)} card={item.card!} people={people} fresh={fresh}
+              mineCheered={me.cheers[item.card!.date]?.[`${item.card!.friend.name}:games`] > 0} onCheer={onCheer} />
+          )))}
       </div>
 
       <div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { colorOf, type Friend } from '../lib/friends';
 import { dailyWordle, leaderboard, playedToday, type GameId, type GameResult } from '../lib/games';
 import { POS_LABEL } from './WordCard';
+import { addDays, shortDate } from '../lib/dates';
 import type { State, Word } from '../lib/types';
 import { Avatar } from './Friends';
 import { TextElla } from './TextElla';
@@ -61,6 +62,43 @@ function WordleReveal({ word, result, onNext }: { word: Word; result: GameResult
         <p className="sense">{word.definition}</p>
         <p className="example">{word.example}</p>
         <button type="button" className="btn" onClick={onNext}>See the leaderboard</button>
+      </div>
+    </article>
+  );
+}
+
+/** The small symbol for each game, used on Yesterday's winners. */
+function Symbol({ game }: { game: GameId }) {
+  if (game === 'wordle') return <span className="sym-wordle" aria-hidden="true">{[...'xyxygxggg'].map((c, i) => <i key={i} className={c} />)}</span>;
+  if (game === 'fuse') return <span className="sym-fuse" aria-hidden="true" />;
+  return <span className="sym-gravity" aria-hidden="true">{[5, 8, 11, 14, 16].map(h => <i key={h} style={{ height: h }} />)}</span>;
+}
+
+/** Yesterday's winner of each game, in one short strip at the top of the Games page. */
+function YesterdaysWinners({ state, date, friends }: { state: State; date: string; friends: Friend[] | null }) {
+  const yesterday = addDays(date, -1);
+  const me = { name: state.name?.value ?? '', color: state.name?.color ?? null };
+  const winners = GAMES.map(g => ({ g, top: leaderboard(g.id, yesterday, friends ?? [], { ...me, result: playedToday(state, g.id, yesterday) })[0] }));
+  if (!winners.some(w => w.top)) return null;
+  return (
+    <article className="card">
+      <div className="band board-band"><span>Yesterday’s winners</span><span>{shortDate(yesterday)}</span></div>
+      <div className="ruled">
+        <div className="winners">
+          {winners.map(({ g, top }) => (
+            <div key={g.id} className={`win${top?.mine ? ' mine' : ''}`}>
+              <span className="whead"><span className="sym"><Symbol game={g.id} /></span><span className="gname">{g.title}</span></span>
+              {top
+                ? (
+                  <span className="wrow">
+                    <Avatar friend={{ name: top.name, color: colorOf(top.color) }} />
+                    <span className="wtext"><span className="wname">{top.mine ? 'You!' : top.name}</span><span className="wscore">{g.id === 'gravity' ? `Level ${top.result.level ?? 1}` : showScore(g.id, top.result)}</span></span>
+                  </span>
+                )
+                : <span className="wscore">No one played</span>}
+            </div>
+          ))}
+        </div>
       </div>
     </article>
   );
@@ -135,6 +173,7 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
 
   return (
     <section className="sync games">
+      <YesterdaysWinners state={state} date={date} friends={friends} />
       {!unlocked && (
         <article className="card">
           <div className="band board-band"><span>Locked</span><span>Practice first</span></div>

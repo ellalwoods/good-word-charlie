@@ -13,6 +13,7 @@ export function Fuse({ state, bank, onDone }: { state: State; bank: Word[]; onDo
   const [fuse, setFuse] = useState(FUSE_START);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+  const sparks = useRef(0);   // ×3 bets won
   const [bet, setBet] = useState<Bet | null>(null);
   const [beyond, setBeyond] = useState(false);
   const [flash, setFlash] = useState('');
@@ -37,7 +38,7 @@ export function Fuse({ state, bank, onDone }: { state: State; bank: Word[]; onDo
     if (fuse > 0 || ended.current) return;
     ended.current = true;
     play('finish');
-    onDone({ at: Date.now(), score, answered });
+    onDone({ at: Date.now(), score, answered, sparks: sparks.current });
   }, [fuse]);
 
   const choose = (o: string) => {
@@ -51,6 +52,7 @@ export function Fuse({ state, bank, onDone }: { state: State; bank: Word[]; onDo
       setScore(next);
       setFuse(f => Math.min(FUSE_MAX, f + BETS[bet].add));
       setFlash(`+${pts} points · +${BETS[bet].add}s`);
+      if (bet === 3) sparks.current += 1;
       play('right');
     } else {
       setFuse(f => Math.max(0, f - BETS[bet].burn));

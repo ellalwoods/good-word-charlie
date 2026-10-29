@@ -30,7 +30,9 @@ export function Wordle({ bank, date, onDone }: { bank: Word[]; date: string; onD
       const won = cur === target.word;
       if (won || next.length >= WORDLE_TRIES) {
         play(won ? 'finish' : 'wrong');
-        setTimeout(() => onDone({ at: Date.now(), score: won ? next.length : WORDLE_TRIES + 1 }), 900);
+        // Only the colours are kept (for the card friends see), never the letters.
+        const grid = next.map(g => markGuess(g, target.word).join(''));
+        setTimeout(() => onDone({ at: Date.now(), score: won ? next.length : WORDLE_TRIES + 1, grid }), 900);
       } else play('tap');
       return;
     }

@@ -10,6 +10,9 @@ export interface GameResult {
   score: number;     // Good Wordle: guesses used (7 if not solved); The Fuse and Gravity: points
   level?: number;    // Gravity: the level reached
   answered?: number; // The Fuse: questions answered
+  grid?: string[];   // Good Wordle: each guess as colours only (g/y/x), never the letters
+  sparks?: number;   // The Fuse: ×3 bets won
+  best?: true;       // a new personal best (beats every earlier go at this game)
 }
 
 /** Good Wordle ranks fewest guesses first; the others most points first. */
@@ -25,9 +28,42 @@ export function resetGames(s: State, date: string): State {
   return { ...s, games, gamesReset: { ...s.gamesReset, [date]: Date.now() } };
 }
 
+/** Whether a result beats every earlier go at the game. A first-ever go isn't a "new" best. */
+export function isPersonalBest(s: State, game: GameId, date: string, result: GameResult): boolean {
+  const earlier = Object.entries(s.games ?? {}).filter(([d]) => d < date).map(([, g]) => g[game]).filter((r): r is GameResult => !!r);
+  if (!earlier.length) return false;
+  if (lowWins(game)) return result.score <= 6 && earlier.every(r => result.score < r.score);
+  return earlier.every(r => result.score > r.score);
+}
+
 export function saveResult(s: State, game: GameId, date: string, result: GameResult): State {
   if (playedToday(s, game, date)) return s;
-  return { ...s, games: { ...s.games, [date]: { ...s.games?.[date], [game]: result } } };
+  const r: GameResult = isPersonalBest(s, game, date, result) ? { ...result, best: true } : result;
+  return { ...s, games: { ...s.games, [date]: { ...s.games?.[date], [game]: r } } };
+}
+
+// ---------- The day's games card on the Friends page ----------
+
+export interface GamesCard { friend: Friend; date: string; at: number; wordle: GameResult; fuse: GameResult; gravity: GameResult }
+
+/** A games card goes up once someone has played all three games on a day; it's posted when the last one finished. */
+export function gamesCards(friends: Friend[]): GamesCard[] {
+  return friends.flatMap(friend => Object.entries(friend.games ?? {}).flatMap(([date, g]) =>
+    g.wordle && g.fuse && g.gravity
+      ? [{ friend, date, at: Math.max(g.wordle.at, g.fuse.at, g.gravity.at), wordle: g.wordle, fuse: g.fuse, gravity: g.gravity }]
+      : []));
+}
+
+export const gamesCardId = (c: GamesCard) => `games:${c.friend.name}:${c.date}`;
+
+/** The card's headline: its best moment. */
+export function gamesHeadline(c: GamesCard, who: string): string {
+  if (c.gravity.best) return `${who} reached level ${c.gravity.level ?? 1} in Gravity, a new best!`;
+  if (c.fuse.best) return `${who} set a new Fuse record!`;
+  if (c.wordle.best) return `${who}’s best Good Wordle yet!`;
+  if (c.wordle.score <= 2) return `${who} cracked the Wordle in ${c.wordle.score}!`;
+  if ((c.gravity.level ?? 1) >= GRAVITY_BEYOND) return `${who} made it beyond their vocabulary in Gravity!`;
+  return `${who} played all three games`;
 }
 
 // A small, stable hash, so a date always picks the same word for everyone.

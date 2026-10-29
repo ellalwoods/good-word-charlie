@@ -127,3 +127,30 @@ describe('resetting today’s games (testing)', () => {
     expect(merge(again, laptop).games?.[D]?.wordle?.score).toBe(3);
   });
 });
+
+describe('personal bests and the games card', () => {
+  it('flags a new best only when it beats every earlier go (not on a first go)', async () => {
+    const Y = '2026-10-28';
+    let s = saveResult(fresh(), 'fuse', '2026-10-27', { at: 1, score: 200 });
+    expect(s.games?.['2026-10-27']?.fuse?.best).toBeUndefined();          // first ever go
+    s = saveResult(s, 'fuse', Y, { at: 2, score: 150 });
+    expect(s.games?.[Y]?.fuse?.best).toBeUndefined();                      // worse
+    s = saveResult(s, 'fuse', D, { at: 3, score: 250 });
+    expect(s.games?.[D]?.fuse?.best).toBe(true);                           // better than both
+    let w = saveResult(fresh(), 'wordle', Y, { at: 1, score: 4 });
+    w = saveResult(w, 'wordle', D, { at: 2, score: 3 });
+    expect(w.games?.[D]?.wordle?.best).toBe(true);                         // fewer guesses is better
+    const x = saveResult(saveResult(fresh(), 'wordle', Y, { at: 1, score: 7 }), 'wordle', D, { at: 2, score: 7 });
+    expect(x.games?.[D]?.wordle?.best).toBeUndefined();                    // not solved is never a best
+  });
+
+  it('only posts a card once all three games are done, timed by the last one', async () => {
+    const { gamesCards, gamesHeadline } = await import('./games');
+    const two = friend('Sam', { [D]: { wordle: { at: 1, score: 3 }, fuse: { at: 2, score: 90 } } });
+    const three = friend('Charlie', { [D]: { wordle: { at: 1, score: 3 }, fuse: { at: 5, score: 90 }, gravity: { at: 3, score: 400, level: 6, best: true } } });
+    const cards = gamesCards([two, three]);
+    expect(cards.map(c => c.friend.name)).toEqual(['Charlie']);
+    expect(cards[0].at).toBe(5);
+    expect(gamesHeadline(cards[0], 'Charlie')).toBe('Charlie reached level 6 in Gravity, a new best!');
+  });
+});

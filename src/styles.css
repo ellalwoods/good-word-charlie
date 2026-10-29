@@ -929,3 +929,52 @@ ol.welcome-list { padding-left: 1.3em; }
 .wordle-reveal .example { margin: 0 0 16px; }
 .games-help { display: flex; justify-content: center; margin-top: 18px; }
 .games-help .chip-text { background: transparent; box-shadow: none; border-style: dashed; }
+
+/* ---------- The day's games card (Friends page) ---------- */
+
+.games-card .hw { margin-bottom: 12px; font-size: 1.6rem; line-height: 1.1; }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tile { position: relative; display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 8px 8px 9px; border: var(--line); background: var(--card); }
+.tile .name { font: 700 0.5625rem/1.2 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.tile .val { font: 400 1.35rem/1 var(--serif); font-variant-numeric: tabular-nums; }
+.tile .val small { margin-left: 2px; font: 700 0.55rem/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; }
+.mini { display: grid; gap: 2px; width: fit-content; }
+.mini div { display: grid; gap: 2px; }
+.mini i, .sym-wordle i { width: 9px; height: 9px; border: 1px solid var(--ink); background: #cfcabd; }
+.mini .g, .sym-wordle .g { background: var(--right); }
+.mini .y, .sym-wordle .y { background: var(--yellow); }
+.fuseline { position: relative; height: 10px; border: 1.5px solid var(--ink); background: var(--card); }
+.fuseline b { position: absolute; inset: 0 auto 0 0; background: repeating-linear-gradient(90deg, #ff7a1a 0 4px, var(--yellow) 4px 7px); }
+.sparks { min-height: 1em; color: var(--pink); font-size: 0.7rem; letter-spacing: 1px; }
+.ladder { display: flex; align-items: flex-end; gap: 2px; height: 26px; }
+.ladder i { flex: 1; border: 1.5px solid var(--ink); background: var(--card); }
+.ladder i.on { background: #7c4dff; }
+.ladder i.on.beyond { background: var(--pink); }
+.pb {
+  position: absolute; top: -11px; right: -6px; z-index: 2; padding: 3px 6px 2px;
+  border: 2px solid #e5342b; background: var(--card); color: #e5342b; transform: rotate(6deg);
+  font: 700 0.55rem/1.1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.games-card-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; }
+.games-card-foot .cheered { margin: 0; }
+
+/* ---------- Yesterday's winners (Games page) ---------- */
+
+.winners { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.win { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+.whead { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.win .gname { font: 700 0.55rem/1.2 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; text-align: center; }
+.sym { display: grid; place-items: center; height: 20px; }
+.sym-wordle { display: grid; grid-template-columns: repeat(3, 6px); gap: 1.5px; }
+.sym-wordle i { width: 6px; height: 6px; }
+.sym-fuse { position: relative; width: 34px; height: 6px; border: 1.5px solid var(--ink); background: repeating-linear-gradient(90deg, #ff7a1a 0 3px, var(--yellow) 3px 5px); }
+.sym-fuse::after { content: "✷"; position: absolute; right: -8px; top: -9px; color: var(--pink); font-size: 0.85rem; }
+.sym-gravity { display: flex; align-items: flex-end; gap: 1.5px; height: 16px; }
+.sym-gravity i { width: 4px; border: 1px solid var(--ink); background: #7c4dff; }
+.sym-gravity i:nth-child(n+4) { background: var(--pink); }
+.wrow { display: flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; }
+.wrow .avatar { flex: none; width: 26px; height: 26px; font-size: 1rem; }
+.wtext { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.win .wname { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 0.9rem/1.1 var(--sans); }
+.win .wscore { font: 700 0.6rem/1.2 var(--mono); }
+.win.mine .wname { align-self: flex-start; padding: 0 4px; background: var(--yellow); }

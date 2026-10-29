@@ -1,3 +1,4 @@
+import { gamesCardId, gamesCards } from './games';
 import type { State } from './types';
 
 /** date -> key -> when it was tapped (negative once untapped). */
@@ -87,6 +88,7 @@ export function news(friends: Friend[], now: number): string[] {
   const recent = (t: number) => t > 0 && now - t < FRESH_FOR;
   return friends.filter(f => !f.mine).flatMap(f => [
     ...uses([f]).filter(u => isFresh(u, now)).map(useId),
+    ...gamesCards([f]).filter(c => now - c.at < FRESH_FOR).map(gamesCardId),
     ...(me ? Object.entries(f.cheers ?? {}).flatMap(([date, keys]) => Object.entries(keys)
       .filter(([k, t]) => recent(t) && k.startsWith(`${me.name}:`))
       .map(([k]) => `cheer:${f.name}:${date}:${k}`)) : []),
