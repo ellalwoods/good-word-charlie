@@ -30,7 +30,7 @@ const GAMES: { id: GameId; title: string; band: string; blurb: string }[] = [
   { id: 'fuse', title: 'The Fuse', band: 'c-yellow',
     blurb: 'Answer as many questions as you can before the fuse burns out. Before each one, bet how sure you are: ×1, ×2 or ×3. A bigger bet wins more points if you’re right, but burns more fuse if you’re wrong. Right answers add a little time back. Questions use words from your Lexicon until you reach 200 points, then any word in the bank.' },
   { id: 'gravity', title: 'Gravity', band: 'c-violet',
-    blurb: 'Definitions fall towards the ground. Match the right word to each definition before it lands. Levels 1 to 4 use only words from your Lexicon, and get faster quickly. At level 5 it slows down a little, but words can come from the whole word bank, including ones you haven’t met yet. Three lives: a definition that lands, or a wrong match, costs one.' },
+    blurb: 'Definitions fall towards the ground. Match the right word to each definition before it lands. Levels 1 to 4 use only words from your Lexicon, and get faster quickly. At level 5 it slows down a little, but words can come from the whole word bank, including ones you haven’t met yet. If you let a definition land or match it incorrectly, you lose a life.' },
 ];
 
 const showScore = (game: GameId, r: GameResult) =>
