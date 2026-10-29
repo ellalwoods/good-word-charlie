@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { colorOf, type Friend } from '../lib/friends';
-import { leaderboard, playedToday, type GameId, type GameResult } from '../lib/games';
+import { dailyWordle, leaderboard, playedToday, type GameId, type GameResult } from '../lib/games';
+import { POS_LABEL } from './WordCard';
 import type { State, Word } from '../lib/types';
 import { Avatar } from './Friends';
 import { Fuse } from './games/Fuse';
@@ -23,9 +24,9 @@ export const GAMES_IN_PROGRESS = true;
 
 const GAMES: { id: GameId; title: string; band: string; blurb: string }[] = [
   { id: 'wordle', title: 'Good Wordle', band: 'c-green',
-    blurb: 'Guess the hidden word in six tries. The clue is its meaning; the tiles show which letters are right. Everyone gets the same word, from the whole bank.' },
+    blurb: 'The classic game you know, with words you probably don’t. Six guesses; the clue is the word’s meaning. Everyone gets the same word each day.' },
   { id: 'fuse', title: 'The Fuse', band: 'c-yellow',
-    blurb: 'A lit fuse and a stack of questions. Bet ×1, ×2 or ×3 on each. Right answers add fuse; wrong ones burn it, harder the more you bet. Your words first, then the whole bank once you pass 200 points.' },
+    blurb: 'Answer as many questions as you can before the fuse burns out. Before each one, bet how sure you are: ×1, ×2 or ×3. A bigger bet wins more points if you’re right, but burns more fuse if you’re wrong. Right answers add a little time back. Questions use words from your Lexicon until you reach 200 points, then any word in the bank.' },
   { id: 'gravity', title: 'Gravity', band: 'c-violet',
     blurb: 'Definitions fall towards the ground. Match the right word to each definition before it lands. Levels 1 to 4 use only words from your Lexicon, and get faster quickly. At level 5 it slows down a little, but words can come from the whole word bank, including ones you haven’t met yet. Three lives: a definition that lands, or a wrong match, costs one.' },
 ];
@@ -46,6 +47,24 @@ function NextGame() {
   const [, tick] = useState(0);
   useEffect(() => { const t = setInterval(() => tick(n => n + 1), 30000); return () => clearInterval(t); }, []);
   return <>{untilNext()}</>;
+}
+
+/** After Good Wordle: the word and what it means, then on to the leaderboard when they're ready. */
+function WordleReveal({ word, result, onNext }: { word: Word; result: GameResult; onNext: () => void }) {
+  const won = result.score <= 6;
+  return (
+    <article className={`card pos-${word.pos} wordle-reveal`}>
+      <div className="band"><span>{won ? `Solved in ${result.score} of 6` : 'Not this time'}</span><span>Today’s word</span></div>
+      <div className="ruled">
+        <p className="tag">{won ? 'Good word!' : 'The word was'}</p>
+        <h3 className="hw reveal-word">{word.word}</h3>
+        <p className="pron">{POS_LABEL[word.pos]} · /{word.pron}/</p>
+        <p className="sense">{word.definition}</p>
+        <p className="example">{word.example}</p>
+        <button type="button" className="btn" onClick={onNext}>See the leaderboard</button>
+      </div>
+    </article>
+  );
 }
 
 function Board({ game, state, date, friends }: { game: GameId; state: State; date: string; friends: Friend[] | null }) {
@@ -77,6 +96,8 @@ function Board({ game, state, date, friends }: { game: GameId; state: State; dat
 export function Games({ state, bank, date, friends, unlocked, onResult, onPractise }: Props) {
   const [open, setOpen] = useState<GameId | null>(null);
   const [past, setPast] = useState(false);
+  // Good Wordle shows the word and its meaning first; the leaderboard waits until they're ready.
+  const [reveal, setReveal] = useState(false);
   const isElla = (state.name?.value ?? '').trim().toLowerCase() === 'ella';
 
   if (GAMES_IN_PROGRESS && !past) {
@@ -101,16 +122,19 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
   if (open) {
     const g = GAMES.find(x => x.id === open)!;
     const result = playedToday(state, open, date);
-    const finish = (r: GameResult) => onResult(open, r);
+    const finish = (r: GameResult) => { onResult(open, r); if (open === 'wordle') setReveal(true); };
     return (
       <section className="sync games">
         <div><button type="button" className="chip chip-quiet" onClick={() => setOpen(null)}>← Games</button></div>
-        {result ? (
+        {result && open === 'wordle' && reveal ? (
+          <WordleReveal word={dailyWordle(bank, date)} result={result} onNext={() => { setReveal(false); window.scrollTo(0, 0); }} />
+        ) : result ? (
           <>
             <article className={`card ${g.band} game-card`}>
               <div className="band"><span>{g.title}</span><span>Played today ✓</span></div>
               <div className="ruled">
                 <p className="game-result">{showScore(open, result)}</p>
+                {open === 'wordle' && <p className="sense">Today’s word: <i>{dailyWordle(bank, date).word}</i>. {dailyWordle(bank, date).definition}</p>}
                 <p className="small-print"><NextGame /></p>
               </div>
             </article>

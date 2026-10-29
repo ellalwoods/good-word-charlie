@@ -46,8 +46,8 @@ export function seeded(seed: string): () => number {
 
 export const WORDLE_TRIES = 6;
 
-/** Words that can be the answer: plain letters, 5 to 8 long. */
-export const wordleWords = (bank: Word[]) => bank.filter(w => /^[a-z]{5,8}$/.test(w.word));
+/** Words that can be the answer: plain letters, 5 or 6 long (shorter words make a fairer puzzle). */
+export const wordleWords = (bank: Word[]) => bank.filter(w => /^[a-z]{5,6}$/.test(w.word));
 
 /** Today's word: the same for everyone, from the whole bank. */
 export function dailyWordle(bank: Word[], date: string): Word {
