@@ -112,3 +112,18 @@ describe('new game countdown', () => {
     expect(untilNext(new Date(2026, 9, 29, 23, 59, 30))).toBe('New game in 1 minute');
   });
 });
+
+describe('resetting today’s games (testing)', () => {
+  it('clears them on every device, without bringing old results back', async () => {
+    const { resetGames } = await import('./games');
+    const phone = saveResult(fresh(), 'wordle', D, { at: Date.now() - 1000, score: 4 });
+    const laptop = phone;                                   // the laptop synced the result earlier
+    const reset = resetGames(phone, D);
+    expect(reset.games?.[D]).toBeUndefined();
+    expect(merge(reset, laptop).games?.[D]).toBeUndefined();
+    expect(merge(laptop, reset).games?.[D]).toBeUndefined();
+    // A new go after the reset counts.
+    const again = saveResult(merge(reset, laptop), 'wordle', D, { at: Date.now() + 1000, score: 3 });
+    expect(merge(again, laptop).games?.[D]?.wordle?.score).toBe(3);
+  });
+});

@@ -40,15 +40,22 @@ export function merge(a: State, b: State): State {
   const name = latestOf(a.name, b.name);
   if (name) out.name = name;
   if (a.welcomed || b.welcomed) out.welcomed = true;
+  // A reset (for testing) wipes that day's results from before it, on every device.
+  const gamesReset: Record<string, number> = {};
+  for (const d of keys(a.gamesReset ?? {}, b.gamesReset ?? {})) gamesReset[d] = Math.max(a.gamesReset?.[d] ?? 0, b.gamesReset?.[d] ?? 0);
+  if (Object.keys(gamesReset).length) out.gamesReset = gamesReset;
   // Each game is once a day: if two devices both played, the earlier go stands.
   const games: NonNullable<State['games']> = {};
   for (const d of keys(a.games ?? {}, b.games ?? {})) {
     const x = a.games?.[d] ?? {}, y = b.games?.[d] ?? {};
-    games[d] = {};
+    const live = <T extends { at: number },>(r: T | undefined) => (r && r.at > (gamesReset[d] ?? 0) ? r : undefined);
+    const day: NonNullable<State['games']>[string] = {};
     for (const g of keys(x, y) as ('wordle' | 'fuse' | 'gravity')[]) {
-      const p = x[g], q = y[g];
-      games[d][g] = !p || !q ? (p ?? q) : p.at !== q.at ? (p.at < q.at ? p : q) : (p.score >= q.score ? p : q);
+      const p = live(x[g]), q = live(y[g]);
+      const pick = !p || !q ? (p ?? q) : p.at !== q.at ? (p.at < q.at ? p : q) : (p.score >= q.score ? p : q);
+      if (pick) day[g] = pick;
     }
+    if (Object.keys(day).length) games[d] = day;
   }
   if (Object.keys(games).length) out.games = games;
   const sound = !a.sound || !b.sound ? (a.sound ?? b.sound)

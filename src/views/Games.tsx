@@ -17,6 +17,8 @@ interface Props {
   unlocked: boolean;
   onResult: (game: GameId, result: GameResult) => void;
   onPractise: () => void;
+  /** Testing only: lets Ella play today's games again. */
+  onReset: () => void;
 }
 
 /** While the games are being built they sit behind a notice; only Ella can step past it to test. */
@@ -93,7 +95,7 @@ function Board({ game, state, date, friends }: { game: GameId; state: State; dat
   );
 }
 
-export function Games({ state, bank, date, friends, unlocked, onResult, onPractise }: Props) {
+export function Games({ state, bank, date, friends, unlocked, onResult, onPractise, onReset }: Props) {
   const [open, setOpen] = useState<GameId | null>(null);
   const [past, setPast] = useState(false);
   // Good Wordle shows the word and its meaning first; the leaderboard waits until they're ready.
@@ -156,7 +158,14 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
 
   return (
     <section className="sync games">
-      {GAMES_IN_PROGRESS && <p className="slip">Testing mode: only you can see the games until the “works in progress” notice comes off.</p>}
+      {GAMES_IN_PROGRESS && (
+        <div className="slip">
+          <p>Testing mode: only you can see the games until the “works in progress” notice comes off.</p>
+          {isElla && GAMES.some(g => playedToday(state, g.id, date)) && (
+            <button type="button" className="chip" onClick={onReset}>Reset my games today</button>
+          )}
+        </div>
+      )}
       {!unlocked && (
         <article className="card">
           <div className="band board-band"><span>Locked</span><span>Practice first</span></div>

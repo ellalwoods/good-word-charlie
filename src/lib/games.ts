@@ -18,6 +18,13 @@ export const lowWins = (g: GameId) => g === 'wordle';
 /** Today's result for a game, if it's been played (each game is once a day). */
 export const playedToday = (s: State, game: GameId, date: string): GameResult | undefined => s.games?.[date]?.[game];
 
+/** Clears today's results so the games can be played again (for testing). */
+export function resetGames(s: State, date: string): State {
+  const games = { ...s.games };
+  delete games[date];
+  return { ...s, games, gamesReset: { ...s.gamesReset, [date]: Date.now() } };
+}
+
 export function saveResult(s: State, game: GameId, date: string, result: GameResult): State {
   if (playedToday(s, game, date)) return s;
   return { ...s, games: { ...s.games, [date]: { ...s.games?.[date], [game]: result } } };

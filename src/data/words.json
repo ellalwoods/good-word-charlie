@@ -3201,7 +3201,7 @@
         "answer": "gruelling",
         "distractors": [
           "notional",
-          "workmanlike",
+          "magnanimous",
           "abject"
         ]
       },
@@ -9286,7 +9286,7 @@
         "distractors": [
           "Saying little, often with dry understatement.",
           "Slow and thorough, leaving nothing to chance.",
-          "Gets the job done without any flair."
+          "Big enough to be gracious to those who lost or wronged you."
         ]
       },
       {
@@ -14867,7 +14867,7 @@
         "distractors": [
           "Short and to the point.",
           "Bogus; passed off as real when it is not.",
-          "Gets the job done without any flair."
+          "Big enough to be gracious to those who lost or wronged you."
         ]
       },
       {
@@ -21138,7 +21138,7 @@
         "prompt": "arcane",
         "answer": "cryptic",
         "distractors": [
-          "solid",
+          "forgiving",
           "commonplace",
           "after the fact"
         ]
@@ -32551,7 +32551,7 @@
         "distractors": [
           "Seeing only what is straight ahead.",
           "Stuck in, or belonging to, another era.",
-          "Gets the job done without any flair."
+          "Big enough to be gracious to those who lost or wronged you."
         ]
       },
       {
@@ -32824,7 +32824,7 @@
         "distractors": [
           "cool",
           "punishing",
-          "solid"
+          "forgiving"
         ]
       },
       {
@@ -35582,89 +35582,88 @@
     "synonym": "tumbledown"
   },
   {
-    "word": "workmanlike",
+    "word": "magnanimous",
     "pos": "adjective",
-    "pron": "WERK-mun-lyke",
-    "definition": "Efficient and competent but not inspired.",
-    "example": "The team put in a workmanlike performance to grind out the win.",
+    "pron": "mag-NAN-ih-mus",
+    "definition": "Generous or kind, especially towards a rival or someone less powerful.",
+    "example": "She was magnanimous in victory and praised her opponent's courage.",
     "groups": [
-      "competent",
-      "dull"
+      "generous"
     ],
     "questions": [
       {
         "type": "pick-meaning",
-        "prompt": "workmanlike",
-        "answer": "Gets the job done without any flair.",
+        "prompt": "magnanimous",
+        "answer": "Big enough to be gracious to those who lost or wronged you.",
         "distractors": [
-          "Still shapeless and at its earliest, roughest stage.",
-          "Bad to breathe in, or just plain vile.",
-          "Dead and gone, or no longer working."
+          "Worn out from being said too many times.",
+          "Grimy and wretched, or grubbily immoral.",
+          "So poor it is a real shame."
         ]
       },
       {
         "type": "pick-word",
-        "prompt": "Gets the job done without any flair.",
-        "answer": "workmanlike",
+        "prompt": "Big enough to be gracious to those who lost or wronged you.",
+        "answer": "magnanimous",
         "distractors": [
-          "execrable",
-          "wholesale",
-          "haphazard"
+          "trite",
+          "squalid",
+          "lamentable"
         ]
       },
       {
         "type": "synonym",
-        "prompt": "workmanlike",
-        "answer": "solid",
+        "prompt": "magnanimous",
+        "answer": "forgiving",
         "distractors": [
-          "atrocious",
-          "lavish",
-          "prickly"
+          "clichéd",
+          "grimy",
+          "dreadful"
         ]
       },
       {
         "type": "rewrite",
-        "prompt": "The novel is {competent but uninspired}, with none of the spark of her first.",
-        "answer": "workmanlike",
+        "prompt": "The champion was {gracious and big-hearted} towards the team she had beaten.",
+        "answer": "magnanimous",
         "distractors": [
-          "pyrrhic",
-          "derelict",
-          "copious"
+          "trite",
+          "meagre",
+          "squalid"
         ]
       },
       {
         "type": "gap",
-        "prompt": "The builder did a ___ job: nothing fancy, but it will last.",
-        "answer": "workmanlike",
+        "prompt": "It was ___ of him to share the credit with his old enemy.",
+        "answer": "magnanimous",
         "distractors": [
-          "nascent",
-          "myriad",
-          "sundry"
+          "meagre",
+          "trite",
+          "lamentable"
         ]
       },
       {
         "type": "gap",
-        "prompt": "After a ___ first half, the side came alive after the break.",
-        "answer": "workmanlike",
+        "prompt": "The ___ landlord let the struggling family stay rent-free for a month.",
+        "answer": "magnanimous",
         "distractors": [
-          "pyrrhic",
-          "myriad",
-          "sundry"
+          "squalid",
+          "meagre",
+          "lamentable"
         ]
       },
       {
         "type": "usage",
-        "prompt": "workmanlike",
-        "answer": "The team's workmanlike win was enough to stay top of the ladder.",
+        "prompt": "magnanimous",
+        "answer": "In a magnanimous gesture, the winner invited his rival to share the stage.",
         "distractors": [
-          "Her workmanlike masterpiece dazzled the critics with genius.",
-          "The workmanlike effort was sloppy and incompetent.",
-          "His workmanlike daydreaming got nothing done."
+          "The magnanimous bully refused to let anyone else play.",
+          "He gave a magnanimous sneer and kept all the prize money.",
+          "Her magnanimous grudge against her sister lasted twenty years."
         ]
       }
     ],
-    "testDefinition": "Gets the job done without any flair.",
-    "synonym": "solid"
+    "testDefinition": "Big enough to be gracious to those who lost or wronged you.",
+    "synonym": "forgiving"
   },
   {
     "word": "effusive",
@@ -38399,7 +38398,7 @@
         "answer": "ingrained",
         "distractors": [
           "execrable",
-          "workmanlike",
+          "magnanimous",
           "protracted"
         ]
       },
@@ -39595,7 +39594,7 @@
         "answer": "alleged",
         "distractors": [
           "outrageous",
-          "solid",
+          "forgiving",
           "clear"
         ]
       },
@@ -39744,7 +39743,7 @@
         "prompt": "token",
         "answer": "A small gesture made mainly for show.",
         "distractors": [
-          "Gets the job done without any flair.",
+          "Big enough to be gracious to those who lost or wronged you.",
           "Contemptuous enough to make you shrivel.",
           "Exacting about doing things just so."
         ]
