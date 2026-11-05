@@ -90,16 +90,48 @@ function ShuffleTest({ met, due, onTest }: { met: number; due: number; onTest: P
   );
 }
 
+type Sort = 'az' | 'newest' | 'weakest' | 'due';
+const SORTS: [Sort, string][] = [['az', 'A–Z'], ['newest', 'Newest'], ['weakest', 'Weakest'], ['due', 'Due soonest']];
+const SORT_KEY = 'good-word-charlie-lexicon-sort';
+const readSort = (): Sort => { try { const s = localStorage.getItem(SORT_KEY); return SORTS.some(([k]) => k === s) ? (s as Sort) : 'az'; } catch { return 'az'; } };
+
 export function Lexicon({ state, bank, number, date, onTest, used, onUsed }: Props) {
   const [open, setOpen] = useState<string | null>(null);
-  const words = bank.filter(w => state.cards[w.word]).sort((a, b) => a.word.localeCompare(b.word));
+  const [query, setQuery] = useState('');
+  const [sort, setSortState] = useState<Sort>(readSort);
+  const setSort = (s: Sort) => { setSortState(s); try { localStorage.setItem(SORT_KEY, s); } catch { /* storage blocked */ } };
+  const met = bank.filter(w => state.cards[w.word]);
 
-  if (!words.length) return <p className="slip">Words appear here once you’ve met them.</p>;
+  if (!met.length) return <p className="slip">Words appear here once you’ve met them.</p>;
+
+  // When each word was first dealt, for "Newest".
+  const metOn: Record<string, string> = {};
+  for (const [d, ws] of Object.entries(state.days)) for (const w of ws) if (!metOn[w] || d < metOn[w]) metOn[w] = d;
+  const q = query.trim().toLowerCase();
+  const words = met
+    .filter(w => !q || w.word.includes(q) || w.definition.toLowerCase().includes(q) || w.synonym.toLowerCase().includes(q))
+    .sort((a, b) => {
+      const ca = state.cards[a.word], cb = state.cards[b.word];
+      if (sort === 'newest') return (metOn[b.word] ?? '').localeCompare(metOn[a.word] ?? '') || a.word.localeCompare(b.word);
+      if (sort === 'weakest') return ca.level - cb.level || ca.due.localeCompare(cb.due) || a.word.localeCompare(b.word);
+      if (sort === 'due') return ca.due.localeCompare(cb.due) || a.word.localeCompare(b.word);
+      return a.word.localeCompare(b.word);
+    });
 
   return (
     <section>
-      <ShuffleTest met={words.length} due={dueForShuffle(state, bank, date).length} onTest={onTest} />
-      <p className="lede">{words.length} word{words.length === 1 ? '' : 's'} so far. The squares show how firmly each one is fixed; tap a word for its card.</p>
+      <ShuffleTest met={met.length} due={dueForShuffle(state, bank, date).length} onTest={onTest} />
+      <p className="lede">{met.length} word{met.length === 1 ? '' : 's'} so far. The squares show how firmly each one is fixed; tap a word for its card.</p>
+      <div className="lex-tools">
+        <input className="field lex-search" type="search" value={query} onChange={e => setQuery(e.target.value)}
+          placeholder="Search words or meanings" aria-label="Search your words" autoCapitalize="off" spellCheck={false} />
+        <div className="chips" role="group" aria-label="Sort by">
+          {SORTS.map(([k, label]) => (
+            <button key={k} type="button" className="chip chip-quiet" aria-pressed={sort === k} onClick={() => setSort(k)}>{label}</button>
+          ))}
+        </div>
+        {q && <p className="small-print">{words.length ? `${words.length} match${words.length === 1 ? '' : 'es'}` : `Nothing matches “${query.trim()}”.`}</p>}
+      </div>
       <ul className="lex">
         {words.map(w => {
           const c = state.cards[w.word];

@@ -190,3 +190,20 @@ describe('Crossword', () => {
     expect(crosswordUnlocked(s, bank)).toBe(true);    // 30
   });
 });
+
+describe('leaving a game half-way', () => {
+  it('keeps the latest progress across devices, and drops it once the game is finished', async () => {
+    const { saveProgress, savedProgress } = await import('./games');
+    const phone = saveProgress(fresh(), 'fuse', D, { fuse: 12, score: 80 });
+    expect(savedProgress(phone, 'fuse', D)).toEqual({ fuse: 12, score: 80 });
+    await new Promise(r => setTimeout(r, 5));
+    const later = saveProgress(phone, 'fuse', D, { fuse: 9, score: 120 });
+    expect(savedProgress(merge(phone, later), 'fuse', D)).toEqual({ fuse: 9, score: 120 });
+    expect(savedProgress(merge(later, phone), 'fuse', D)).toEqual({ fuse: 9, score: 120 });
+    const finished = saveResult(later, 'fuse', D, { at: Date.now(), score: 150 });
+    expect(savedProgress(finished, 'fuse', D)).toBeUndefined();
+    // A device that still had the half-way save can't bring it back.
+    expect(savedProgress(merge(finished, later), 'fuse', D)).toBeUndefined();
+    expect(saveProgress(finished, 'fuse', D, { fuse: 30 })).toBe(finished);
+  });
+});

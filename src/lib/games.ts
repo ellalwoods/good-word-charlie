@@ -13,6 +13,7 @@ export interface GameResult {
   grid?: string[];   // Good Wordle: each guess as colours only (g/y/x), never the letters
   sparks?: number;   // The Fuse: ×3 bets won
   best?: true;       // a new personal best (beats every earlier go at this game)
+  hints?: number;    // Crossword: letters revealed
 }
 
 /** Good Wordle ranks fewest guesses first; the others most points first. */
@@ -40,7 +41,19 @@ export function isPersonalBest(s: State, game: GameId, date: string, result: Gam
 export function saveResult(s: State, game: GameId, date: string, result: GameResult): State {
   if (playedToday(s, game, date)) return s;
   const r: GameResult = isPersonalBest(s, game, date, result) ? { ...result, best: true } : result;
-  return { ...s, games: { ...s.games, [date]: { ...s.games?.[date], [game]: r } } };
+  const playing = { ...s.playing, [date]: { ...s.playing?.[date] } };
+  delete playing[date][game];
+  return { ...s, games: { ...s.games, [date]: { ...s.games?.[date], [game]: r } }, playing };
+}
+
+/** A game left half-way today: paused exactly where it was, so leaving can't buy a fresh start. */
+export const savedProgress = (s: State, game: GameId, date: string): unknown =>
+  playedToday(s, game, date) ? undefined : s.playing?.[date]?.[game]?.data;
+
+export function saveProgress(s: State, game: GameId, date: string, data: unknown): State {
+  if (playedToday(s, game, date)) return s;
+  // Only today's games can be resumed; older ones are dropped.
+  return { ...s, playing: { [date]: { ...s.playing?.[date], [game]: { at: Date.now(), data } } } };
 }
 
 // ---------- The day's games card on the Friends page ----------

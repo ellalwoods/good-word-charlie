@@ -59,6 +59,20 @@ export function merge(a: State, b: State): State {
     if (Object.keys(day).length) games[d] = day;
   }
   if (Object.keys(games).length) out.games = games;
+  // Games left half-way: the latest save wins, and a finished game drops its saved progress.
+  const playing: NonNullable<State['playing']> = {};
+  for (const d of keys(a.playing ?? {}, b.playing ?? {})) {
+    const x = a.playing?.[d] ?? {}, y = b.playing?.[d] ?? {};
+    const day: NonNullable<State['playing']>[string] = {};
+    for (const g of keys(x, y) as ('wordle' | 'fuse' | 'gravity' | 'crossword')[]) {
+      if (games[d]?.[g]) continue;
+      const p = x[g], q = y[g];
+      const pick = !p || !q ? (p ?? q) : p.at >= q.at ? p : q;
+      if (pick) day[g] = pick;
+    }
+    if (Object.keys(day).length) playing[d] = day;
+  }
+  if (Object.keys(playing).length) out.playing = playing;
   const sound = !a.sound || !b.sound ? (a.sound ?? b.sound)
     : a.sound.at !== b.sound.at ? (a.sound.at > b.sound.at ? a.sound : b.sound) : (a.sound.on ? b.sound : a.sound);
   if (sound) out.sound = sound;

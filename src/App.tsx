@@ -14,7 +14,7 @@ import { usable } from './lib/validate';
 import { Friends } from './views/Friends';
 import { Games, Unlocked } from './views/Games';
 import { crosswordUnlocked } from './lib/crossword';
-import { saveResult } from './lib/games';
+import { saveProgress, saveResult } from './lib/games';
 import { Lexicon } from './views/Lexicon';
 import { Practice } from './views/Practice';
 import { Sync as SyncView, syncLabel } from './views/Sync';
@@ -253,6 +253,7 @@ export default function App() {
           ) : tab === 'games' ? (
             <Games state={state} bank={bank} date={date} friends={friends} unlocked={!!state.done[date]}
               onPractise={() => go('today')}
+              onProgress={(g, d) => update(saveProgress(latest(), g, date, d))}
               onResult={(g, r) => { update(saveResult(latest(), g, date, r)); setTimeout(loadFriends, 1500); }} />
           ) : tab === 'friends' ? (
             <Friends snap={snap} state={state} bank={bank} date={date} friends={friends} failed={friendsFailed}

@@ -7,10 +7,14 @@ const ROWS = ['qwertyuiop', 'asdfghjkl', '⏎zxcvbnm⌫'];
 const RANK = { x: 1, y: 2, g: 3 } as const;
 
 /** Good Wordle: today's word (the same for everyone), its meaning as the clue, six guesses. */
-export function Wordle({ bank, date, onDone }: { bank: Word[]; date: string; onDone: (r: GameResult) => void }) {
+export function Wordle({ bank, date, onDone, saved, onSave }: {
+  bank: Word[]; date: string; onDone: (r: GameResult) => void;
+  saved?: unknown; onSave: (data: unknown) => void;
+}) {
   const target = dailyWordle(bank, date);
   const len = target.word.length;
-  const [guesses, setGuesses] = useState<string[]>([]);
+  // Guesses so far come back if they left half-way.
+  const [guesses, setGuesses] = useState<string[]>(() => (saved as { guesses?: string[] } | undefined)?.guesses ?? []);
   const [cur, setCur] = useState('');
   const [msg, setMsg] = useState('');
   const over = guesses.includes(target.word) || guesses.length >= WORDLE_TRIES;
@@ -27,6 +31,7 @@ export function Wordle({ bank, date, onDone }: { bank: Word[]; date: string; onD
       if (cur.length < len) { setMsg(`Needs ${len} letters`); return; }
       const next = [...guesses, cur];
       setGuesses(next); setCur('');
+      if (!(cur === target.word || next.length >= WORDLE_TRIES)) onSave({ guesses: next });
       const won = cur === target.word;
       if (won || next.length >= WORDLE_TRIES) {
         play(won ? 'finish' : 'wrong');

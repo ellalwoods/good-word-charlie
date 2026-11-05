@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { colorOf, type Friend } from '../lib/friends';
-import { dailyWordle, leaderboard, playedToday, type GameId, type GameResult } from '../lib/games';
+import { dailyWordle, leaderboard, playedToday, savedProgress, type GameId, type GameResult } from '../lib/games';
 import { POS_LABEL } from './WordCard';
 import { addDays, shortDate } from '../lib/dates';
 import type { State, Word } from '../lib/types';
@@ -22,6 +22,8 @@ interface Props {
   /** Today's practice is finished, so the games are open. */
   unlocked: boolean;
   onResult: (game: GameId, result: GameResult) => void;
+  /** Saves a game left half-way, paused. */
+  onProgress: (game: GameId, data: unknown) => void;
   onPractise: () => void;
 }
 
@@ -46,7 +48,7 @@ const HOW: Record<GameId, string[]> = {
 };
 
 const showScore = (game: GameId, r: GameResult) =>
-  game === 'crossword' ? `${Math.floor(r.score / 60)}:${String(r.score % 60).padStart(2, '0')}` : game === 'wordle' ? `${r.score > 6 ? 'X' : r.score}/6` : game === 'gravity' ? `${r.score} pts · level ${r.level ?? 1}` : `${r.score} pts`;
+  game === 'crossword' ? `${Math.floor(r.score / 60)}:${String(r.score % 60).padStart(2, '0')}${r.hints ? ` · ${r.hints} hint${r.hints === 1 ? '' : 's'}` : ''}` : game === 'wordle' ? `${r.score > 6 ? 'X' : r.score}/6` : game === 'gravity' ? `${r.score} pts · level ${r.level ?? 1}` : `${r.score} pts`;
 
 /** The moment a new game opens up: shown once, over everything. */
 export function Unlocked({ onPlay, onLater }: { onPlay: () => void; onLater: () => void }) {
@@ -164,7 +166,7 @@ function Board({ game, state, date, friends }: { game: GameId; state: State; dat
   );
 }
 
-export function Games({ state, bank, date, friends, unlocked, onResult, onPractise }: Props) {
+export function Games({ state, bank, date, friends, unlocked, onResult, onProgress, onPractise }: Props) {
   const [open, setOpen] = useState<GameId | null>(null);
   // Good Wordle shows the word and its meaning first; the leaderboard waits until they're ready.
   const [reveal, setReveal] = useState(false);
@@ -177,6 +179,7 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
   if (open) {
     const g = GAMES.find(x => x.id === open)!;
     const result = playedToday(state, open, date);
+    const saved = savedProgress(state, open, date);
     const finish = (r: GameResult) => { onResult(open, r); if (open === 'wordle') setReveal(true); };
     return (
       <section className="sync games">
@@ -205,10 +208,12 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
               <article className={`card ${g.band} game-card ready-card`}>
                 <div className="band"><span>{g.title}</span><span>Once a day</span></div>
                 <div className="ruled">
-                  <p className="tag">Ready?</p>
+                  <p className="tag">{saved ? 'Paused' : 'Ready?'}</p>
                   <h3 className="hw" id="ready-title">{g.title}</h3>
-                  <ul className="ready-how">{HOW[open].map(line => <li key={line}>{line}</li>)}</ul>
-                  <button type="button" className="btn ready-go" data-sound="own" onClick={() => { play('levelup'); setGoing(true); window.scrollTo(0, 0); }}>Go!</button>
+                  {saved
+                    ? <p className="sense">You left this one part-way. It’s paused exactly where you were{open === 'wordle' ? '' : ', clock included'}.</p>
+                    : <ul className="ready-how">{HOW[open].map(line => <li key={line}>{line}</li>)}</ul>}
+                  <button type="button" className="btn ready-go" data-sound="own" onClick={() => { play('levelup'); setGoing(true); window.scrollTo(0, 0); }}>{saved ? 'Resume' : 'Go!'}</button>
                   <button type="button" className="btn btn-quiet ready-back" onClick={() => setOpen(null)}>Not now</button>
                 </div>
               </article>
@@ -218,10 +223,10 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
           <article className={`card ${g.band} game-card`}>
             <div className="band"><span>{g.title}</span><span>Once a day</span></div>
             <div className="ruled">
-              {open === 'wordle' && <Wordle bank={bank} date={date} onDone={finish} />}
-              {open === 'fuse' && <Fuse state={state} bank={bank} onDone={finish} />}
-              {open === 'gravity' && <Gravity state={state} bank={bank} onDone={finish} />}
-              {open === 'crossword' && <Crossword state={state} bank={bank} date={date} who={state.name?.value || 'me'} onDone={finish} />}
+              {open === 'wordle' && <Wordle bank={bank} date={date} onDone={finish} saved={saved} onSave={d => onProgress(open, d)} />}
+              {open === 'fuse' && <Fuse state={state} bank={bank} onDone={finish} saved={saved} onSave={d => onProgress(open, d)} />}
+              {open === 'gravity' && <Gravity state={state} bank={bank} onDone={finish} saved={saved} onSave={d => onProgress(open, d)} />}
+              {open === 'crossword' && <Crossword state={state} bank={bank} date={date} who={state.name?.value || 'me'} onDone={finish} saved={saved} onSave={d => onProgress(open, d)} />}
             </div>
           </article>
         )}
@@ -261,14 +266,14 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
         const top = leaderboard(g.id, date, friends ?? [], { name: state.name?.value ?? '', color: state.name?.color ?? null, result })[0];
         return (
           <article key={g.id} className={`card ${g.band} game-card${unlocked ? '' : ' locked'}`}>
-            <div className="band"><span>Game {i + 1} of {GAMES.length}</span><span>{result ? 'Played today ✓' : unlocked ? 'Ready' : 'Locked'}</span></div>
+            <div className="band"><span>Game {i + 1} of {GAMES.length}</span><span>{result ? 'Played today ✓' : !unlocked ? 'Locked' : savedProgress(state, g.id, date) ? 'Paused' : 'Ready'}</span></div>
             <div className="ruled">
               <h3 className="hw">{g.title}</h3>
               <p className="sense">{g.blurb}</p>
               {top && <p className="tag game-top">Today’s #1: {top.mine ? 'You' : top.name} · {showScore(g.id, top.result)}</p>}
               <button type="button" className={`btn${result ? ' btn-quiet' : ''}`} disabled={!unlocked}
                 onClick={() => openGame(g.id)}>
-                {!unlocked ? 'Locked' : result ? 'See leaderboard' : 'Play'}
+                {!unlocked ? 'Locked' : result ? 'See leaderboard' : savedProgress(state, g.id, date) ? 'Resume' : 'Play'}
               </button>
             </div>
           </article>

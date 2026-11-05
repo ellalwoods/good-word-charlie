@@ -4,6 +4,7 @@ import {
   gravitySpeed, seeded, type GameResult,
 } from '../../lib/games';
 import { play } from '../../lib/sounds';
+import { useSaveOnLeave } from './useSaveOnLeave';
 import type { State, Word } from '../../lib/types';
 
 interface Card { id: number; word: Word; lane: number; depth: number; again: boolean; hit?: boolean }
@@ -15,12 +16,32 @@ const PAUSE_AT_BEYOND = 3500;   // ms of breather before words go beyond your ow
  * Three lives: a card that lands, or a wrong tap, turns red and costs one; that word comes
  * back later. Faster quickly up to level 5, then words go beyond yours and the pace eases.
  */
-export function Gravity({ state, bank, onDone }: { state: State; bank: Word[]; onDone: (r: GameResult) => void }) {
+interface Saved {
+  cards: { id: number; w: string; lane: number; depth: number; again: boolean }[]; again: string[];
+  nextId: number; score: number; lives: number; level: number; cleared: number; spawnIn: number; options: string[]; targetId: number;
+}
+
+export function Gravity({ state, bank, onDone, saved, onSave }: {
+  state: State; bank: Word[]; onDone: (r: GameResult) => void; saved?: unknown; onSave: (data: unknown) => void;
+}) {
   const rand = useRef(seeded(`gravity:${Date.now()}`)).current;
+  // A game left half-way comes back frozen exactly as it was: same cards, same heights, same lives.
+  const byWord = new Map(bank.map(w => [w.word, w]));
+  const was = saved as Saved | undefined;
   const g = useRef({
-    cards: [] as Card[], again: [] as Word[], nextId: 1, score: 0, lives: GRAVITY_LIVES, level: 1, cleared: 0,
-    spawnIn: 0.4, pausedUntil: 0, over: false, options: [] as string[], targetId: 0,
+    cards: (was?.cards ?? []).flatMap(c => (byWord.has(c.w) ? [{ id: c.id, word: byWord.get(c.w)!, lane: c.lane, depth: c.depth, again: c.again } as Card] : [])),
+    again: (was?.again ?? []).flatMap(w => (byWord.has(w) ? [byWord.get(w)!] : [])),
+    nextId: was?.nextId ?? 1, score: was?.score ?? 0, lives: was?.lives ?? GRAVITY_LIVES, level: was?.level ?? 1, cleared: was?.cleared ?? 0,
+    spawnIn: was?.spawnIn ?? 0.4, pausedUntil: 0, over: false, options: was?.options ?? ([] as string[]), targetId: was?.targetId ?? 0,
   });
+  useSaveOnLeave((): Saved => {
+    const s = g.current;
+    return {
+      cards: s.cards.filter(c => !c.hit).map(c => ({ id: c.id, w: c.word.word, lane: c.lane, depth: c.depth, again: c.again })),
+      again: s.again.map(w => w.word), nextId: s.nextId, score: s.score, lives: s.lives, level: s.level, cleared: s.cleared,
+      spawnIn: s.spawnIn, options: s.options, targetId: s.targetId,
+    };
+  }, onSave, () => g.current.over);
   const [, render] = useState(0);
   const [flash, setFlash] = useState('');
   const [breather, setBreather] = useState(false);
@@ -90,7 +111,7 @@ export function Gravity({ state, bank, onDone }: { state: State; bank: Word[]; o
       const s = g.current;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
-      if (!s.over && Date.now() >= s.pausedUntil) {
+      if (!s.over && !document.hidden && Date.now() >= s.pausedUntil) {
         const speed = gravitySpeed(s.level);
         for (const c of s.cards) {
           if (c.hit) continue;

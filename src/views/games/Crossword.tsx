@@ -2,21 +2,47 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { dailyCrossword, squares, type Entry } from '../../lib/crossword';
 import type { GameResult } from '../../lib/games';
 import { play } from '../../lib/sounds';
+import { useSaveOnLeave } from './useSaveOnLeave';
 import type { State, Word } from '../../lib/types';
 
 const ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm⌫'];
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
 /** Today's criss-cross of your own words. The clock runs from Go until the last word is right. */
-export function Crossword({ state, bank, date, who, onDone }: { state: State; bank: Word[]; date: string; who: string; onDone: (r: GameResult) => void }) {
+/** A hint reveals one letter of the word you're on; then there's a wait before the next. */
+export const HINT_WAIT = 7;
+
+interface Saved { fill: Record<string, string>; elapsed: number; hints: number; lastHint: number }
+
+export function Crossword({ state, bank, date, who, onDone, saved, onSave }: {
+  state: State; bank: Word[]; date: string; who: string; onDone: (r: GameResult) => void;
+  saved?: unknown; onSave: (data: unknown) => void;
+}) {
   const puzzle = useMemo(() => dailyCrossword(state, bank, date, who), [date, who]);
-  const [fill, setFill] = useState<Record<string, string>>({});
+  // A crossword left half-way comes back with its letters, and the clock carries on from where it paused.
+  const was = saved as Saved | undefined;
+  const [fill, setFill] = useState<Record<string, string>>(was?.fill ?? {});
+  const [hints, setHints] = useState(was?.hints ?? 0);
+  const [lastHint, setLastHint] = useState(was?.lastHint ?? -HINT_WAIT);   // in seconds on the clock
   const [cur, setCur] = useState<Entry | null>(() => puzzle?.entries.slice().sort((a, b) => a.num - b.num)[0] ?? null);
   const [pos, setPos] = useState(0);
-  const [secs, setSecs] = useState(0);
+  const [secs, setSecs] = useState(was?.elapsed ?? 0);
   const [flash, setFlash] = useState('');
-  const start = useRef(Date.now());
+  const start = useRef(Date.now() - (was?.elapsed ?? 0) * 1000);
   const done = useRef(false);
+  const elapsed = () => Math.floor((Date.now() - start.current) / 1000);
+
+  // The clock stops while the page is out of sight, and picks up from the same second.
+  useEffect(() => {
+    let away = 0;
+    const onVis = () => {
+      if (document.visibilityState === 'hidden') away = elapsed();
+      else start.current = Date.now() - away * 1000;
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, []);
+  useSaveOnLeave((): Saved => ({ fill, elapsed: elapsed(), hints, lastHint }), onSave, () => done.current);
 
   // A physical keyboard types too; the handler is refreshed each render below.
   const typeRef = useRef<(k: string) => void>(() => {});
@@ -31,7 +57,7 @@ export function Crossword({ state, bank, date, who, onDone }: { state: State; ba
   }, []);
 
   useEffect(() => {
-    const t = setInterval(() => { if (!done.current) setSecs(Math.floor((Date.now() - start.current) / 1000)); }, 250);
+    const t = setInterval(() => { if (!done.current && !document.hidden) setSecs(elapsed()); }, 250);
     return () => clearInterval(t);
   }, []);
 
@@ -73,7 +99,7 @@ export function Crossword({ state, bank, date, who, onDone }: { state: State; ba
       const score = Math.max(1, Math.round((Date.now() - start.current) / 1000));
       play('finish');
       setFlash(`Solved in ${clock(score)}!`);
-      setTimeout(() => onDone({ at: Date.now(), score }), 1200);
+      setTimeout(() => onDone({ at: Date.now(), score, hints }), 1200);
       return;
     }
     if (!was && solved(cur, next)) { play('right'); setFlash(`${cur.word.word}! ✓`); }
@@ -84,6 +110,27 @@ export function Crossword({ state, bank, date, who, onDone }: { state: State; ba
       const nxt = order.slice(order.indexOf(cur) + 1).concat(order).find(e => !solved(e, next));
       if (nxt) { setCur(nxt); setPos(Math.max(0, squares(nxt).findIndex(sq => !next[sq]))); }
     }
+  };
+
+  // A hint fills one square of the current word with its right letter: the first one that's empty or wrong.
+  const hintWait = Math.max(0, lastHint + HINT_WAIT - secs);
+  const hint = () => {
+    if (done.current || hintWait > 0) return;
+    const k = curSquares.findIndex((sq, i) => fill[sq] !== cur.word.word[i]);
+    if (k < 0) return;
+    const next = { ...fill, [curSquares[k]]: cur.word.word[k] };
+    setFill(next);
+    setHints(h => h + 1);
+    setLastHint(elapsed());
+    setPos(Math.min(k + 1, curSquares.length - 1));
+    if (entries.every(e => solved(e, next))) {
+      done.current = true;
+      const score = Math.max(1, elapsed());
+      play('finish');
+      setFlash(`Solved in ${clock(score)}!`);
+      setTimeout(() => onDone({ at: Date.now(), score, hints: hints + 1 }), 1200);
+    } else if (solved(cur, next)) { play('right'); setFlash(`${cur.word.word}! ✓`); }
+    else play('tap');
   };
 
   typeRef.current = type;
@@ -112,6 +159,12 @@ export function Crossword({ state, bank, date, who, onDone }: { state: State; ba
         <span className="num">{cur.num} {cur.dir}</span>
         <span className="txt">{cur.word.testDefinition}</span>
         <button type="button" onClick={() => moveTo(order[(order.indexOf(cur) + 1) % order.length])} aria-label="Next clue">›</button>
+      </div>
+      <div className="hint-row">
+        <button type="button" className="chip hint-btn" data-sound="own" disabled={hintWait > 0 || solved(cur)} onClick={hint}>
+          {hintWait > 0 ? `Hint in ${hintWait}s` : 'Hint: reveal a letter'}
+        </button>
+        {hints > 0 && <span className="tag">{hints} hint{hints === 1 ? '' : 's'} used</span>}
       </div>
       <div className="kb" role="group" aria-label="Keyboard">
         {ROWS.map(row => (

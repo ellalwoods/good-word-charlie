@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { BETS, choiceQuestion, FUSE_MAX, FUSE_START, fusePoints, fuseSource, seeded, type Bet, type Choice, type GameResult } from '../../lib/games';
 import { play } from '../../lib/sounds';
+import { useSaveOnLeave } from './useSaveOnLeave';
 import type { State, Word } from '../../lib/types';
 
 /**
@@ -8,29 +9,51 @@ import type { State, Word } from '../../lib/types';
  * right answers add fuse, wrong ones burn it (more for a bigger bet). Your own words first,
  * then the whole bank once you pass 200 points.
  */
-export function Fuse({ state, bank, onDone }: { state: State; bank: Word[]; onDone: (r: GameResult) => void }) {
+interface Saved {
+  fuse: number; score: number; answered: number; sparks: number; bet: Bet | null; beyond: boolean; seen: string[];
+  q: { w: string; kind: Choice['kind']; prompt: string; answer: string; options: string[] };
+}
+
+export function Fuse({ state, bank, onDone, saved, onSave }: {
+  state: State; bank: Word[]; onDone: (r: GameResult) => void; saved?: unknown; onSave: (data: unknown) => void;
+}) {
+  // A game left half-way picks up exactly where it was: same fuse, same question, same bet.
+  const was = saved as Saved | undefined;
   const rand = useRef(seeded(`fuse:${Date.now()}`)).current;
-  const [fuse, setFuse] = useState(FUSE_START);
-  const [score, setScore] = useState(0);
-  const [answered, setAnswered] = useState(0);
-  const sparks = useRef(0);   // ×3 bets won
-  const [bet, setBet] = useState<Bet | null>(null);
-  const [beyond, setBeyond] = useState(false);
+  const [fuse, setFuse] = useState(was?.fuse ?? FUSE_START);
+  const [score, setScore] = useState(was?.score ?? 0);
+  const [answered, setAnswered] = useState(was?.answered ?? 0);
+  const sparks = useRef(was?.sparks ?? 0);   // ×3 bets won
+  const [bet, setBet] = useState<Bet | null>(was?.bet ?? null);
+  const [beyond, setBeyond] = useState(was?.beyond ?? false);
   const [flash, setFlash] = useState('');
   const [picked, setPicked] = useState<string | null>(null);
-  const seen = useRef<string[]>([]);
+  const seen = useRef<string[]>(was?.seen ?? []);
   const newQ = (pts: number) => {
     const src = fuseSource(state, bank, pts);
     const q = choiceQuestion(src.words, bank, rand, undefined, seen.current.slice(-20));
     seen.current.push(q.word.word);
     return { q, beyond: src.beyond };
   };
-  const [q, setQ] = useState<Choice>(() => newQ(0).q);
+  const restore = (x: Saved['q']): Choice | null => {
+    const word = bank.find(w => w.word === x.w);
+    return word ? { word, kind: x.kind, prompt: x.prompt, answer: x.answer, options: x.options } : null;
+  };
+  const [q, setQ] = useState<Choice>(() => (was?.q && restore(was.q)) || newQ(was?.score ?? 0).q);
   const ended = useRef(false);
+  // The question after an answer is chosen straight away, so leaving mid-answer can't replay it.
+  const pending = useRef<{ q: Choice; beyond: boolean } | null>(null);
+  const pack = (c: Choice) => ({ w: c.word.word, kind: c.kind, prompt: c.prompt, answer: c.answer, options: c.options });
+  const snapshot = (): Saved => ({
+    fuse, score, answered, sparks: sparks.current, seen: seen.current.slice(-40),
+    bet: pending.current ? null : bet, beyond: pending.current?.beyond ?? beyond, q: pack(pending.current?.q ?? q),
+  });
+  useSaveOnLeave(snapshot, onSave, () => ended.current);
 
   // The fuse burns a tenth of a second at a time, paused only while an answer is being shown.
   useEffect(() => {
-    const t = setInterval(() => setFuse(f => (!picked ? f - 0.1 : f)), 100);
+    // It doesn't burn while the page is out of sight, either.
+    const t = setInterval(() => setFuse(f => (!picked && !document.hidden ? f - 0.1 : f)), 100);
     return () => clearInterval(t);
   }, [picked]);
 
@@ -60,8 +83,10 @@ export function Fuse({ state, bank, onDone }: { state: State; bank: Word[]; onDo
       play('wrong');
     }
     setAnswered(n => n + 1);
+    pending.current = newQ(next);
     setTimeout(() => {
-      const { q: nq, beyond: b } = newQ(next);
+      const { q: nq, beyond: b } = pending.current!;
+      pending.current = null;
       if (b && !beyond) { setFlash('Beyond your words now: anything in the bank can come up.'); play('levelup'); }
       setBeyond(b);
       setQ(nq); setBet(null); setPicked(null);
@@ -83,7 +108,7 @@ export function Fuse({ state, bank, onDone }: { state: State; bank: Word[]; onDo
           <p className="tag">How sure are you?</p>
           <div className="bets">
             {([1, 2, 3] as Bet[]).map(b => (
-              <button key={b} type="button" className={`bet bet-${b}`} onClick={() => setBet(b)}>
+              <button key={b} type="button" className={`bet bet-${b}`} onClick={() => { setBet(b); onSave({ ...snapshot(), bet: b }); }}>
                 {b === 1 ? 'Safe' : b === 2 ? 'Sure' : 'Certain'} ×{b}
                 <small>+{BETS[b].add}s / −{BETS[b].burn}s</small>
               </button>
