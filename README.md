@@ -44,6 +44,9 @@ Once today's practice is done, **Go to games** opens three once-a-day games, eac
 - **Good Wordle:** the same word for everyone (from the whole bank), its meaning as the clue, six guesses. Ranked by fewest guesses.
 - **The Fuse:** bet ×1, ×2 or ×3 on each question against a burning fuse. Your own words until 200 points, then the whole bank.
 - **Gravity:** meanings fall in three lanes; tap the word for the lowest card. Three lives. Speeds up quickly to level 5, then words go beyond your own and the pace drops back.
+- **Crossword** (unlocks at 30 learned words): a daily criss-cross of 6–7 of your own words, clued by their meanings. Fastest time wins. A test builds a year of puzzles ahead to check every day works.
+
+Each game opens behind a "Ready?" screen; it starts on Go.
 
 
 ## Practising

@@ -154,3 +154,39 @@ describe('personal bests and the games card', () => {
     expect(gamesHeadline(cards[0], 'Charlie')).toBe('Charlie reached level 6 in Gravity, a new best!');
   });
 });
+
+describe('Crossword', () => {
+  it('builds a working puzzle every day for a year, even from only 30 words', async () => {
+    const { buildCrossword, squares } = await import('./crossword');
+    for (const words of [bank.slice(0, 30), bank.slice(0, 120), bank.slice(380, 410)]) {
+      for (let d = 0; d < 365; d++) {
+        const date = new Date(Date.UTC(2026, 10, 1) + d * 864e5).toISOString().slice(0, 10);
+        const p = buildCrossword(words, `crossword:test:${date}`);
+        expect(p, date).not.toBeNull();
+        expect(p!.entries.length).toBeGreaterThanOrEqual(6);
+        expect(Math.max(p!.rows, p!.cols)).toBeLessThanOrEqual(11);
+        // Where words cross, they agree; and every square belongs to the grid.
+        const grid = new Map<string, string>();
+        for (const e of p!.entries) squares(e).forEach((sq, k) => {
+          if (grid.has(sq)) expect(grid.get(sq)).toBe(e.word.word[k]);
+          grid.set(sq, e.word.word[k]);
+          const [y, x] = sq.split(',').map(Number);
+          expect(y >= 0 && x >= 0 && y < p!.rows && x < p!.cols).toBe(true);
+        });
+        expect(new Set(p!.entries.map(e => e.word.word)).size).toBe(p!.entries.length);
+      }
+    }
+  });
+
+  it('is the same puzzle all day, and only opens at 30 words', async () => {
+    const { buildCrossword, crosswordUnlocked } = await import('./crossword');
+    const a = buildCrossword(bank.slice(0, 40), 'crossword:Ella:2026-11-05');
+    const b = buildCrossword(bank.slice(0, 40), 'crossword:Ella:2026-11-05');
+    expect(a!.entries.map(e => e.word.word)).toEqual(b!.entries.map(e => e.word.word));
+    let s = fresh();
+    for (let i = 0; i < 9; i++) s = ensureToday(s, bank, `2026-10-${String(10 + i).padStart(2, '0')}`);
+    expect(crosswordUnlocked(s, bank)).toBe(false);   // 27 words
+    s = ensureToday(s, bank, '2026-10-19');
+    expect(crosswordUnlocked(s, bank)).toBe(true);    // 30
+  });
+});

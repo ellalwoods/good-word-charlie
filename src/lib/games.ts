@@ -1,13 +1,13 @@
 import type { Friend } from './friends';
 import type { State, Word } from './types';
 
-export type GameId = 'wordle' | 'fuse' | 'gravity';
-export const GAME_IDS: GameId[] = ['wordle', 'fuse', 'gravity'];
+export type GameId = 'wordle' | 'fuse' | 'gravity' | 'crossword';
+export const GAME_IDS: GameId[] = ['wordle', 'fuse', 'gravity', 'crossword'];
 
 /** One go at a game. `score` is what the leaderboard ranks by. */
 export interface GameResult {
   at: number;        // when it was played
-  score: number;     // Good Wordle: guesses used (7 if not solved); The Fuse and Gravity: points
+  score: number;     // Good Wordle: guesses used (7 if not solved); Crossword: seconds; The Fuse and Gravity: points
   level?: number;    // Gravity: the level reached
   answered?: number; // The Fuse: questions answered
   grid?: string[];   // Good Wordle: each guess as colours only (g/y/x), never the letters
@@ -16,7 +16,7 @@ export interface GameResult {
 }
 
 /** Good Wordle ranks fewest guesses first; the others most points first. */
-export const lowWins = (g: GameId) => g === 'wordle';
+export const lowWins = (g: GameId) => g === 'wordle' || g === 'crossword';
 
 /** Today's result for a game, if it's been played (each game is once a day). */
 export const playedToday = (s: State, game: GameId, date: string): GameResult | undefined => s.games?.[date]?.[game];
@@ -32,7 +32,8 @@ export function resetGames(s: State, date: string): State {
 export function isPersonalBest(s: State, game: GameId, date: string, result: GameResult): boolean {
   const earlier = Object.entries(s.games ?? {}).filter(([d]) => d < date).map(([, g]) => g[game]).filter((r): r is GameResult => !!r);
   if (!earlier.length) return false;
-  if (lowWins(game)) return result.score <= 6 && earlier.every(r => result.score < r.score);
+  if (game === 'wordle') return result.score <= 6 && earlier.every(r => result.score < r.score);
+  if (lowWins(game)) return earlier.every(r => result.score < r.score);
   return earlier.every(r => result.score > r.score);
 }
 

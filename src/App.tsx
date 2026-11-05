@@ -12,7 +12,8 @@ import { cleanKey, Sync } from './lib/sync';
 import type { State, Word } from './lib/types';
 import { usable } from './lib/validate';
 import { Friends } from './views/Friends';
-import { Games } from './views/Games';
+import { Games, Unlocked } from './views/Games';
+import { crosswordUnlocked } from './lib/crossword';
 import { saveResult } from './lib/games';
 import { Lexicon } from './views/Lexicon';
 import { Practice } from './views/Practice';
@@ -202,7 +203,9 @@ export default function App() {
   // Only when this device doesn't know who you are: not while it's still fetching your account.
   const asking = settled && !welcoming && !asked && !name && snap.status !== 'off' && snap.status !== 'saving'
     && (friends !== null || friendsFailed);
-  const blocked = welcoming || install.open || asking;
+  // A new game opening up (the crossword at 30 words) gets its moment, once.
+  const unlocking = settled && !welcoming && !asking && !session && crosswordUnlocked(state, bank) && !state.unlocked?.crossword;
+  const blocked = welcoming || install.open || asking || unlocking;
 
   const heading = useMemo(() => longDate(new Date(`${date}T12:00`)), [date]);
 
@@ -285,6 +288,10 @@ export default function App() {
       {asking && (
         <WhoAreYou people={(friends ?? []).filter(f => !f.mine)} onClaim={async n => { await claim(n); doneAsking(); }}
           onAdd={async (n, c) => { await joinFriends(n, c); doneAsking(); }} onGuest={doneAsking} />
+      )}
+      {unlocking && !install.open && (
+        <Unlocked onPlay={() => { update({ ...latest(), unlocked: { crossword: Date.now() } }); go('games'); }}
+          onLater={() => update({ ...latest(), unlocked: { crossword: Date.now() } })} />
       )}
       {welcoming && <Welcome onDone={() => { setFlag(WELCOMED); setWelcomedHere(true); update({ ...state, welcomed: true }); }} />}
     </>

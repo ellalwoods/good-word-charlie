@@ -9,6 +9,10 @@ import { TextElla } from './TextElla';
 import { Fuse } from './games/Fuse';
 import { Gravity } from './games/Gravity';
 import { Wordle } from './games/Wordle';
+import { Crossword } from './games/Crossword';
+import { CROSSWORD_UNLOCK, learnedWords } from '../lib/crossword';
+import { Burst } from './Burst';
+import { play } from '../lib/sounds';
 
 interface Props {
   state: State;
@@ -29,10 +33,40 @@ const GAMES: { id: GameId; title: string; band: string; blurb: string }[] = [
     blurb: 'Answer as many questions as you can before the fuse burns out. Before each one, bet how sure you are: ×1, ×2 or ×3. A bigger bet wins more points if you’re right, but burns more fuse if you’re wrong. Right answers add a little time back. Questions use words from your Lexicon until you reach 200 points, then any word in the bank.' },
   { id: 'gravity', title: 'Gravity', band: 'c-violet',
     blurb: 'Definitions fall towards the ground. Match the right word to each definition before it lands. Levels 1 to 4 use only words from your Lexicon, and get faster quickly. At level 5 it slows down a little, but words can come from the whole word bank, including ones you haven’t met yet. If you let a definition land or match it incorrectly, you lose a life.' },
+  { id: 'crossword', title: 'Crossword', band: 'c-orange',
+    blurb: 'A criss-cross of your own words, new every day. The clues are their meanings. Fastest time wins.' },
 ];
 
+/** What to know before pressing Go. */
+const HOW: Record<GameId, string[]> = {
+  wordle: ['Guess the word in six tries. The clue is its meaning.', 'Green: right letter, right place. Yellow: in the word, wrong place.'],
+  fuse: ['Bet ×1, ×2 or ×3 before each question.', 'Right answers add time; wrong ones burn the fuse.', 'The fuse is lit the moment you press Go.'],
+  gravity: ['Tap the word that matches the lowest definition.', 'Let one land, or tap the wrong word, and you lose a life. You have three.'],
+  crossword: ['Tap a square, then type. Tap it again to switch between across and down.', 'The clock starts when you press Go.'],
+};
+
 const showScore = (game: GameId, r: GameResult) =>
-  game === 'wordle' ? `${r.score > 6 ? 'X' : r.score}/6` : game === 'gravity' ? `${r.score} pts · level ${r.level ?? 1}` : `${r.score} pts`;
+  game === 'crossword' ? `${Math.floor(r.score / 60)}:${String(r.score % 60).padStart(2, '0')}` : game === 'wordle' ? `${r.score > 6 ? 'X' : r.score}/6` : game === 'gravity' ? `${r.score} pts · level ${r.level ?? 1}` : `${r.score} pts`;
+
+/** The moment a new game opens up: shown once, over everything. */
+export function Unlocked({ onPlay, onLater }: { onPlay: () => void; onLater: () => void }) {
+  useEffect(() => { play('levelup'); }, []);
+  return (
+    <div className="welcome-overlay" role="dialog" aria-modal="true" aria-labelledby="unlock-title">
+      <article className="card game-card c-orange unlock-card">
+        <div className="band"><span>New game unlocked</span><span>{CROSSWORD_UNLOCK} words</span></div>
+        <div className="ruled">
+          <Burst className="burst-head" />
+          <p className="tag">You’ve learned {CROSSWORD_UNLOCK} words</p>
+          <h3 className="hw" id="unlock-title">Crossword unlocked!</h3>
+          <p className="sense">A criss-cross puzzle made of your own words, new every day. Find it on the Games tab.</p>
+          <button type="button" className="btn" onClick={onPlay}>Play it now</button>
+          <button type="button" className="btn btn-quiet ready-back" onClick={onLater}>Later</button>
+        </div>
+      </article>
+    </div>
+  );
+}
 
 /** "New game in 5 hours": time until midnight, when every game resets. Minutes in the last hour. */
 export function untilNext(now = new Date()): string {
@@ -78,7 +112,7 @@ function Symbol({ game }: { game: GameId }) {
 function YesterdaysWinners({ state, date, friends }: { state: State; date: string; friends: Friend[] | null }) {
   const yesterday = addDays(date, -1);
   const me = { name: state.name?.value ?? '', color: state.name?.color ?? null };
-  const winners = GAMES.map(g => ({ g, top: leaderboard(g.id, yesterday, friends ?? [], { ...me, result: playedToday(state, g.id, yesterday) })[0] }));
+  const winners = GAMES.filter(g => g.id !== 'crossword').map(g => ({ g, top: leaderboard(g.id, yesterday, friends ?? [], { ...me, result: playedToday(state, g.id, yesterday) })[0] }));
   if (!winners.some(w => w.top)) return null;
   return (
     <article className="card">
@@ -134,6 +168,11 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
   const [open, setOpen] = useState<GameId | null>(null);
   // Good Wordle shows the word and its meaning first; the leaderboard waits until they're ready.
   const [reveal, setReveal] = useState(false);
+  // Each game waits behind a "Ready?" screen until Go is pressed.
+  const [going, setGoing] = useState(false);
+  const learned = learnedWords(state, bank).length;
+  const isOpen = (id: GameId) => id !== 'crossword' || learned >= CROSSWORD_UNLOCK;
+  const openGame = (id: GameId) => { setOpen(id); setGoing(false); window.scrollTo(0, 0); };
 
   if (open) {
     const g = GAMES.find(x => x.id === open)!;
@@ -156,6 +195,25 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
             </article>
             <Board game={open} state={state} date={date} friends={friends} />
           </>
+        ) : !going ? (
+          <>
+            <article className={`card ${g.band} game-card fogged`} aria-hidden="true">
+              <div className="band"><span>{g.title}</span><span>Once a day</span></div>
+              <div className="ruled"><h3 className="hw">{g.title}</h3><p className="sense">{g.blurb}</p><div className="fog-block" /></div>
+            </article>
+            <div className="welcome-overlay" role="dialog" aria-modal="true" aria-labelledby="ready-title">
+              <article className={`card ${g.band} game-card ready-card`}>
+                <div className="band"><span>{g.title}</span><span>Once a day</span></div>
+                <div className="ruled">
+                  <p className="tag">Ready?</p>
+                  <h3 className="hw" id="ready-title">{g.title}</h3>
+                  <ul className="ready-how">{HOW[open].map(line => <li key={line}>{line}</li>)}</ul>
+                  <button type="button" className="btn ready-go" data-sound="own" onClick={() => { play('levelup'); setGoing(true); window.scrollTo(0, 0); }}>Go!</button>
+                  <button type="button" className="btn btn-quiet ready-back" onClick={() => setOpen(null)}>Not now</button>
+                </div>
+              </article>
+            </div>
+          </>
         ) : (
           <article className={`card ${g.band} game-card`}>
             <div className="band"><span>{g.title}</span><span>Once a day</span></div>
@@ -163,6 +221,7 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
               {open === 'wordle' && <Wordle bank={bank} date={date} onDone={finish} />}
               {open === 'fuse' && <Fuse state={state} bank={bank} onDone={finish} />}
               {open === 'gravity' && <Gravity state={state} bank={bank} onDone={finish} />}
+              {open === 'crossword' && <Crossword state={state} bank={bank} date={date} who={state.name?.value || 'me'} onDone={finish} />}
             </div>
           </article>
         )}
@@ -185,16 +244,30 @@ export function Games({ state, bank, date, friends, unlocked, onResult, onPracti
       )}
       {GAMES.map((g, i) => {
         const result = playedToday(state, g.id, date);
+        if (!isOpen(g.id)) {
+          return (
+            <article key={g.id} className="card game-card game-locked">
+              <div className="band"><span>Game {i + 1} of {GAMES.length}</span><span>Locked</span></div>
+              <div className="ruled">
+                <h3 className="hw">{g.title}</h3>
+                <p className="sense">A criss-cross of your own words, new every day. Unlocks once you’ve learned {CROSSWORD_UNLOCK} words.</p>
+                <div className="unlock-label"><span className="tag">Unlocks at {CROSSWORD_UNLOCK} words</span><span className="tag">You have {learned}</span></div>
+                <div className="unlock-bar" aria-label={`${learned} of ${CROSSWORD_UNLOCK} words`}><b style={{ width: `${(learned / CROSSWORD_UNLOCK) * 100}%` }} /></div>
+                <button type="button" className="btn" disabled>{CROSSWORD_UNLOCK - learned} word{CROSSWORD_UNLOCK - learned === 1 ? '' : 's'} to go</button>
+              </div>
+            </article>
+          );
+        }
         const top = leaderboard(g.id, date, friends ?? [], { name: state.name?.value ?? '', color: state.name?.color ?? null, result })[0];
         return (
           <article key={g.id} className={`card ${g.band} game-card${unlocked ? '' : ' locked'}`}>
-            <div className="band"><span>Game {i + 1} of 3</span><span>{result ? 'Played today ✓' : unlocked ? 'Ready' : 'Locked'}</span></div>
+            <div className="band"><span>Game {i + 1} of {GAMES.length}</span><span>{result ? 'Played today ✓' : unlocked ? 'Ready' : 'Locked'}</span></div>
             <div className="ruled">
               <h3 className="hw">{g.title}</h3>
               <p className="sense">{g.blurb}</p>
               {top && <p className="tag game-top">Today’s #1: {top.mine ? 'You' : top.name} · {showScore(g.id, top.result)}</p>}
               <button type="button" className={`btn${result ? ' btn-quiet' : ''}`} disabled={!unlocked}
-                onClick={() => { setOpen(g.id); window.scrollTo(0, 0); }}>
+                onClick={() => openGame(g.id)}>
                 {!unlocked ? 'Locked' : result ? 'See leaderboard' : 'Play'}
               </button>
             </div>

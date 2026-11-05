@@ -40,6 +40,7 @@ export function merge(a: State, b: State): State {
   const name = latestOf(a.name, b.name);
   if (name) out.name = name;
   if (a.welcomed || b.welcomed) out.welcomed = true;
+  if (a.unlocked?.crossword || b.unlocked?.crossword) out.unlocked = { crossword: Math.max(a.unlocked?.crossword ?? 0, b.unlocked?.crossword ?? 0) };
   // A reset (for testing) wipes that day's results from before it, on every device.
   const gamesReset: Record<string, number> = {};
   for (const d of keys(a.gamesReset ?? {}, b.gamesReset ?? {})) gamesReset[d] = Math.max(a.gamesReset?.[d] ?? 0, b.gamesReset?.[d] ?? 0);
@@ -50,7 +51,7 @@ export function merge(a: State, b: State): State {
     const x = a.games?.[d] ?? {}, y = b.games?.[d] ?? {};
     const live = <T extends { at: number },>(r: T | undefined) => (r && r.at > (gamesReset[d] ?? 0) ? r : undefined);
     const day: NonNullable<State['games']>[string] = {};
-    for (const g of keys(x, y) as ('wordle' | 'fuse' | 'gravity')[]) {
+    for (const g of keys(x, y) as ('wordle' | 'fuse' | 'gravity' | 'crossword')[]) {
       const p = live(x[g]), q = live(y[g]);
       const pick = !p || !q ? (p ?? q) : p.at !== q.at ? (p.at < q.at ? p : q) : (p.score >= q.score ? p : q);
       if (pick) day[g] = pick;

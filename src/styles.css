@@ -978,3 +978,45 @@ ol.welcome-list { padding-left: 1.3em; }
 .win .wname { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 0.9rem/1.1 var(--sans); }
 .win .wscore { font: 700 0.6rem/1.2 var(--mono); }
 .win.mine .wname { align-self: flex-start; padding: 0 4px; background: var(--yellow); }
+
+/* ---------- Ready? Go! ---------- */
+
+.fogged { filter: blur(3px); opacity: 0.6; pointer-events: none; }
+.fog-block { height: 220px; margin-top: 10px; border: 2px dashed var(--ink); opacity: 0.4; }
+.ready-card, .unlock-card { width: 100%; max-width: 26rem; animation: pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+.ready-card .hw, .unlock-card .hw { margin: 2px 0 8px; font-size: 2.4rem; }
+.unlock-card .ruled { position: relative; overflow: hidden; text-align: center; }
+.ready-how { margin: 0 0 16px; padding-left: 1.1em; }
+.ready-how li { margin-bottom: 4px; }
+.ready-go { font-size: 1.5rem; padding-block: 16px; background: var(--right); }
+.ready-back { margin-top: 10px; }
+
+/* ---------- Crossword ---------- */
+
+.game-locked { --band: #cfcabd; --band-ink: var(--ink); }
+.unlock-label { display: flex; justify-content: space-between; gap: 8px; }
+.unlock-bar { position: relative; height: 14px; margin: 4px 0 12px; border: var(--line); background: var(--card); }
+.unlock-bar b { position: absolute; inset: 0 auto 0 0; background: repeating-linear-gradient(45deg, #ff7a1a 0 6px, var(--yellow) 6px 12px); }
+.xgrid { display: grid; width: fit-content; margin: 0 auto 12px; }
+.xcell { position: relative; width: var(--cs); height: var(--cs); }
+.xcell.on {
+  appearance: none; display: grid; place-items: center; margin: -0.75px; padding: 0;
+  border: 1.5px solid var(--ink); background: var(--card); color: var(--ink); cursor: pointer;
+  font: 700 calc(var(--cs) * 0.5)/1 var(--mono); text-transform: uppercase;
+}
+.xcell .n { position: absolute; top: 1px; left: 2px; font: 700 calc(var(--cs) * 0.26)/1 var(--mono); }
+.xcell.word { background: #dce9fb; }
+.xcell.good { background: var(--right); }
+.xcell.sel { background: var(--yellow); }
+.cluebar { display: flex; align-items: center; gap: 10px; min-height: 56px; margin-bottom: 10px; padding: 8px 10px; border: var(--line); background: var(--card); box-shadow: 3px 3px 0 var(--ink); }
+.cluebar .num { font: 700 0.75rem/1 var(--mono); white-space: nowrap; }
+.cluebar .txt { flex: 1; font: italic 400 1.15rem/1.2 var(--serif); }
+.cluebar button { appearance: none; flex: none; width: 32px; height: 32px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; font: 700 0.9rem/1 var(--mono); }
+.clues { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.clues ol { margin: 4px 0 0; padding: 0; list-style: none; }
+.clues li button { appearance: none; display: flex; gap: 6px; width: 100%; padding: 3px 0; border: 0; border-bottom: 1px dotted var(--rule); background: none; color: var(--ink); text-align: left; cursor: pointer; font: 400 0.9rem/1.25 var(--sans); }
+.clues li b { font: 700 0.7rem/1.6 var(--mono); }
+.clues li.cur button { background: var(--yellow); }
+.clues li.done button { opacity: 0.45; text-decoration: line-through; }
+@media (max-width: 380px) { .clues { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .ready-card, .unlock-card { animation: none; } }
