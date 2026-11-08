@@ -106,10 +106,14 @@ export const WORDLE_TRIES = 6;
 /** Words that can be the answer: plain letters, 5 or 6 long (shorter words make a fairer puzzle). */
 export const wordleWords = (bank: Word[]) => bank.filter(w => /^[a-z]{5,6}$/.test(w.word));
 
+/** Days whose word was picked before the bank changed, kept so a day never switches word part-way through. */
+const WORDLE_PINNED: Record<string, string> = { '2026-11-08': 'logjam' };
+
 /** Today's word: the same for everyone, from the whole bank. */
 export function dailyWordle(bank: Word[], date: string): Word {
   const pool = wordleWords(bank);
-  return pool[hash(`wordle:${date}`) % pool.length];
+  const pinned = pool.find(w => w.word === WORDLE_PINNED[date]);
+  return pinned ?? pool[hash(`wordle:${date}`) % pool.length];
 }
 
 /** Colours for a guess: g (right place), y (in the word, wrong place), x (not in it). Repeated letters count properly. */
