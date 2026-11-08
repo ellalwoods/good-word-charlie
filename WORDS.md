@@ -7,6 +7,13 @@ Avoid:
 - words that sound comic or fusty (bumptious, gimcrack)
 - long, showy words for simple ideas (perspicacious, pellucid)
 - words an educated adult already uses daily (tacit, salient, glib)
+- everyday news and office words with one plain meaning (rectify, thwart, gruelling, innocuous, precarious, mitigate)
+- words you can guess from a common word inside them (plodding, underhand, placatory, painstaking, far-fetched)
+- words people know from one famous phrase (pyrrhic victory, herculean task, heyday)
+
+**Prefer borrowed words.** The best words have a second life: a literal meaning from another field (medicine, chemistry, cooking, sailing, music, the church, farming, war) that is used figuratively, such as febrile, moribund, oleaginous, saccharine, emollient, doldrums, crucible, leaven, etiolated or sinecure. Put the borrowed picture in the card definition ("…like a sailing ship when the wind drops") so the word sticks.
+
+This came from the words Ella marked "Already know it": almost all of them were plain, everyday or guessable words with no second meaning, while the ones she learned and liked were mostly borrowed. The commonplace words that were still unseen were replaced in November 2026 and added to `rejected.json`.
 
 **Approved (positive examples):** farcical, paucity, modicum, glut, risible, specious, spurious, jejune, otiose, perfunctory, desultory, tawdry, nascent, querulous, febrile, oleaginous (of a person), facile, tendentious, nugatory, meretricious, turgid, fatuous, anodyne, inchoate, moribund, peremptory, ersatz, pyrrhic
 
